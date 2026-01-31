@@ -5,6 +5,9 @@
     "type": "module",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
+    "bin": {
+        "idumb": "./bin/cli.js"
+    },
     "exports": {
         ".": {
             "import": "./dist/index.js",
@@ -13,11 +16,11 @@
     },
     "files": [
         "dist",
-        "contexts",
-        "README.md"
+        "bin",
+        "templates"
     ],
     "scripts": {
-        "build": "bun build src/index.ts --outdir dist --target node",
+        "build": "bun build src/index.ts --outdir dist --target node && bun build src/cli.ts --outdir bin --target node && mv bin/cli.js bin/cli.js.tmp && echo '#!/usr/bin/env node' > bin/cli.js && cat bin/cli.js.tmp >> bin/cli.js && rm bin/cli.js.tmp",
         "dev": "bun --watch src/index.ts",
         "typecheck": "tsc --noEmit",
         "prepublishOnly": "bun run build"

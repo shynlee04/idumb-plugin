@@ -2,270 +2,97 @@
 
 > 🧠 **iDumb Meta-Framework Plugin** - Context manipulation, governance enforcement, and agent orchestration for OpenCode
 
-[![npm version](https://img.shields.io/npm/v/@idumb/opencode-plugin.svg)](https://www.npmjs.com/package/@idumb/opencode-plugin)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-
-## What is iDumb?
-
-iDumb is a meta-framework plugin that enhances OpenCode with:
-
-- **🎯 Zero-Turn Agent Priming** - Inject governance context before first response
-- **🔒 SACRED Turn-1 Anchoring** - Preserve original intent through compaction
-- **🎨 Agent-Specific Context** - Load role-based instructions per agent
-- **🔗 Delegation Interception** - Inject context into child agent sessions
-- **✅ Completion Validation** - Enforce verification before task completion
-- **📊 State Persistence** - Track sessions, anchors, and context across restarts
-
 ## Installation
 
-### Option 1: From npm (when published)
-
 ```bash
+# Install the plugin
 npm install @idumb/opencode-plugin
-# or
+
+# Initialize in your project
+npx @idumb/opencode-plugin init
+
+# Or with pnpm
 pnpm add @idumb/opencode-plugin
-# or
-bun add @idumb/opencode-plugin
+pnpm dlx @idumb/opencode-plugin init
 ```
 
-Then add to your OpenCode config:
+## Activation
 
-```yaml
-# .opencode/config.yaml
-plugins:
-  - "@idumb/opencode-plugin"
+Add to your project's `opencode.json`:
+
+```json
+{
+  "$schema": "https://opencode.ai/config.json",
+  "plugin": ["@idumb/opencode-plugin"]
+}
 ```
 
-### Option 2: Local installation
+## What Gets Created
 
-```bash
-# Clone and install
-git clone https://github.com/shynlee04/idumb-plugin.git
-cd idumb-plugin
-bun install
-bun run build
-
-# Add to your project's .opencode/plugins/
-cp -r dist/* /path/to/your/project/.opencode/plugins/
-```
-
-### Option 3: Direct from GitHub
-
-```yaml
-# .opencode/config.yaml
-plugins:
-  - "github:shynlee04/idumb-plugin"
-```
-
-## Quick Start
-
-### 1. Initialize iDumb in your project
-
-```bash
-# Create the .idumb directory structure
-mkdir -p .idumb/contexts
-```
-
-### 2. Create agent context files (optional)
-
-```markdown
-<!-- .idumb/contexts/dev.md -->
-# Developer Agent Context
-
-## Role
-You are a Developer Agent focused on implementation.
-
-## Mandatory Behaviors
-- Run tests before claiming completion
-- Follow existing patterns
-- Stay in scope
-```
-
-### 3. The plugin auto-activates
-
-When you start OpenCode in your project, iDumb will:
-1. Load on plugin initialization
-2. Listen for session events
-3. Inject governance context on session creation
-4. Provide custom tools to agents
-
-## Custom Tools Available to Agents
-
-### `idumb_init`
-
-**MANDATORY first call** for agents to receive their context.
+Running `init` creates in YOUR project:
 
 ```
-Agent must call: idumb_init
-Returns: Governance rules, current state, active anchors
-```
-
-### `idumb_complete`
-
-**MANDATORY before claiming completion** - records outcomes.
-
-```typescript
-idumb_complete({
-  summary: "What was accomplished",
-  artifacts: ["file1.ts", "file2.ts"],
-  verified: true  // Must be true to complete
-})
-```
-
-### `idumb_anchor`
-
-Save critical context that survives compaction.
-
-```typescript
-idumb_anchor({
-  intent: "The user's original goal was to...",
-  priority: "critical"  // critical | important | normal
-})
+your-project/
+├── .idumb/
+│   ├── state.json              # Session state (gitignored)
+│   ├── config.example.yaml     # Configuration template
+│   └── contexts/               # Agent-specific context files
+│       ├── supreme-coordinator.md
+│       └── dev.md
+└── opencode.json               # (you add the plugin here)
 ```
 
 ## How It Works
 
-### Session Lifecycle
+The plugin loads in YOUR project directory and:
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                     SESSION CREATED                          │
-│  • Detect agent from title                                   │
-│  • Initialize session state                                  │
-│  • Inject governance via session.prompt({ system: ... })     │
-└─────────────────────────────────────────────────────────────┘
-                              │
-                              ▼
-┌─────────────────────────────────────────────────────────────┐
-│                    FIRST USER MESSAGE                        │
-│  • Capture Turn-1 intent                                     │
-│  • Auto-save as SACRED anchor                                │
-└─────────────────────────────────────────────────────────────┘
-                              │
-                              ▼
-┌─────────────────────────────────────────────────────────────┐
-│                     DURING SESSION                           │
-│  • Agent calls idumb_init (gets context)                     │
-│  • Agent calls idumb_anchor (saves critical info)            │
-│  • Delegation → tool.execute.before injects context          │
-└─────────────────────────────────────────────────────────────┘
-                              │
-                              ▼
-┌─────────────────────────────────────────────────────────────┐
-│                      ON COMPACTION                           │
-│  • Inject Turn-1 intent as SACRED anchor                     │
-│  • Include parent context if delegated session               │
-│  • Add user-saved anchors                                    │
-│  • Add governance reminder                                   │
-└─────────────────────────────────────────────────────────────┘
-                              │
-                              ▼
-┌─────────────────────────────────────────────────────────────┐
-│                     ON COMPLETION                            │
-│  • Agent calls idumb_complete                                │
-│  • Validates verified: true                                  │
-│  • Records outcome in state                                  │
-└─────────────────────────────────────────────────────────────┘
+1. **On Session Start** → Detects agent from session title, injects governance context
+2. **On First Message** → Captures "Turn-1 Intent" as SACRED anchor
+3. **On Delegation** → Injects parent context into child agent prompts
+4. **On Compaction** → Preserves original intent and anchors through summarization
+
+## Custom Tools Available
+
+### `idumb_init`
+**Agent must call first** to receive governance context.
+
+### `idumb_complete`
+**Agent must call before completion** to record outcome.
+
+### `idumb_anchor`
+Save critical context that survives session compaction.
+
+## Customization
+
+### Add Agent Contexts
+
+Create `.idumb/contexts/<agent-name>.md` for each agent:
+
+```markdown
+<!-- .idumb/contexts/architect.md -->
+# Architect Agent Context
+
+## Role
+You are an Architecture Specialist.
+
+## Mandatory Behaviors
+- Review PRD before making decisions
+- Document ADRs for significant choices
 ```
 
-### Delegation Interception
+The filename (without `.md`) is matched against the agent name detected in sessions.
 
-When an agent delegates via `task` tool, iDumb:
+## Environment Variables
 
-1. Intercepts `tool.execute.before`
-2. Injects parent context + governance rules
-3. Modifies the prompt with:
-   - Parent's original intent
-   - Delegation rules
-   - Required tool calls
+- `IDUMB_DEBUG=true` - Enable verbose logging
 
-## Configuration
+## How Plugin Discovers Your Project
 
-### State File Structure
+When OpenCode loads the plugin, it receives:
+- `ctx.directory` - Your project's working directory
 
-```json
-// .idumb/state.json
-{
-  "version": "0.1.0",
-  "initialized": true,
-  "sessions": {
-    "session-123": {
-      "id": "session-123",
-      "agent": "dev",
-      "parentId": null,
-      "turnOneIntent": "Create a login form...",
-      "createdAt": "2026-02-01T...",
-      "contextInjected": true
-    }
-  },
-  "anchors": [
-    {
-      "sessionId": "session-123",
-      "intent": "Original user goal...",
-      "timestamp": "2026-02-01T...",
-      "preserved": true
-    }
-  ]
-}
-```
-
-### Agent Context Files
-
-Place `.md` files in `.idumb/contexts/`:
-
-- `supreme-coordinator.md` - Top-level orchestrator context
-- `dev.md` - Developer agent context
-- `architect.md` - Architecture agent context
-- `reviewer.md` - Code review agent context
-
-Files are named by agent slug (lowercase).
-
-## Debugging
-
-Enable debug mode by setting in the plugin:
-
-```typescript
-const CONFIG = {
-  DEBUG: true,  // Set to true for verbose logging
-}
-```
-
-Logs appear with `[iDumb]` prefix in OpenCode output.
-
-## API Reference
-
-### Events Handled
-
-| Event | Purpose |
-|-------|---------|
-| `session.created` | Initialize session, inject governance |
-| `session.updated` | Capture Turn-1 intent |
-| `tool.execute.before` | Intercept delegations, inject context |
-| `tool.execute.after` | Track delegation results |
-| `experimental.session.compacting` | Inject SACRED anchors |
-| `permission.asked` | Optional auto-approval rules |
-
-### Hooks Provided
-
-| Hook | Capability |
-|------|------------|
-| Custom Tools | `idumb_init`, `idumb_complete`, `idumb_anchor` |
-| System Prompt | Via `session.prompt({ system: ... })` |
-| Task Args | Modified via `output.args` in `tool.execute.before` |
-| Compaction Context | Via `output.context.push()` |
-
-## Contributing
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+The plugin then looks for `.idumb/` in that directory. If not found, it stays inactive.
 
 ## License
 
-MIT © [shynlee04](https://github.com/shynlee04)
-
----
-
-**Built for the [OpenCode](https://opencode.ai) ecosystem** 🚀
+MIT
