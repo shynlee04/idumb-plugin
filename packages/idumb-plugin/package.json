@@ -1,0 +1,64 @@
+{
+    "name": "@idumb/opencode-plugin",
+    "version": "0.1.0",
+    "description": "iDumb Meta-Framework Plugin for OpenCode - Context manipulation, governance enforcement, and agent orchestration",
+    "type": "module",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "exports": {
+        ".": {
+            "import": "./dist/index.js",
+            "types": "./dist/index.d.ts"
+        }
+    },
+    "files": [
+        "dist",
+        "contexts",
+        "README.md"
+    ],
+    "scripts": {
+        "build": "bun build src/index.ts --outdir dist --target node",
+        "dev": "bun --watch src/index.ts",
+        "typecheck": "tsc --noEmit",
+        "prepublishOnly": "bun run build"
+    },
+    "keywords": [
+        "opencode",
+        "plugin",
+        "ai",
+        "agent",
+        "meta-framework",
+        "context-management",
+        "governance",
+        "bmad",
+        "orchestration"
+    ],
+    "author": "shynlee04",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/shynlee04/idumb-plugin.git"
+    },
+    "bugs": {
+        "url": "https://github.com/shynlee04/idumb-plugin/issues"
+    },
+    "homepage": "https://github.com/shynlee04/idumb-plugin#readme",
+    "dependencies": {
+        "@opencode-ai/plugin": "^0.1.0"
+    },
+    "devDependencies": {
+        "@types/node": "^20.0.0",
+        "typescript": "^5.0.0",
+        "bun-types": "latest"
+    },
+    "peerDependencies": {
+        "@opencode-ai/plugin": ">=0.1.0"
+    },
+    "engines": {
+        "node": ">=18.0.0",
+        "bun": ">=1.0.0"
+    },
+    "publishConfig": {
+        "access": "public"
+    }
+}
