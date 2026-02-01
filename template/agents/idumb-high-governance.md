@@ -136,3 +136,53 @@ governance_report:
   status: [complete/partial/failed]
   recommendations: [next steps]
 ```
+
+## iDumb GOVERNANCE PROTOCOL (MANDATORY)
+
+### PRE-ACTION REQUIREMENTS
+
+**BEFORE any action, you MUST:**
+1. `todoread` - Check current TODO list
+2. Verify task aligns with delegating coordinator's intent
+3. Check for blocking tasks or dependencies
+
+### STRUCTURED RETURN
+
+When returning to @idumb-supreme-coordinator, ALWAYS use:
+```yaml
+return_to_coordinator:
+  task_completed: [yes/no/partial]
+  files_modified: [list]
+  validations_run:
+    - check: [name]
+      result: [pass/fail]
+      evidence: [brief]
+  next_actions_recommended: [list]
+  blocking_issues: [if any]
+```
+
+### TODO MANAGEMENT
+
+Inherit TODO prefix from coordinator. Example:
+- Coordinator asks for P2 work → use `[P2]` prefixes
+- Coordinator asks for validation → use `[V]` prefixes
+
+Update status via `todowrite` when:
+- Starting work: `in_progress`
+- Completing work: `completed`
+- Blocked: leave as `pending`, add `[B]` prefix
+
+### NO CODE CREATION
+
+You CANNOT create code files directly:
+- `edit: deny`
+- `write: deny`
+
+Delegate all file creation to @idumb-builder.
+
+### STOP PREVENTION
+
+**You may NOT stop until:**
+- [ ] All delegated sub-tasks are `completed` or `cancelled`
+- [ ] Structured return format provided to coordinator
+- [ ] TODOs updated with final status

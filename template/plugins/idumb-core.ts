@@ -109,6 +109,72 @@ function addHistoryEntry(directory: string, action: string, agent: string, resul
 }
 
 // ============================================================================
+// SESSION METADATA STORAGE (Phase 3)
+// ============================================================================
+
+interface SessionMetadata {
+  sessionId: string
+  createdAt: string
+  lastUpdated: string
+  phase: string
+  governanceLevel: string
+  delegationDepth: number
+  parentSession: string | null
+}
+
+function getSessionsDir(directory: string): string {
+  return join(directory, ".idumb", "sessions")
+}
+
+function storeSessionMetadata(directory: string, sessionId: string): void {
+  const sessionsDir = getSessionsDir(directory)
+  if (!existsSync(sessionsDir)) {
+    mkdirSync(sessionsDir, { recursive: true })
+  }
+  
+  const metadataPath = join(sessionsDir, `${sessionId}.json`)
+  
+  // Check if metadata already exists
+  if (existsSync(metadataPath)) {
+    // Update lastUpdated only
+    try {
+      const existing = JSON.parse(readFileSync(metadataPath, "utf8")) as SessionMetadata
+      existing.lastUpdated = new Date().toISOString()
+      writeFileSync(metadataPath, JSON.stringify(existing, null, 2))
+    } catch {
+      // Ignore parse errors
+    }
+    return
+  }
+  
+  // Create new metadata
+  const state = readState(directory)
+  const metadata: SessionMetadata = {
+    sessionId,
+    createdAt: new Date().toISOString(),
+    lastUpdated: new Date().toISOString(),
+    phase: state?.phase || "init",
+    governanceLevel: "standard",
+    delegationDepth: 0,
+    parentSession: null,
+  }
+  
+  writeFileSync(metadataPath, JSON.stringify(metadata, null, 2))
+}
+
+function loadSessionMetadata(directory: string, sessionId: string): SessionMetadata | null {
+  const metadataPath = join(getSessionsDir(directory), `${sessionId}.json`)
+  if (!existsSync(metadataPath)) {
+    return null
+  }
+  try {
+    return JSON.parse(readFileSync(metadataPath, "utf8")) as SessionMetadata
+  } catch {
+    return null
+  }
+}
+
+// ============================================================================
 // CONTEXT INJECTION
 // ============================================================================
 
@@ -357,7 +423,8 @@ export const IdumbCorePlugin: Plugin = async ({ directory, client }) => {
       try {
         // Session created - initialize or load state
         if (event.type === "session.created") {
-          log(directory, `Session created: ${event.properties?.info?.id || event.properties?.sessionID || "unknown"}`)
+          const sessionId = event.properties?.info?.id || event.properties?.sessionID || "unknown"
+          log(directory, `Session created: ${sessionId}`)
           
           const state = readState(directory)
           if (state) {
@@ -367,6 +434,9 @@ export const IdumbCorePlugin: Plugin = async ({ directory, client }) => {
           } else {
             log(directory, "No state found - run /idumb:init")
           }
+          
+          // Store session metadata for tracking (Phase 3)
+          storeSessionMetadata(directory, sessionId as string)
         }
         
         // Session idle - checkpoint opportunity
@@ -383,6 +453,15 @@ export const IdumbCorePlugin: Plugin = async ({ directory, client }) => {
           
           // Re-sync with GSD after compaction
           syncWithGSD(directory)
+        }
+        
+        // TODO updated - sync with governance state (Phase 3)
+        if (event.type === "todo.updated") {
+          const sessionId = event.properties?.sessionID
+          log(directory, `TODOs updated in session: ${sessionId}`)
+          
+          // Could sync TODO state to .idumb/brain/state.json here
+          // For now, just log the event
         }
       } catch (error) {
         // Silent fail with logging - never break OpenCode
@@ -514,6 +593,73 @@ export const IdumbCorePlugin: Plugin = async ({ directory, client }) => {
     
     // Note: Commands are intercepted via command.executed event
     // We log command execution for governance tracking
+    
+    // ========================================================================
+    // STOP HOOK - TODO ENFORCEMENT (Phase 3)
+    // ========================================================================
+    
+    stop: async (input: { sessionID?: string; session_id?: string }) => {
+      // FALLBACK STRATEGY (Line 232): All hooks wrapped in try/catch
+      try {
+        const sessionId = input.sessionID || input.session_id
+        if (!sessionId) {
+          log(directory, "[STOP] No session ID available")
+          return
+        }
+        
+        log(directory, `[STOP] Session stop triggered: ${sessionId}`)
+        
+        // Fetch current TODOs via SDK
+        const response = await client.session.todo({ path: { id: sessionId } })
+        const todos = response.data || []
+        
+        // Find incomplete tasks
+        const incomplete = todos.filter((t: any) => 
+          t.status === "pending" || t.status === "in_progress"
+        )
+        
+        if (incomplete.length > 0) {
+          log(directory, `[STOP] Found ${incomplete.length} incomplete TODOs - prompting continuation`)
+          
+          // Build governance reminder
+          const todoList = incomplete
+            .map((t: any) => `- [${t.priority?.toUpperCase() || "MEDIUM"}] ${t.content}`)
+            .join("\n")
+          
+          // Prompt agent to continue
+          await client.session.prompt({
+            path: { id: sessionId },
+            body: {
+              parts: [{
+                type: "text",
+                text: `## [iDumb Governance] Incomplete Tasks Detected
+
+You have **${incomplete.length}** incomplete task(s) that must be addressed before stopping:
+
+${todoList}
+
+**Required Actions:**
+1. Complete each pending task, OR
+2. Mark tasks as \`cancelled\` with a reason if they cannot be completed
+3. Update the TODO list using \`todowrite\`
+
+Do NOT stop until all tasks are either \`completed\` or \`cancelled\`.`
+              }]
+            }
+          })
+          
+          log(directory, "[STOP] Continuation prompt sent")
+        } else {
+          log(directory, "[STOP] All TODOs complete - allowing stop")
+          
+          // Record successful completion in history
+          addHistoryEntry(directory, "session:stop:clean", "plugin", "pass")
+        }
+      } catch (error) {
+        // Silent fail with logging - never block OpenCode stop
+        log(directory, `[ERROR] stop hook failed: ${error instanceof Error ? error.message : String(error)}`)
+      }
+    },
   }
 }
 
