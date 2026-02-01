@@ -1,106 +1,191 @@
-# iDumb - OpenCode Meta-Framework
+# iDumb - Meta-Framework for OpenCode + GSD
 
-> 🧠 Context manipulation, governance enforcement, and agent orchestration for OpenCode
+> Hierarchical governance, context anchoring, and expert-skeptic validation for OpenCode
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![OpenCode](https://img.shields.io/badge/OpenCode-Compatible-blue)](https://opencode.ai)
 
-## What's Inside
+## What is iDumb?
 
-This monorepo contains:
+iDumb wraps your existing AI development workflow (GSD, BMAD, or custom) with:
 
-| Package | Description | Status |
-|---------|-------------|--------|
-| [`@idumb/opencode-plugin`](./packages/idumb-plugin) | Core OpenCode plugin | ✅ Prototype |
-| `@idumb/cli` | CLI for project initialization | 🚧 Planned |
-| `@idumb/bmad-wrapper` | BMAD framework wrapper | 🚧 Planned |
+- **Hierarchical Agent Governance** - Coordinator → Governors → Validators
+- **Context Anchoring** - Critical decisions survive context compaction
+- **Expert-Skeptic Mode** - Never trust, always verify with evidence
+- **Invisible GSD Integration** - `/gsd:*` commands work normally, iDumb intercepts via hooks
 
 ## Quick Install
 
+### From GitHub (Recommended)
+
 ```bash
-# Install the plugin in your project
-npm install @idumb/opencode-plugin
-# or
-pnpm add @idumb/opencode-plugin
-# or from GitHub
-npx github:shynlee04/idumb-plugin init
+# Interactive installation
+npx github:shynlee04/idumb
+
+# Or with flags
+npx github:shynlee04/idumb --local   # Current project only
+npx github:shynlee04/idumb --global  # All projects (~/.config/opencode/)
 ```
 
-## Core Features
+### From Source
 
-### 🎯 Zero-Turn Agent Priming
-Inject governance context before the agent's first response.
+```bash
+git clone https://github.com/shynlee04/idumb.git
+cd idumb
+node bin/install.js --local
+```
 
-### 🔒 SACRED Turn-1 Anchoring
-Preserve original user intent through session compaction.
+## After Installation
 
-### 🎨 Agent-Specific Context
-Load role-based instructions per agent type.
+1. **Restart OpenCode** to load new agents/commands
+2. Run `/idumb:init` to initialize governance
+3. Run `/idumb:help` for all commands
 
-### 🔗 Delegation Interception
-Automatically inject context into child agent sessions.
+## Commands
 
-### ✅ Completion Validation
-Enforce verification before task completion claims.
+| Command | Description |
+|---------|-------------|
+| `/idumb:init` | Initialize governance for this project |
+| `/idumb:status` | Show current governance state |
+| `/idumb:validate` | Run full validation hierarchy |
+| `/idumb:help` | Show all commands |
 
-### 📊 State Persistence
-Track sessions, anchors, and context across restarts.
+## Agent Hierarchy
 
-## Wrapped Frameworks
+```
+@idumb-supreme-coordinator (primary)
+  └─→ @idumb-high-governance (all)
+        ├─→ @idumb-low-validator (hidden subagent)
+        └─→ @idumb-builder (hidden subagent)
+```
 
-iDumb acts as a wrapper/enhancer for:
+**How it works:**
+- **Supreme Coordinator** - NEVER executes directly, ONLY delegates
+- **High Governance** - Mid-level coordination, further delegates
+- **Low Validator** - Does actual validation (grep, glob, tests)
+- **Builder** - Does actual file operations
 
-- **BMAD** - Full software development lifecycle
-- **Speckit** - Specification-driven development (planned)
-- **GSD** - Get Sh*t Done methodology (planned)
+## GSD Integration
 
-## Documentation
+iDumb wraps GSD transparently:
 
-- [Plugin README](./packages/idumb-plugin/README.md) - Installation & usage
-- [Research Findings](./_bmad-output/planning-artifacts/research/) - Technical research
+- `/gsd:*` commands work normally
+- iDumb intercepts via plugin hooks
+- Validation runs automatically after GSD operations
+- State tracked separately in `.idumb/` (not `.planning/`)
+
+## Files Created
+
+```
+.opencode/
+├── agents/
+│   ├── idumb-supreme-coordinator.md
+│   ├── idumb-high-governance.md
+│   ├── idumb-low-validator.md
+│   └── idumb-builder.md
+├── commands/idumb/
+│   ├── init.md
+│   ├── status.md
+│   ├── validate.md
+│   └── help.md
+├── tools/
+│   ├── idumb-state.ts
+│   ├── idumb-validate.ts
+│   └── idumb-context.ts
+├── plugins/
+│   └── idumb-core.ts
+└── skills/idumb-governance/
+    └── SKILL.md
+
+.idumb/                    # Created in your project
+├── brain/
+│   └── state.json         # Governance state
+└── governance/
+    └── plugin.log         # Plugin activity log
+```
+
+## Core Concepts
+
+### Context Anchoring
+
+Critical decisions are anchored to survive context compaction:
+
+```yaml
+anchor:
+  type: decision
+  content: "Using PostgreSQL because of JSONB requirements"
+  priority: critical
+```
+
+### Expert-Skeptic Mode
+
+**NEVER assume. ALWAYS verify.**
+
+- Don't trust files are current - check timestamps
+- Don't trust state is consistent - validate structure
+- Don't trust context survives compaction - anchor critical decisions
+
+### Hierarchical Delegation
+
+Coordinators delegate to governors, governors delegate to validators/builders.
+Each layer adds context and validates results.
+
+## Uninstall
+
+```bash
+npx github:shynlee04/idumb --uninstall
+# Or manually remove files from .opencode/
+```
+
+Note: `.idumb/` directory is preserved (contains state).
 
 ## Development
 
 ```bash
-# Clone the repo
-git clone https://github.com/shynlee04/idumb-plugin.git
-cd idumb-plugin
+git clone https://github.com/shynlee04/idumb.git
+cd idumb
 
-# Install dependencies
-bun install
+# Test local installation
+node bin/install.js --local
 
-# Build the plugin
-cd packages/idumb-plugin
-bun run build
+# Make changes to template/
+# Re-run install to apply
 ```
 
 ## Project Structure
 
 ```
 idumb/
-├── packages/
-│   └── idumb-plugin/          # Main OpenCode plugin
-│       ├── src/index.ts       # Plugin source
-│       ├── contexts/          # Default agent contexts
-│       └── README.md          # Package documentation
-├── .opencode/                 # Local OpenCode setup
-│   └── plugins/               # Local plugin testing
-├── .idumb/                    # Local state directory
-│   ├── state.json             # Session state
-│   └── contexts/              # Agent context files
-├── _bmad-output/              # BMAD workflow outputs
-│   └── planning-artifacts/    # Research & planning docs
-└── bmm-workflow-status.yaml   # Project status tracking
+├── bin/
+│   └── install.js         # npx installer
+├── template/              # Files copied during install
+│   ├── agents/            # Agent definitions
+│   ├── commands/idumb/    # Slash commands
+│   ├── tools/             # Custom tools
+│   ├── plugins/           # Plugin files
+│   └── skills/            # Skill definitions
+├── .planning/research/    # Research documentation
+├── package.json           # npm package config
+└── README.md              # This file
 ```
 
 ## Research
 
-Based on fact-based research of OpenCode's public plugin API:
-- [Plugin API Facts](./_bmad-output/planning-artifacts/research/opencode-plugin-api-facts-2026-02-01.md)
+Based on official OpenCode documentation:
+- [OpenCode Internals](.planning/research/OPENCODE-INTERNALS-2026-02-02.md)
+- [GSD Framework](.planning/research/GSD-FRAMEWORK-2026-02-02.md)
+- [Plugin Distribution](.planning/research/PLUGIN-DISTRIBUTION-2026-02-02.md)
+
+## Requirements
+
+- Node.js >= 18.0.0
+- OpenCode installed and configured
+- (Optional) GSD framework for full integration
 
 ## License
 
-MIT © [shynlee04](https://github.com/shynlee04)
+MIT
 
 ---
 
-**Built for the [OpenCode](https://opencode.ai) ecosystem** 🚀
+**Built for the [OpenCode](https://opencode.ai) ecosystem**

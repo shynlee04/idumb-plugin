@@ -1,0 +1,40 @@
+{
+  "name": "@anthropic-ai/idumb",
+  "version": "0.1.0",
+  "description": "Meta-framework plugin for OpenCode - wraps GSD/BMAD with hierarchical governance",
+  "type": "module",
+  "bin": {
+    "idumb": "./bin/install.js",
+    "create-idumb": "./bin/install.js"
+  },
+  "main": "./template/plugins/idumb-core.ts",
+  "files": [
+    "bin",
+    "template"
+  ],
+  "scripts": {
+    "postinstall": "echo 'Run: npx @anthropic-ai/idumb to install'"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/anthropic-ai/idumb.git"
+  },
+  "keywords": [
+    "opencode",
+    "gsd",
+    "bmad",
+    "ai-coding",
+    "meta-framework",
+    "governance",
+    "plugin"
+  ],
+  "author": "iDumb",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/anthropic-ai/idumb/issues"
+  },
+  "homepage": "https://github.com/anthropic-ai/idumb#readme",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
