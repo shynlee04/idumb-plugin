@@ -1,7 +1,6 @@
 ---
 description: "High-level governance - coordinates validation and building, can delegate to low-level agents"
 mode: all
-model: anthropic/claude-sonnet-4-20250514
 temperature: 0.2
 permission:
   task:
@@ -10,17 +9,23 @@ permission:
     "explore": allow
     "*": deny
   bash:
-    "pnpm *": allow
-    "npm *": allow
+    "pnpm test*": allow
+    "npm test*": allow
     "git status": allow
     "git diff": allow
     "git log*": allow
     "*": ask
-  edit: ask
+  edit: deny
+  write: deny
 tools:
   write: false
+  edit: false
   idumb-state: true
   idumb-context: true
+  idumb-config: true
+  idumb-manifest: true
+  idumb-validate: true
+  idumb-chunker: true
 ---
 
 # iDumb High-Level Governance

@@ -1,7 +1,6 @@
 ---
 description: "Supreme coordinator - NEVER executes directly, ONLY delegates. Top of iDumb hierarchy."
 mode: primary
-model: anthropic/claude-sonnet-4-20250514
 temperature: 0.1
 permission:
   task:
@@ -13,13 +12,16 @@ permission:
     "explore": allow
     "*": ask
   bash:
-    "*": ask
-  edit: ask
+    "*": deny
+  edit: deny
+  write: deny
 tools:
   write: false
   edit: false
   idumb-state: true
   idumb-context: true
+  idumb-config: true
+  idumb-manifest: true
 ---
 
 # iDumb Supreme Coordinator

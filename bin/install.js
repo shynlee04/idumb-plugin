@@ -40,12 +40,47 @@ function printHeader() {
     print('');
 }
 
-function prompt(question) {
-    const rl = createInterface({ input: process.stdin, output: process.stdout });
-    return new Promise(resolve => {
-        rl.question(question, answer => {
+/**
+ * Cross-platform prompt with TTY detection and timeout
+ * Falls back to default values in non-interactive environments
+ */
+function prompt(question, defaultValue = '') {
+    // Check if running in non-interactive environment
+    if (!process.stdin.isTTY) {
+        print(`  [Non-interactive] Using default: ${defaultValue || '(empty)'}`);
+        return Promise.resolve(defaultValue);
+    }
+    
+    const rl = createInterface({ 
+        input: process.stdin, 
+        output: process.stdout,
+        terminal: true
+    });
+    
+    return new Promise((resolve) => {
+        // 30 second timeout for interactive prompts
+        const timeout = setTimeout(() => {
+            print(`  [Timeout] Using default: ${defaultValue || '(empty)'}`);
             rl.close();
-            resolve(answer.trim().toLowerCase());
+            resolve(defaultValue);
+        }, 30000);
+        
+        rl.question(question, answer => {
+            clearTimeout(timeout);
+            rl.close();
+            resolve(answer.trim().toLowerCase() || defaultValue);
+        });
+        
+        // Handle stdin close (Ctrl+D)
+        rl.on('close', () => {
+            clearTimeout(timeout);
+        });
+        
+        // Handle errors gracefully
+        rl.on('error', () => {
+            clearTimeout(timeout);
+            rl.close();
+            resolve(defaultValue);
         });
     });
 }
@@ -102,7 +137,7 @@ async function step1_selectLocation() {
     print('  [l] Local   (./.opencode/)        - Current project only');
     print('');
     
-    const answer = await prompt('Choose [g/l]: ');
+    const answer = await prompt('Choose [g/l]: ', 'l');
     
     if (answer === 'g' || answer === 'global') {
         return { type: 'global', path: OPENCODE_GLOBAL };
@@ -146,7 +181,7 @@ async function step3_checkGSD(targetDir) {
     
     print('  ⚠ GSD not installed at target location');
     print('');
-    const answer = await prompt('Install GSD now? [y/n]: ');
+    const answer = await prompt('Install GSD now? [y/n]: ', 'n');
     
     if (answer === 'y' || answer === 'yes') {
         print('  Installing GSD...');
@@ -213,6 +248,9 @@ async function step6_installTools(targetDir) {
     print('  ✓ idumb-state.ts - State management');
     print('  ✓ idumb-validate.ts - Validation runner');
     print('  ✓ idumb-context.ts - Context classification');
+    print('  ✓ idumb-config.ts - Configuration management');
+    print('  ✓ idumb-manifest.ts - Drift/conflict detection');
+    print('  ✓ idumb-chunker.ts - Chunk reading for long docs');
 }
 
 async function step7_installPlugin(targetDir) {
@@ -243,8 +281,8 @@ async function step8_installSkills(targetDir) {
 
 async function step9_createIdumbDir(location) {
     print('');
-    print('STEP 9: Creating .idumb Directory');
-    print('───────────────────────────────────');
+    print('STEP 9: Creating .idumb Directory & Configuration');
+    print('──────────────────────────────────────────────────');
     
     // For global install, don't create .idumb - let plugin create per-project on first use
     if (location.type === 'global') {
@@ -255,17 +293,28 @@ async function step9_createIdumbDir(location) {
     const idumbDir = join(process.cwd(), '.idumb');
     const brainDir = join(idumbDir, 'brain');
     const governanceDir = join(idumbDir, 'governance');
+    const historyDir = join(brainDir, 'history');
+    const contextDir = join(brainDir, 'context');
+    const validationsDir = join(governanceDir, 'validations');
+    const anchorsDir = join(idumbDir, 'anchors');
     
+    // Create all hierarchy paths
     mkdirSync(brainDir, { recursive: true });
+    mkdirSync(historyDir, { recursive: true });
+    mkdirSync(contextDir, { recursive: true });
     mkdirSync(governanceDir, { recursive: true });
+    mkdirSync(validationsDir, { recursive: true });
+    mkdirSync(anchorsDir, { recursive: true });
     
     // Detect GSD phase for initial state
     const detection = detectProject();
     let framework = 'none';
     let phase = 'init';
+    let gsdDetected = false;
     
     if (detection.hasGSD) {
         framework = 'gsd';
+        gsdDetected = true;
         // Try to read phase from .planning/STATE.md
         const stateMdPath = join(process.cwd(), '.planning', 'STATE.md');
         if (existsSync(stateMdPath)) {
@@ -296,18 +345,106 @@ async function step9_createIdumbDir(location) {
         }, null, 2));
     }
     
+    // Create config file with hierarchical paths
+    // Governance values are ALLOWED - they enforce automation and integrate with GSD mode
+    const configFile = join(idumbDir, 'config.json');
+    if (!existsSync(configFile)) {
+        writeFileSync(configFile, JSON.stringify({
+            version: '0.1.0',
+            // User preferences (line 202) - allowed: "what to call user, language"
+            user: {
+                name: 'Developer',
+                language: {
+                    communication: 'english',
+                    documents: 'english'
+                }
+            },
+            // Governance settings - ALLOWED: enforces validation/automation, integrates with GSD mode
+            // GSD mode: "yolo" → level: "light", mode: "interactive" → level: "moderate"
+            governance: {
+                level: 'moderate',        // Derived from GSD mode, enforces validation strictness
+                expertSkeptic: true,      // Enforces critical thinking, context-first
+                autoValidation: true      // Enables automatic governance checks
+            },
+            // Hierarchical paths (lines 204-210) - required
+            paths: {
+                state: {
+                    brain: '.idumb/brain/state.json',
+                    history: '.idumb/brain/history/',
+                    anchors: '.idumb/anchors/'
+                },
+                artifacts: {
+                    governance: '.idumb/governance/',
+                    validations: '.idumb/governance/validations/'
+                },
+                context: {
+                    codebase: '.idumb/brain/context/codebase.md',
+                    sessions: '.idumb/brain/context/sessions.md'
+                }
+            },
+            // GSD hierarchy mapping (mirrors GSD's milestone → phase → plan → task)
+            hierarchy: {
+                status: ['milestone', 'phase', 'plan', 'task'],
+                agents: ['coordinator', 'governor', 'validator', 'builder']
+            },
+            // GSD framework integration (line 212) - traces to GSD config.json
+            frameworks: {
+                gsd: {
+                    detected: gsdDetected,
+                    configPath: '.planning/config.json',
+                    syncEnabled: true
+                }
+            },
+            // Staleness detection (line 219, 237) - for stale check
+            staleness: {
+                warningThresholdHours: 48,
+                purgeThresholdHours: 168
+            },
+            // Timestamp injection settings (line 219)
+            timestamps: {
+                enabled: true,
+                format: 'ISO8601',
+                frontmatterInjection: true
+            }
+        }, null, 2));
+    }
+    
     print(`  ✓ .idumb/brain/state.json (framework: ${framework}, phase: ${phase})`);
+    print('  ✓ .idumb/config.json (user preferences, hierarchical paths)');
     print('  ✓ .idumb/governance/');
+    print('  ✓ .idumb/anchors/');
 }
 
 async function showComplete(targetDir, location) {
     print('');
-    print('════════════════════════════════════════════════════════════');
-    print('                    ✓ INSTALLATION COMPLETE                 ');
-    print('════════════════════════════════════════════════════════════');
+    print('════════════════════════════════════════════════════════════════');
+    print('                    ✓ INSTALLATION COMPLETE                     ');
+    print('════════════════════════════════════════════════════════════════');
     print('');
-    print(`Installed to: ${targetDir}`);
+    
+    // Installation summary
+    print('INSTALLATION SUMMARY:');
+    print('─────────────────────');
+    print(`  Location:        ${location.type === 'global' ? 'Global (~/.config/opencode/)' : 'Local (./.opencode/)'}`);
+    print(`  Target:          ${targetDir}`);
     print('');
+    print('  Components Installed:');
+    print('  ├── Agents:     4 (coordinator, governance, validator, builder)');
+    print('  ├── Commands:   4 (/idumb:init, :status, :validate, :help)');
+    print('  ├── Tools:      6 (state, validate, context, config, manifest, chunker)');
+    print('  ├── Plugins:    1 (idumb-core.ts)');
+    print('  └── Skills:     1 (idumb-governance/)');
+    
+    if (location.type === 'local') {
+        print('');
+        print('  Project Setup:');
+        print('  ├── .idumb/config.json         ✓');
+        print('  ├── .idumb/brain/state.json    ✓');
+        print('  ├── .idumb/governance/         ✓');
+        print('  └── .idumb/anchors/            ✓');
+    }
+    print('');
+    
     print('NEXT STEPS:');
     print('───────────');
     print('1. Restart OpenCode to load new agents/commands');
@@ -326,6 +463,7 @@ async function showComplete(targetDir, location) {
     print('  /gsd:* commands work normally');
     print('  iDumb intercepts via plugin hooks');
     print('  Governance state in .idumb/');
+    print('  Config syncs with .planning/config.json');
     print('');
 }
 
@@ -347,6 +485,9 @@ async function uninstall(targetDir) {
         join(targetDir, 'tools', 'idumb-state.ts'),
         join(targetDir, 'tools', 'idumb-validate.ts'),
         join(targetDir, 'tools', 'idumb-context.ts'),
+        join(targetDir, 'tools', 'idumb-config.ts'),
+        join(targetDir, 'tools', 'idumb-manifest.ts'),
+        join(targetDir, 'tools', 'idumb-chunker.ts'),
         join(targetDir, 'plugins', 'idumb-core.ts'),
         join(targetDir, 'skills', 'idumb-governance'),
     ];
@@ -408,7 +549,7 @@ async function main() {
     if (existsSync(existingAgent)) {
         print('');
         print('⚠ Existing iDumb installation detected');
-        const answer = await prompt('Overwrite? [y/n]: ');
+        const answer = await prompt('Overwrite? [y/n]: ', 'n');
         if (answer !== 'y' && answer !== 'yes') {
             print('Installation cancelled.');
             return;

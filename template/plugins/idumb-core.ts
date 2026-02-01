@@ -155,6 +155,87 @@ function buildCompactionContext(directory: string): string {
 }
 
 // ============================================================================
+// TIMESTAMP FRONTMATTER INJECTION
+// ============================================================================
+
+// GSD short-lived artifacts that should have timestamps
+const GSD_TIMESTAMPED_PATTERNS = [
+  /\.planning\/phases\/.*-PLAN\.md$/,
+  /\.planning\/phases\/.*-RESEARCH\.md$/,
+  /\.planning\/phases\/.*-CONTEXT\.md$/,
+  /\.planning\/STATE\.md$/,
+  /\.planning\/todos\/.*\.md$/,
+]
+
+interface FrontmatterTimestamp {
+  created?: string
+  modified: string
+  staleAfterHours: number
+}
+
+function shouldInjectTimestamp(filePath: string): boolean {
+  return GSD_TIMESTAMPED_PATTERNS.some(pattern => pattern.test(filePath))
+}
+
+function extractFrontmatter(content: string): { frontmatter: Record<string, any> | null; body: string } {
+  const match = content.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/)
+  if (!match) {
+    return { frontmatter: null, body: content }
+  }
+  
+  try {
+    // Simple YAML-like parsing (just key: value pairs)
+    const frontmatter: Record<string, any> = {}
+    const lines = match[1].split("\n")
+    for (const line of lines) {
+      const colonIndex = line.indexOf(":")
+      if (colonIndex > 0) {
+        const key = line.slice(0, colonIndex).trim()
+        const value = line.slice(colonIndex + 1).trim()
+        frontmatter[key] = value
+      }
+    }
+    return { frontmatter, body: match[2] }
+  } catch {
+    return { frontmatter: null, body: content }
+  }
+}
+
+function injectTimestampFrontmatter(content: string, existingCreated?: string): string {
+  const now = new Date().toISOString()
+  const { frontmatter, body } = extractFrontmatter(content)
+  
+  const timestamp: FrontmatterTimestamp = {
+    modified: now,
+    staleAfterHours: 48, // Default staleness threshold
+  }
+  
+  // Preserve existing created timestamp, or set to now
+  if (existingCreated) {
+    timestamp.created = existingCreated
+  } else if (frontmatter?.created) {
+    timestamp.created = frontmatter.created
+  } else {
+    timestamp.created = now
+  }
+  
+  // Build new frontmatter
+  const newFrontmatter = {
+    ...frontmatter,
+    idumb_created: timestamp.created,
+    idumb_modified: timestamp.modified,
+    idumb_stale_after_hours: timestamp.staleAfterHours,
+  }
+  
+  // Serialize frontmatter (simple YAML-like format)
+  const fmLines = Object.entries(newFrontmatter)
+    .map(([k, v]) => `${k}: ${v}`)
+    .join("\n")
+  
+  return `---\n${fmLines}\n---\n${body}`
+}
+
+// ============================================================================
 // GSD INTEGRATION
 // ============================================================================
 
@@ -271,34 +352,41 @@ export const IdumbCorePlugin: Plugin = async ({ directory, client }) => {
     // ========================================================================
     
     event: async ({ event }: { event: any }) => {
-      // Session created - initialize or load state
-      if (event.type === "session.created") {
-        log(directory, `Session created: ${event.properties?.info?.id || event.properties?.sessionID || "unknown"}`)
-        
-        const state = readState(directory)
-        if (state) {
-          // Sync with GSD if present
-          syncWithGSD(directory)
-          log(directory, `State loaded: phase=${state.phase}, framework=${state.framework}`)
-        } else {
-          log(directory, "No state found - run /idumb:init")
+      // FALLBACK STRATEGY (Line 232): All hooks wrapped in try/catch
+      // Errors in plugins must NEVER break OpenCode execution
+      try {
+        // Session created - initialize or load state
+        if (event.type === "session.created") {
+          log(directory, `Session created: ${event.properties?.info?.id || event.properties?.sessionID || "unknown"}`)
+          
+          const state = readState(directory)
+          if (state) {
+            // Sync with GSD if present
+            syncWithGSD(directory)
+            log(directory, `State loaded: phase=${state.phase}, framework=${state.framework}`)
+          } else {
+            log(directory, "No state found - run /idumb:init")
+          }
         }
-      }
-      
-      // Session idle - checkpoint opportunity
-      if (event.type === "session.idle") {
-        log(directory, "Session idle - considering checkpoint")
         
-        // Could add automatic checkpoint logic here
-        // For now, just log
-      }
-      
-      // Session compacted - state may need refresh
-      if (event.type === "session.compacted") {
-        log(directory, "Session compacted")
+        // Session idle - checkpoint opportunity
+        if (event.type === "session.idle") {
+          log(directory, "Session idle - considering checkpoint")
+          
+          // Could add automatic checkpoint logic here
+          // For now, just log
+        }
         
-        // Re-sync with GSD after compaction
-        syncWithGSD(directory)
+        // Session compacted - state may need refresh
+        if (event.type === "session.compacted") {
+          log(directory, "Session compacted")
+          
+          // Re-sync with GSD after compaction
+          syncWithGSD(directory)
+        }
+      } catch (error) {
+        // Silent fail with logging - never break OpenCode
+        log(directory, `[ERROR] event hook failed: ${error instanceof Error ? error.message : String(error)}`)
       }
     },
     
@@ -307,15 +395,21 @@ export const IdumbCorePlugin: Plugin = async ({ directory, client }) => {
     // ========================================================================
     
     "experimental.session.compacting": async (input, output) => {
-      log(directory, "Compaction triggered - injecting context")
-      
-      // Build context from state and anchors
-      const context = buildCompactionContext(directory)
-      
-      // Append to compaction context (don't replace)
-      output.context.push(context)
-      
-      log(directory, `Injected ${context.split("\n").length} lines of context`)
+      // FALLBACK STRATEGY (Line 232): All hooks wrapped in try/catch
+      try {
+        log(directory, "Compaction triggered - injecting context")
+        
+        // Build context from state and anchors
+        const context = buildCompactionContext(directory)
+        
+        // Append to compaction context (don't replace)
+        output.context.push(context)
+        
+        log(directory, `Injected ${context.split("\n").length} lines of context`)
+      } catch (error) {
+        // Silent fail with logging - never break OpenCode
+        log(directory, `[ERROR] compaction hook failed: ${error instanceof Error ? error.message : String(error)}`)
+      }
     },
     
     // ========================================================================
@@ -323,61 +417,94 @@ export const IdumbCorePlugin: Plugin = async ({ directory, client }) => {
     // ========================================================================
     
     "tool.execute.before": async (input: any, output: any) => {
-      const toolName = input.tool
-      
-      // Intercept task tool (agent delegation)
-      if (toolName === "task") {
-        log(directory, `Task delegation detected: ${JSON.stringify(input.args || {}).slice(0, 100)}`)
+      // FALLBACK STRATEGY (Line 232): All hooks wrapped in try/catch
+      try {
+        const toolName = input.tool
         
-        const state = readState(directory)
-        if (state) {
-          // Inject governance context into task prompt
-          const governanceContext = [
-            "\n\n---",
-            "## iDumb Governance Context",
-            `Current phase: ${state.phase}`,
-            `Framework: ${state.framework}`,
-            state.anchors.length > 0 ? 
-              `Active anchors: ${state.anchors.filter(a => a.priority !== "normal").length}` :
-              "No active anchors",
-            "---\n",
-          ].join("\n")
+        // Intercept task tool (agent delegation)
+        if (toolName === "task") {
+          log(directory, `Task delegation detected: ${JSON.stringify(input.args || {}).slice(0, 100)}`)
           
-          // Prepend to task prompt
-          if (output.args && typeof output.args.prompt === "string") {
-            output.args.prompt = governanceContext + output.args.prompt
-            log(directory, "Injected governance context into task delegation")
+          const state = readState(directory)
+          if (state) {
+            // Inject governance context into task prompt
+            const governanceContext = [
+              "\n\n---",
+              "## iDumb Governance Context",
+              `Current phase: ${state.phase}`,
+              `Framework: ${state.framework}`,
+              state.anchors.length > 0 ? 
+                `Active anchors: ${state.anchors.filter(a => a.priority !== "normal").length}` :
+                "No active anchors",
+              "---\n",
+            ].join("\n")
+            
+            // Prepend to task prompt
+            if (output.args && typeof output.args.prompt === "string") {
+              output.args.prompt = governanceContext + output.args.prompt
+              log(directory, "Injected governance context into task delegation")
+            }
           }
         }
-      }
-      
-      // Track file edits
-      if (toolName === "edit" || toolName === "write") {
-        log(directory, `File operation: ${toolName} on ${input.args?.path || input.args?.filePath}`)
+        
+        // Track file edits
+        if (toolName === "edit" || toolName === "write") {
+          const filePath = input.args?.path || input.args?.filePath || ""
+          log(directory, `File operation: ${toolName} on ${filePath}`)
+          
+          // Inject timestamp frontmatter for GSD short-lived artifacts
+          if (shouldInjectTimestamp(filePath)) {
+            log(directory, `Injecting timestamp frontmatter into: ${filePath}`)
+            
+            // For write operations, inject into content
+            if (toolName === "write" && output.args?.content) {
+              // Check if file exists to get existing created timestamp
+              const fullPath = join(directory, filePath)
+              let existingCreated: string | undefined
+              if (existsSync(fullPath)) {
+                const existing = readFileSync(fullPath, "utf8")
+                const { frontmatter } = extractFrontmatter(existing)
+                existingCreated = frontmatter?.idumb_created
+              }
+              
+              output.args.content = injectTimestampFrontmatter(output.args.content, existingCreated)
+              log(directory, "Timestamp frontmatter injected into write content")
+            }
+          }
+        }
+      } catch (error) {
+        // Silent fail with logging - never break OpenCode
+        log(directory, `[ERROR] tool.execute.before failed: ${error instanceof Error ? error.message : String(error)}`)
       }
     },
     
     "tool.execute.after": async (input: any, output: any) => {
-      const toolName = input.tool
-      
-      // Record completed task delegations
-      if (toolName === "task") {
-        const result = output.error ? "fail" : "pass"
-        addHistoryEntry(directory, `task:${input.args?.description || "unknown"}`, "plugin", result as "pass" | "fail")
-        log(directory, `Task completed: ${result}`)
-      }
-      
-      // Sync with GSD after certain operations
-      if (toolName === "edit" || toolName === "write") {
-        const filePath = input.args?.path || input.args?.filePath || ""
+      // FALLBACK STRATEGY (Line 232): All hooks wrapped in try/catch
+      try {
+        const toolName = input.tool
         
-        // If editing GSD files, sync state
-        if (filePath.includes("STATE.md") || 
-            filePath.includes("ROADMAP.md") ||
-            filePath.includes(".planning/")) {
-          syncWithGSD(directory)
-          log(directory, "GSD file modified - synced state")
+        // Record completed task delegations
+        if (toolName === "task") {
+          const result = output.error ? "fail" : "pass"
+          addHistoryEntry(directory, `task:${input.args?.description || "unknown"}`, "plugin", result as "pass" | "fail")
+          log(directory, `Task completed: ${result}`)
         }
+        
+        // Sync with GSD after certain operations
+        if (toolName === "edit" || toolName === "write") {
+          const filePath = input.args?.path || input.args?.filePath || ""
+          
+          // If editing GSD files, sync state
+          if (filePath.includes("STATE.md") || 
+              filePath.includes("ROADMAP.md") ||
+              filePath.includes(".planning/")) {
+            syncWithGSD(directory)
+            log(directory, "GSD file modified - synced state")
+          }
+        }
+      } catch (error) {
+        // Silent fail with logging - never break OpenCode
+        log(directory, `[ERROR] tool.execute.after failed: ${error instanceof Error ? error.message : String(error)}`)
       }
     },
     

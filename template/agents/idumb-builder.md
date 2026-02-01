@@ -21,6 +21,7 @@ tools:
   task: false
   idumb-state: true
   idumb-context: true
+  idumb-config: true
 ---
 
 # iDumb Builder

@@ -27,10 +27,8 @@ tools:
   idumb-validate: true
   idumb-state: true
   idumb-context: true
----
-  write: false
-  edit: false
-  task: false
+  idumb-manifest: true
+  idumb-chunker: true
 ---
 
 # iDumb Low-Level Validator

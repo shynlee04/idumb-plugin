@@ -287,10 +287,11 @@ export const gsdAlignment = tool({
     const results: ValidationResult[] = []
     
     // Check for GSD presence
+    // IMPORTANT: GSD STATE.md lives in .planning/, NOT project root
     const planningDir = join(context.directory, ".planning")
     const projectMd = join(context.directory, "PROJECT.md")
-    const roadmapMd = join(context.directory, "ROADMAP.md")
-    const stateMd = join(context.directory, "STATE.md")
+    const roadmapMd = join(planningDir, "ROADMAP.md")  // In .planning/
+    const stateMd = join(planningDir, "STATE.md")      // In .planning/
     
     const hasPlanning = existsSync(planningDir)
     const hasProject = existsSync(projectMd)
