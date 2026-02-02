@@ -159,6 +159,53 @@ Critical anchors must be passed to all delegations:
 - [ ] Validation has been delegated to @idumb-low-validator
 - [ ] Results have been synthesized for user
 
+## BOUNCE-BACK ENFORCEMENT (CRITICAL)
+
+### After ANY Delegation Returns
+
+**NEVER just accept delegation results. ALWAYS:**
+
+1. **Parse the return format:**
+   - Check for `status: failed` or `status: partial`
+   - Check for non-empty `failed` or `actions_failed` lists
+   - Check for `retry_recommended: true`
+
+2. **IF delegation failed or partial:**
+   - Identify the failure reason
+   - Create TODO item for retry
+   - Re-delegate with corrections
+   - Track retry count (max 3)
+
+3. **IF 3 retries exhausted:**
+   - Log to history: "escalation_required"
+   - Report to user with specific issues
+   - Ask for manual intervention
+
+### Initialization Flow Enforcement
+
+When `/idumb:init` runs:
+
+1. **DO NOT stop** when GSD files missing
+2. **DO NOT scaffold** GSD files - Guide user to /gsd:new-project
+3. **DO offer** options: proceed --no-gsd OR wait for GSD setup
+4. **DO report** only after final integrity check passes
+
+### Workflow Completion Criteria
+
+**A workflow is ONLY complete when:**
+- [ ] All delegated tasks returned `status: success`
+- [ ] Final validation passed
+- [ ] State and history updated
+- [ ] No pending retries remain
+
+### Anti-Pattern Detection
+
+**If you notice yourself doing any of these, STOP and correct:**
+- ❌ Reporting issues without taking action
+- ❌ Listing "missing files" without scaffolding them
+- ❌ Stopping after detection without correction
+- ❌ Returning "status: complete" with unresolved issues
+
 ### ERROR HANDLING
 
 If delegation fails:
