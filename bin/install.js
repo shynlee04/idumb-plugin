@@ -19,7 +19,15 @@ const TEMPLATE_DIR = join(__dirname, '..', 'template');
 // CONFIGURATION
 // ============================================================================
 
-const OPENCODE_GLOBAL = join(process.env.HOME || '', '.config', 'opencode');
+// Cross-platform global config path (Windows: %APPDATA%, macOS/Linux: ~/.config)
+function getGlobalConfigPath() {
+    if (process.platform === 'win32') {
+        return join(process.env.APPDATA || join(process.env.USERPROFILE || '', 'AppData', 'Roaming'), 'opencode');
+    }
+    return join(process.env.HOME || '', '.config', 'opencode');
+}
+
+const OPENCODE_GLOBAL = getGlobalConfigPath();
 const OPENCODE_LOCAL = join(process.cwd(), '.opencode');
 const GSD_REPO = 'https://github.com/glittercowboy/get-shit-done.git';
 
@@ -563,7 +571,7 @@ async function main() {
     await step7_installPlugin(location.path);
     await step8_installSkills(location.path);
     await step9_createIdumbDir(location);
-    await showComplete(location.path, location.type);
+    await showComplete(location.path, location);
 }
 
 main().catch(e => {

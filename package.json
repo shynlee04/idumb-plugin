@@ -1,7 +1,7 @@
 {
-  "name": "@anthropic-ai/idumb",
+  "name": "idumb",
   "version": "0.1.0",
-  "description": "Meta-framework plugin for OpenCode - wraps GSD/BMAD with hierarchical governance",
+  "description": "OpenCode plugin that wraps GSD framework with hierarchical governance, context anchoring, and expert-skeptic validation",
   "type": "module",
   "bin": {
     "idumb": "./bin/install.js",
@@ -13,27 +13,32 @@
     "template"
   ],
   "scripts": {
-    "postinstall": "echo 'Run: npx @anthropic-ai/idumb to install'"
+    "install:local": "node bin/install.js --local",
+    "install:global": "node bin/install.js --global",
+    "uninstall": "node bin/install.js --uninstall"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/anthropic-ai/idumb.git"
+    "url": "git+https://github.com/shynlee04/idumb.git"
   },
   "keywords": [
     "opencode",
     "gsd",
-    "bmad",
+    "get-shit-done",
     "ai-coding",
+    "agentic-coding",
     "meta-framework",
     "governance",
-    "plugin"
+    "plugin",
+    "hierarchical-agents",
+    "context-anchoring"
   ],
-  "author": "iDumb",
+  "author": "shynlee04",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/anthropic-ai/idumb/issues"
+    "url": "https://github.com/shynlee04/idumb/issues"
   },
-  "homepage": "https://github.com/anthropic-ai/idumb#readme",
+  "homepage": "https://github.com/shynlee04/idumb#readme",
   "engines": {
     "node": ">=18.0.0"
   }
