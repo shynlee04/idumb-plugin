@@ -1,6 +1,7 @@
 ---
 description: "High-level governance - coordinates validation and building, can delegate to low-level agents"
-mode: all
+mode: subagent
+hidden: true
 temperature: 0.2
 permission:
   task:

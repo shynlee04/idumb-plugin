@@ -1,4 +1,4 @@
-## Currently I can’t install this anywhere in any project → failure
+## 
 
 pay attention to this time fix this:
 
@@ -99,8 +99,9 @@ Add new features belong to governance, automation governance, and context intell
     1. the above can be think of for enforcing validation + governance of completion task
     2. the above can be think of for enforcing no code touch without matching plan id
 
-### The negotiable common list:
+### The non-negotiable common list:
 
+- [ ]  if the concepts were to modify OpenCode SourceCode to make it work → it wont because saying above (users  have OpenCode as a client-side platform → the plugin is in no way trying to fork Source Code from this perspective)
 - [ ]  Read and understand very carefully the do and the don’ts above → form the matrix of list
 - [ ]  For the concepts of idumb as they are features → they must resonate with the `Core concepts:` which are visions for idumb
 - [ ]  Any configuration that are not definite (different and controlled by users which are not in anyway belong to either GSD nor OpenCode innate values ) >>> These are of the list that users can not have access to (like models of llm) and they will be block out of the concept >>>they must be removed out and if they are needed for the concepts work find work-around
@@ -124,3 +125,115 @@ Add new features belong to governance, automation governance, and context intell
 
 - [ ]  all highest level (agents, coordinator) must all be controlled with enforce context-first, frameing with master tracking and hierarchy todo → must delegate and ban all execution
 - [ ]  the mid-level delegation can be depend on which phases → but modifying code file (creating code files) should never be the permissions
+
+### `Core concepts` :  only these made success - concepts work
+
+- [ ]  starting points → integration multiple levels - integration to OpenCode and GSD → not making any overlapping or conflict concepts + not breaking any chain + not breaking core OpenCode nor GSD
+- [ ]  Have you address edge cases of what if from users using GSD - to validate cases against user’s journey
+- [ ]  Have you assess issues both high-level (as a strategist) and mid to low level tactically
+
+## Making it into its own framework
+
+as many attempts of iterations on trials and errors but could not bring out the finest results when playing the wrapper approach (because the level of precision and control over the targeted GSD frameworks, and your high-level of hallucination when having to mange too many things) >>> my decisions to  make shift to a complete meta framework (still hold true to all above value) >>> ONLY NOW THAT WE WILL TAKE OVER WHAT GSD FRAMEWORK IS DOING AND make them even betters by not only fine-tuning the templates (concepts of using commands, prompts, agents, subagents ); improve with more controlled accuracy with more concepts like SKILL and customized tools and hooks manipulation;  and make of interpretation of  “Self-intelligent-governance” “Expert-agent-first” and “Context-first” with absolute validation and guardrails: >>> So the below need u to start the project and store these into more valid and hierarchy set so that we can start phases after phases with more granular and controlled
+
+## The research
+
+Beside these research sofar
+
+```markdown
+CROSS-CONCEPT-MATRIX-2026-02-02.md
+event-subscription-opencode.md
+grep-carefully-to-really-learn-what-happen-.md
+IMPLEMENTATION-GUIDE.md
+INTERCEPTION-ARCHITECTURE-ANALYSIS.md
+INTERCEPTION-SOLUTION-SUMMARY.md
+VALIDATION-CHECKLIST-2026-02-02.md
+```
+
+- I need the following system of research so that you can
+
+1. learn carefully how the GSD concepts implement each other; their concepts; their control over different entry points of a project through OpenCode concepts and through themselves as a framework >>>> then validate with this if this is still true CROSS-CONCEPT-MATRIX-2026-02-02.md
+2. Then “Through some other concepts being learnt from OpenCode and some other Community plugins (Do not copy exactly but improve them)  of that you learn from to synthesize a more complete picture >>> you can follow the below guide 
+
+### **Phase 2.1 `Less for more`**  <<>> OpenCode Concepts of: its native tools; agents (primary, all, and subagents); Agent SKILLS; Commands, permissions >>> Update on Skill This is not very true the Skill should come only as support to trigger them automatically is probable
+
+the `less for more` means these: consume only what needs and valid; agents automatically know by drilling down to the assigned hierarchy, making used of “loaded-on-demand” and improve accuracy by “allowing specific prompts being used when of which agents” - in the group we have SKILLS are the most popular known for this less for more. Beside more is because these granular controls give us more matches, fine-tuning the per-case uses without compromising much context windows
+
+- list of native tools https://opencode.ai/docs/tools/ → pair with `permissions` for →
+- agents https://opencode.ai/docs/agents/   → agents can setup into `modes` (keywords: all, primary, subagent, permission.tasks, permissions, prompts, hidden - the focus can create more granular configuration for all our roles, high-level, lower-level coordinator, enforce on what tools use etc →
+    - → pair with `commands` to invoke agents https://opencode.ai/docs/commands/
+    - → or even make permissions more granular controls https://opencode.ai/docs/permissions/
+- the trump card of this `less for more  https://github.com/zenobi-us/opencode-skillful?tab=readme-ov-file`→ read this very carefully as they pari quite well with almost everything up therehttps://github.com/zenobi-us/opencode-skillful?tab=readme-ov-file >>> SINCE WE CAN FORCE USER INSTALL ANY MORE OF SO THIS IS SHOULD BE MADE NATIVE IN OUR PLUGIN
+
+---
+
+### **Phase 2.2  `accurately specific with concision`**  <<>> OpenCode Concepts of: custom tools , Agent SKILLS; agents (primary, all, and subagents); overwritten innate commands
+
+this is the methodology for making use of `metadata` `frontmatter` ; or making a combo of tools executions in certain order as `context` is observed and/or pair with our dev `scripts` in package.json for auto-run quick automation of validation tools → make controlling much less token but specifically accurate 
+
+- Custom tools https://opencode.ai/docs/custom-tools/ (keywords: multi tools per files, context → as a tools so what tools can pair with this can too
+- overwritten commands: same as commands above but focus more on keywords built-in, sub-tasks, file references → yes with custom tools and per agent manipulate the `compact` command that summarized and reference specific types of artifacts, and of metadata and controlled with frontmatter
+- ok with Agent SKILLS → improve specificity and accuracy in a much higher level
+- 
+
+---
+
+### **Phase 2.3  `the best governance = auto, routined, and eventwatch`**  <<>> this include just this one https://opencode.ai/docs/plugins/
+
+this is a hand-down overkill → because it include almost all-in-one-and-the-beyond-mixture-of-whatever-order sets of everything else >>> YES AND THIS IS US WE ARE MAKING A PLUGIN TO BECOME A ALL-IN-ON-PACK
+
+## SOME OTHER PLUGINS OF COMMUNITY TO LEARN FROM
+
+Here’s an index of the OpenCode ecosystem **plugins** listed on that page, with one‑line descriptions: (there are those with TODO tasks and subtasks or anything that you feel click with our approach you can learn from to synthesize later)
+
+- opencode-daytona – Run OpenCode sessions in isolated Daytona sandboxes with git sync and live previews.[[opencode](https://opencode.ai/docs/ecosystem#plugins)]
+- opencode-helicone-session – Inject Helicone session headers automatically for request grouping.[[opencode](https://opencode.ai/docs/ecosystem#plugins)]
+- opencode-type-inject – Auto-inject TypeScript/Svelte types into file reads via lookup tools.[[opencode](https://opencode.ai/docs/ecosystem#plugins)]
+- opencode-openai-codex-auth – Use a ChatGPT Plus/Pro subscription instead of OpenAI API credits.[[opencode](https://opencode.ai/docs/ecosystem#plugins)]
+- opencode-gemini-auth – Use an existing Gemini plan instead of API billing.[[opencode](https://opencode.ai/docs/ecosystem#plugins)]
+- opencode-antigravity-auth – Use Antigravity’s free models instead of API billing.[[opencode](https://opencode.ai/docs/ecosystem#plugins)]
+- opencode-devcontainers – Multi-branch devcontainer isolation with shallow clones and auto-assigned ports.[[opencode](https://opencode.ai/docs/ecosystem#plugins)]
+- opencode-google-antigravity-auth – Google Antigravity OAuth plugin with Google Search support and robust API handling.[[opencode](https://opencode.ai/docs/ecosystem#plugins)]
+- opencode-dynamic-context-pruning – Prune obsolete tool outputs to optimize token usage.[[opencode](https://opencode.ai/docs/ecosystem#plugins)]
+- opencode-websearch-cited – Add native websearch with Google-grounded-style citations for supported providers.[[opencode](https://opencode.ai/docs/ecosystem#plugins)]
+- opencode-pty – Let agents run background PTY processes and send interactive input.[[opencode](https://opencode.ai/docs/ecosystem#plugins)]
+- opencode-shell-strategy – Guidance for non-interactive shell commands to avoid TTY-dependent hangs.[[opencode](https://opencode.ai/docs/ecosystem#plugins)]
+- opencode-wakatime – Track OpenCode usage with Wakatime.[[opencode](https://opencode.ai/docs/ecosystem#plugins)]
+- opencode-md-table-formatter – Clean up markdown tables generated by LLMs.[[opencode](https://opencode.ai/docs/ecosystem#plugins)]
+- opencode-morph-fast-apply – Faster code editing via Morph Fast Apply API and lazy edit markers.[[opencode](https://opencode.ai/docs/ecosystem#plugins)]
+- oh-my-opencode – Background agents, curated agents, and pre-built LSP/AST/MCP tools, Claude Code compatible.[[opencode](https://opencode.ai/docs/ecosystem#plugins)]
+- opencode-notificator – Desktop notifications and sound alerts for OpenCode sessions.[[opencode](https://opencode.ai/docs/ecosystem#plugins)]
+- opencode-notifier – Desktop notifications and alerts for permissions, completions, and error events.[[opencode](https://opencode.ai/docs/ecosystem#plugins)]
+- opencode-zellij-namer – AI-powered automatic naming of Zellij sessions from OpenCode context.[[opencode](https://opencode.ai/docs/ecosystem#plugins)]
+- opencode-skillful – Lazy-load prompts with skill discovery and injection for agents.[[opencode](https://opencode.ai/docs/ecosystem#plugins)]
+- opencode-supermemory – Persistent cross-session memory using Supermemory.[[opencode](https://opencode.ai/docs/ecosystem#plugins)]
+- @plannotator/opencode – Interactive plan review with visual annotation and private/offline sharing.[[opencode](https://opencode.ai/docs/ecosystem#plugins)]
+- @openspoon/subtask2 – Extend /commands into an orchestration system with granular flow control.[[opencode](https://opencode.ai/docs/ecosystem#plugins)]
+- opencode-scheduler – Schedule recurring jobs via launchd/systemd using cron syntax.[[opencode](https://opencode.ai/docs/ecosystem#plugins)]
+- micode – Structured Brainstorm → Plan → Implement flow with session continuity.[[opencode](https://opencode.ai/docs/ecosystem#plugins)]
+- octto – Interactive browser UI for AI brainstorming with multi-question forms.[[opencode](https://opencode.ai/docs/ecosystem#plugins)]
+- opencode-background-agents – Background agents with async delegation and context persistence.[[opencode](https://opencode.ai/docs/ecosystem#plugins)]
+- opencode-notify – Native OS notifications so you know when tasks complete.[[opencode](https://opencode.ai/docs/ecosystem#plugins)]
+- opencode-workspace – Bundled multi-agent orchestration harness with many components in one install.[[opencode](https://opencode.ai/docs/ecosystem#plugins)]
+- opencode-worktree – Zero-friction git worktrees for OpenCode.[[opencode](https://opencode.ai/docs/ecosystem#plugins)]
+
+## The most important things that you should never be drift out of
+
+- this is a plugin meaning users of all walks can install it with npx, pnpm, npm, bunx from my github setting at public >> so these assumption SHOULD NEVER be made to any of the list
+    - assume users’ llm models
+    - making this project .opencode folder’s files changes
+    - marking changes to OpenCode source code (as forking) X Not allow because users use it OpenCode as client
+    - assume a project as greenfield >>> NO  THEY ARE MUCH MANY MORE ENTRY POINTS
+    - assume they will install this as project-base level >>> NOT, they can install this at global settings level too
+
+## The ready-to-use or ideas that facilitate the following:
+
+Because the concepts of “highly-intelligent”, “self-governance” , “context-supreme”; multi-iterative-loop of highly accurately project development frame work so these tools, combination of any sdk, packages that may help with the following (but make sure they are make into these categories: run on client-side environment, is package with our plugin and work under the same Concepts of us and OpenCode, nay “brain concepts” of having to make use of database >>> they must be light, fast, and run at their local under subfolder of our brain concept>>> all these to allow OpenCode LLM as agents execute, retrieve, use, modify and read right at local dev environment
+
+- Build-in brain Concept  >>> this require a lot from these group
+- tools supporting fast searching + hop-reading across not only sections of a files, but also across paths both horizontal and vertical (innate with grep, glob, list, regex would not enough ) >>> I need your insights in this
+- tools that allow accurate chunk writing + controlled metadata and more through schema and api  + parsing and shard tools  into json the relational of values, id, properties of sorts >>> these ideas are for creating long-term traceable nodes and relational data for the ideas of brainy agents → must understand layers, hierarchy, from conversation, to controlled workflows and loops, using time and date and id system into schema to control drift and gaps
+    - >>> yes the above can be made with AI agent by transforming data but they LLM can’t be accurately follow a set if not using tools. I mean they are fine with writing recap, or synthesize description but metadata and schema needs control through manipulation subscription to LSP at OpenCode for instance https://opencode.ai/docs/lsp/
+- that’s same thing for AST indexing of the codebase combining with subscription to event watch of file changes, file update + meta data and relational nodes >>> to give more powerful approach toward symbol level reading of agents to the codebase
+
+— Reseach up-to-date to 2026 tech

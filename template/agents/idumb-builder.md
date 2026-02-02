@@ -22,16 +22,6 @@ tools:
   idumb-state: true
   idumb-context: true
   idumb-config: true
-scope:
-  paths_allowed:
-    - ".idumb/**"
-    - ".opencode/**"
-    - "template/**"
-  paths_denied:
-    - ".planning/**"
-    - "src/**"
-    - "app/**"
-    - "lib/**"
 ---
 
 # iDumb Builder

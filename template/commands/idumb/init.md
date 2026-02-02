@@ -12,15 +12,27 @@ You are initializing iDumb governance for this project.
 ## INITIALIZATION FLOW
 
 ```
-Step 1 → Step 2 → Step 3 → Step 4 ──┬→ [PASS] → Step 5 → Step 6 → Step 7 → COMPLETE
-                                    │
-                                    └→ [FAIL] → Step 4b (guide user) → USER DECISION
-                                                    │
-                                         ┌──────────┴───────────┐
-                                         ↓                      ↓
-                                 [proceed --no-gsd]     [wait for GSD]
-                                         ↓                      ↓
-                                   Step 5...              Status: gsd_incomplete
+Step 1 → Step 2 → Step 3 → Step 4 ──┬→ [PASS] → Step 5 → Step 6 → Step 7
+                                    │                                  ↓
+                                    │         Step 8 (Brownfield Detection)
+                                    │                                  ↓
+                                    │    ┌────────────────┬────────────┴────────────┐
+                                    │    ↓                ↓                         ↓
+                                    │ [brownfield]    [greenfield]           [existing_gsd]
+                                    │    ↓                ↓                         ↓
+                                    │ Step 9 + 10     Step 9               Skip to Step 11
+                                    │    ↓                ↓                         ↓
+                                    │    └────────→ Step 11 (Menu) ←────────────────┘
+                                    │                     ↓
+                                    └→ [FAIL] →    Step 12 → COMPLETE
+                                              ↓
+                                    Step 4b (guide user) → USER DECISION
+                                              │
+                                   ┌──────────┴───────────┐
+                                   ↓                      ↓
+                           [proceed --no-gsd]     [wait for GSD]
+                                   ↓                      ↓
+                             Step 5...              Status: gsd_incomplete
 ```
 
 ## YOUR TASK
@@ -227,7 +239,96 @@ Return Format:
   summary: "[brief status]"
 ```
 
-### Step 8: Report to user
+### Step 8: GSD Integration (Brownfield Detection)
+
+**Check project type:**
+```bash
+# Count source files (excluding node_modules, .git)
+SRC_FILES=$(find . -type f \( -name "*.ts" -o -name "*.tsx" -o -name "*.js" -o -name "*.jsx" -o -name "*.py" -o -name "*.go" -o -name "*.rs" \) -not -path "*/node_modules/*" -not -path "*/.git/*" 2>/dev/null | wc -l)
+PLANNING_EXISTS=$([ -d ".planning" ] && echo "true" || echo "false")
+```
+
+**Determine project type:**
+```yaml
+project_type_detection:
+  if: SRC_FILES > 5 AND PLANNING_EXISTS == false
+    type: brownfield
+    action: Auto-run /gsd:map-codebase then /gsd:new-project
+  elif: SRC_FILES <= 5 AND PLANNING_EXISTS == false
+    type: greenfield
+    action: Offer /gsd:new-project
+  else:
+    type: existing_gsd
+    action: Sync with existing .planning/ state
+```
+
+### Step 9: GSD Agent Header Wrapping
+
+**IF brownfield or greenfield, delegate to builder:**
+
+```
+@idumb-builder
+Task: Wrap GSD agent frontmatter with iDumb governance
+Files: .opencode/agents/gsd-*.md
+For each file:
+  1. Read current frontmatter
+  2. Add to tools section:
+     idumb-state: true
+     idumb-validate: true
+  3. Add idumb block:
+     idumb:
+       governance: true
+       sync_on_complete: true
+       report_to: idumb-supreme-coordinator
+  4. Preserve existing content
+  5. Write back
+```
+
+### Step 10: Auto-Trigger GSD Flow (Brownfield Only)
+
+**IF brownfield:**
+
+Report to user:
+```yaml
+brownfield_detected:
+  status: "Existing codebase detected with ${SRC_FILES} source files"
+  action: "Starting GSD brownfield initialization"
+  steps:
+    1: "/gsd:map-codebase - Analyze existing code structure"
+    2: "/gsd:new-project - Create project context and roadmap"
+  governance: "iDumb will monitor and sync with GSD progress"
+```
+
+Then instruct:
+```
+After this command completes, the next action is:
+1. Run: /gsd:map-codebase
+2. Then: /gsd:new-project
+3. iDumb will automatically sync state after each GSD command
+```
+
+### Step 11: Present Final Menu
+
+```yaml
+idumb_ready:
+  status: complete
+  gsd_status: [ready | brownfield_pending | greenfield_pending]
+  next_actions:
+    if_brownfield:
+      - "Run /gsd:map-codebase to analyze codebase"
+      - "Then /gsd:new-project to create roadmap"
+    if_greenfield:
+      - "Run /gsd:new-project to start project"
+    if_existing_gsd:
+      - "GSD already initialized - iDumb synced"
+      - "Run /gsd:progress to see current state"
+  commands_available:
+    - "/idumb:status - Check governance state"
+    - "/idumb:validate - Run validation checks"
+    - "/gsd:* - All GSD commands now governed"
+```
+
+### Step 12: Report to user
 
 **ONLY report `status: complete` if Step 7 returns `pass`**
 

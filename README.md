@@ -133,7 +133,7 @@ Each layer adds context and validates results.
 ## Uninstall
 
 ```bash
-npx github:shynlee04/idumb --uninstall
+npx github:shynlee04/idumb-plugin --uninstall
 # Or manually remove files from .opencode/
 ```
 

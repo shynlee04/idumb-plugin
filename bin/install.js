@@ -6,11 +6,21 @@
  * Wraps GSD with hierarchical governance
  */
 
+// Node.js version check - require 18+
+const nodeVersion = parseInt(process.versions.node.split('.')[0], 10);
+if (nodeVersion < 18) {
+    console.error('Error: Node.js 18 or higher is required.');
+    console.error(`Current version: ${process.versions.node}`);
+    console.error('Please upgrade: https://nodejs.org/');
+    process.exit(1);
+}
+
 import { existsSync, mkdirSync, cpSync, readFileSync, writeFileSync, readdirSync } from 'fs';
-import { join, dirname } from 'path';
+import { join, dirname, basename, sep } from 'path';
 import { fileURLToPath } from 'url';
 import { createInterface } from 'readline';
 import { execSync } from 'child_process';
+import { homedir } from 'os';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const TEMPLATE_DIR = join(__dirname, '..', 'template');
@@ -19,7 +29,7 @@ const TEMPLATE_DIR = join(__dirname, '..', 'template');
 // CONFIGURATION
 // ============================================================================
 
-const OPENCODE_GLOBAL = join(process.env.HOME || '', '.config', 'opencode');
+const OPENCODE_GLOBAL = join(process.env.HOME || process.env.USERPROFILE || homedir(), '.config', 'opencode');
 const OPENCODE_LOCAL = join(process.cwd(), '.opencode');
 const GSD_REPO = 'https://github.com/glittercowboy/get-shit-done.git';
 
@@ -112,12 +122,21 @@ function detectProject() {
     const hasSrc = existsSync(join(cwd, 'src'));
     const hasGit = existsSync(join(cwd, '.git'));
     
+    let projectName = 'unknown';
+    if (hasPackageJson) {
+        try {
+            projectName = JSON.parse(readFileSync(join(cwd, 'package.json'), 'utf8')).name || 'unknown';
+        } catch {
+            projectName = basename(cwd);
+        }
+    } else {
+        projectName = basename(cwd);
+    }
+    
     return {
         isProject: hasPackageJson || hasSrc || hasGit,
         hasGSD,
-        projectName: hasPackageJson ? 
-            JSON.parse(readFileSync(join(cwd, 'package.json'), 'utf8')).name || 'unknown' :
-            cwd.split('/').pop()
+        projectName
     };
 }
 
@@ -245,12 +264,13 @@ async function step6_installTools(targetDir) {
     
     copyDir(join(TEMPLATE_DIR, 'tools'), toolsDir);
     
-    print('  ✓ idumb-state.ts - State management');
+    print('  ✓ idumb-state.ts - State management + sessions');
     print('  ✓ idumb-validate.ts - Validation runner');
     print('  ✓ idumb-context.ts - Context classification');
     print('  ✓ idumb-config.ts - Configuration management');
     print('  ✓ idumb-manifest.ts - Drift/conflict detection');
     print('  ✓ idumb-chunker.ts - Chunk reading for long docs');
+    print('  ✓ idumb-todo.ts - Hierarchical TODO management');
 }
 
 async function step7_installPlugin(targetDir) {
@@ -279,10 +299,78 @@ async function step8_installSkills(targetDir) {
     print('  ✓ idumb-governance/SKILL.md - Governance protocols');
 }
 
-async function step9_createIdumbDir(location) {
+async function step9_installWorkflows(targetDir) {
     print('');
-    print('STEP 9: Creating .idumb Directory & Configuration');
-    print('──────────────────────────────────────────────────');
+    print('STEP 9: Installing GSD Workflows');
+    print('─────────────────────────────────');
+    
+    const workflowsDir = join(targetDir, 'get-shit-done', 'workflows');
+    mkdirSync(workflowsDir, { recursive: true });
+    
+    const templateWorkflows = join(TEMPLATE_DIR, 'workflows');
+    if (existsSync(templateWorkflows)) {
+        copyDir(templateWorkflows, workflowsDir);
+        print('  ✓ Installed workflows to .opencode/get-shit-done/workflows/');
+    } else {
+        print('  ⚠ No template workflows found (skipped)');
+    }
+}
+
+async function step10_installTemplates(targetDir) {
+    print('');
+    print('STEP 10: Installing GSD Templates');
+    print('──────────────────────────────────');
+    
+    const templatesDir = join(targetDir, 'get-shit-done', 'templates');
+    mkdirSync(templatesDir, { recursive: true });
+    
+    const templateTemplates = join(TEMPLATE_DIR, 'templates');
+    if (existsSync(templateTemplates)) {
+        copyDir(templateTemplates, templatesDir);
+        print('  ✓ Installed templates to .opencode/get-shit-done/templates/');
+    } else {
+        print('  ⚠ No template templates found (skipped)');
+    }
+}
+
+async function step11_installReferences(targetDir) {
+    print('');
+    print('STEP 11: Installing GSD References');
+    print('───────────────────────────────────');
+    
+    const referencesDir = join(targetDir, 'get-shit-done', 'references');
+    mkdirSync(referencesDir, { recursive: true });
+    
+    const templateReferences = join(TEMPLATE_DIR, 'references');
+    if (existsSync(templateReferences)) {
+        copyDir(templateReferences, referencesDir);
+        print('  ✓ Installed references to .opencode/get-shit-done/references/');
+    } else {
+        print('  ⚠ No template references found (skipped)');
+    }
+}
+
+async function step12_installRouter(targetDir) {
+    print('');
+    print('STEP 12: Installing GSD Router');
+    print('───────────────────────────────');
+    
+    const routerDir = join(targetDir, 'get-shit-done', 'router');
+    mkdirSync(routerDir, { recursive: true });
+    
+    const templateRouter = join(TEMPLATE_DIR, 'router');
+    if (existsSync(templateRouter)) {
+        copyDir(templateRouter, routerDir);
+        print('  ✓ Installed router to .opencode/get-shit-done/router/');
+    } else {
+        print('  ⚠ No template router found (skipped)');
+    }
+}
+
+async function step13_createIdumbDir(location) {
+    print('');
+    print('STEP 13: Creating .idumb Directory & Configuration');
+    print('───────────────────────────────────────────────────');
     
     // For global install, don't create .idumb - let plugin create per-project on first use
     if (location.type === 'global') {
@@ -474,9 +562,14 @@ async function showComplete(targetDir, location) {
     print('  Components Installed:');
     print('  ├── Agents:     4 (coordinator, governance, validator, builder)');
     print('  ├── Commands:   4 (/idumb:init, :status, :validate, :help)');
-    print('  ├── Tools:      6 (state, validate, context, config, manifest, chunker)');
+    print('  ├── Tools:      7 (state, validate, context, config, manifest, chunker, todo)');
     print('  ├── Plugins:    1 (idumb-core.ts)');
-    print('  └── Skills:     1 (idumb-governance/)');
+    print('  ├── Skills:     1 (idumb-governance/)');
+    print('  └── GSD Layer:');
+    print('      ├── workflows/   (agent delegation patterns)');
+    print('      ├── templates/   (document templates)');
+    print('      ├── references/  (framework documentation)');
+    print('      └── router/      (command routing)');
     
     if (location.type === 'local') {
         print('');
@@ -546,6 +639,7 @@ async function uninstall(targetDir) {
         join(targetDir, 'tools', 'idumb-config.ts'),
         join(targetDir, 'tools', 'idumb-manifest.ts'),
         join(targetDir, 'tools', 'idumb-chunker.ts'),
+        join(targetDir, 'tools', 'idumb-todo.ts'),
         join(targetDir, 'plugins', 'idumb-core.ts'),
         join(targetDir, 'skills', 'idumb-governance'),
     ];
@@ -556,7 +650,9 @@ async function uninstall(targetDir) {
         if (existsSync(path)) {
             try {
                 rmSync(path, { recursive: true });
-                print(`  ✓ Removed ${path.split('/').slice(-2).join('/')}`);
+                // Cross-platform path display
+                const displayPath = path.split(sep).slice(-2).join('/');
+                print(`  ✓ Removed ${displayPath}`);
             } catch (e) {
                 print(`  ✗ Failed to remove ${path}`);
             }
@@ -620,8 +716,12 @@ async function main() {
     await step6_installTools(location.path);
     await step7_installPlugin(location.path);
     await step8_installSkills(location.path);
-    await step9_createIdumbDir(location);
-    await showComplete(location.path, location.type);
+    await step9_installWorkflows(location.path);
+    await step10_installTemplates(location.path);
+    await step11_installReferences(location.path);
+    await step12_installRouter(location.path);
+    await step13_createIdumbDir(location);
+    await showComplete(location.path, location);
 }
 
 main().catch(e => {

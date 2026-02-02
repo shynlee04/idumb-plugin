@@ -202,6 +202,22 @@ function loadGSDConfig(directory: string): GSDConfig | null {
   return null
 }
 
+// Reserved keys that iDumb must not allow users to set
+// These are controlled by OpenCode or GSD, not by iDumb
+const RESERVED_OPENCODE_KEYS = ['models', 'provider', 'temperature', 'topP', 'topK']
+const RESERVED_GSD_KEYS = ['milestones', 'phases', 'agents', 'mode', 'depth', 'profile']
+
+function isReservedKey(section: string, key: string): { reserved: boolean; owner?: string } {
+  // Check if the key matches OpenCode or GSD reserved patterns
+  if (RESERVED_OPENCODE_KEYS.some(r => key.includes(r) || r.includes(key))) {
+    return { reserved: true, owner: 'OpenCode' }
+  }
+  if (RESERVED_GSD_KEYS.some(r => key.includes(r) || r.includes(key))) {
+    return { reserved: true, owner: 'GSD' }
+  }
+  return { reserved: false }
+}
+
 // ============================================================================
 // TOOLS
 // ============================================================================
@@ -245,6 +261,20 @@ export const update = tool({
   },
   async execute(args, context) {
     const config = loadConfig(context.directory)
+    
+    // Check for reserved keys
+    const reservedCheck = isReservedKey(args.section, args.key)
+    if (reservedCheck.reserved) {
+      return JSON.stringify({
+        error: `Key '${args.key}' is reserved by ${reservedCheck.owner}`,
+        message: `This value is controlled by ${reservedCheck.owner}, not iDumb. ` +
+                 `To change ${reservedCheck.owner} settings, use their respective configuration.`,
+        reservedKeys: {
+          opencode: RESERVED_OPENCODE_KEYS,
+          gsd: RESERVED_GSD_KEYS
+        }
+      }, null, 2)
+    }
     
     try {
       // Parse value (might be JSON)

@@ -212,3 +212,29 @@ If delegation fails:
 1. Log to history via idumb-state
 2. Create retry task in TODO
 3. Report to user with options
+
+## DOS/DONTS MATRIX (ENFORCEMENT REQUIRED)
+
+This matrix is derived from the requirements document. **Every action must comply.**
+
+| Category | DO | DON'T |
+|----------|----|----- |
+| **As Plugin** | Understand OpenCode concepts (commands, agents, tools, sessions) | Assume anything works without testing |
+| **As Wrapper** | Align to GSD hierarchy; wrap, don't break | Break GSD artifacts (STATE.md, PLAN frontmatter) |
+| **Execution** | Delegate ALL work; context-first | Execute code directly; skip context |
+| **Context** | Anchor critical decisions; check staleness (<48h) | Ignore stale context; trust without verify |
+| **Automation** | Have fallback strategy; log errors | Let errors break OpenCode |
+| **Files** | Write to .idumb/ only; read from .planning/ | Modify .planning/ directly |
+| **TODOs** | Hierarchical [P1][V][B]; enforce completion | Stop with incomplete TODOs |
+
+### Definition of "IF IT WORKS"
+
+Every concept you introduce must pass ALL:
+- [ ] Does NOT break GSD
+- [ ] Does NOT break OpenCode
+- [ ] Follows hierarchy (delegate, don't execute)
+- [ ] Has metadata/ID control
+- [ ] Has validation gate
+- [ ] Has fallback strategy
+- [ ] Is consumed by LLM (not ignored)
+- [ ] Persists across sessions (if needed)
