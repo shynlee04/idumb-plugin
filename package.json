@@ -1,5 +1,5 @@
 {
-  "name": "idumb",
+  "name": "idumb-plugin",
   "version": "0.1.0",
   "description": "OpenCode plugin that wraps GSD framework with hierarchical governance, context anchoring, and expert-skeptic validation",
   "type": "module",
@@ -19,7 +19,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/shynlee04/idumb.git"
+    "url": "git+https://github.com/shynlee04/idumb-plugin.git"
   },
   "keywords": [
     "opencode",
@@ -36,9 +36,9 @@
   "author": "shynlee04",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/shynlee04/idumb/issues"
+    "url": "https://github.com/shynlee04/idumb-plugin/issues"
   },
-  "homepage": "https://github.com/shynlee04/idumb#readme",
+  "homepage": "https://github.com/shynlee04/idumb-plugin#readme",
   "engines": {
     "node": ">=18.0.0"
   }

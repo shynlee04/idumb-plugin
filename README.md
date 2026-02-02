@@ -19,19 +19,19 @@ iDumb wraps your existing AI development workflow (GSD, BMAD, or custom) with:
 ### From GitHub (Recommended)
 
 ```bash
-# Interactive installation
-npx github:shynlee04/idumb
+# Non-interactive installation (recommended for CI/scripts)
+npx github:shynlee04/idumb-plugin --local   # Current project only
+npx github:shynlee04/idumb-plugin --global  # All projects (~/.config/opencode/)
 
-# Or with flags
-npx github:shynlee04/idumb --local   # Current project only
-npx github:shynlee04/idumb --global  # All projects (~/.config/opencode/)
+# Interactive installation (when running in terminal)
+npx github:shynlee04/idumb-plugin
 ```
 
 ### From Source
 
 ```bash
-git clone https://github.com/shynlee04/idumb.git
-cd idumb
+git clone https://github.com/shynlee04/idumb-plugin.git
+cd idumb-plugin
 node bin/install.js --local
 ```
 
