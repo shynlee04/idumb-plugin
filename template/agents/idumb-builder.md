@@ -108,7 +108,7 @@ When creating from templates:
    - `{{PROJECT_NAME}}` - Project name
    - `{{TIMESTAMP}}` - ISO timestamp
    - `{{PHASE}}` - Current phase
-   - `{{FRAMEWORK}}` - gsd/bmad/speckit
+   - `{{FRAMEWORK}}` - idumb/bmad/planning/custom
 3. Write to destination
 4. Verify file exists
 
@@ -158,7 +158,7 @@ builder_result:
 
 ## IMPORTANT
 
-- NEVER modify GSD core files (STATE.md, ROADMAP.md, etc.)
+- NEVER modify core planning files (PROJECT.md, ROADMAP.md, etc.)
 - ALWAYS use .idumb/ for iDumb state
 - ALWAYS verify changes after making them
 - ALWAYS update state.json after changes

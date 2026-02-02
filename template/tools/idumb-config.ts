@@ -2,7 +2,7 @@
  * iDumb Configuration Management Tool
  * 
  * Manages .idumb/config.json with user preferences, hierarchical paths,
- * and GSD integration (reads from .planning/config.json)
+ * and planning system integration (reads from .planning/config.json)
  * 
  * IMPORTANT: No console.log - would pollute TUI
  */
@@ -15,7 +15,7 @@ import { join } from "path"
 // TYPES AND SCHEMA
 // ============================================================================
 
-// Config values that ENFORCE automation and INTEGRATE with GSD are ALLOWED
+// Config values that ENFORCE automation and INTEGRATE with planning systems are ALLOWED
 // Values that BLOCK functionality (like specific model IDs) are NOT allowed
 interface IdumbConfig {
   version: string
@@ -27,9 +27,9 @@ interface IdumbConfig {
       documents: string      // Language for generated artifacts
     }
   }
-  // Governance settings - ALLOWED: enforces validation/automation, integrates with GSD mode
+  // Governance settings - ALLOWED: enforces validation/automation
   governance: {
-    level: "light" | "moderate" | "strict"  // Derived from GSD mode
+    level: "light" | "moderate" | "strict"  // Governance strictness level
     expertSkeptic: boolean                   // Enforces critical thinking
     autoValidation: boolean                  // Enables automatic governance
   }
@@ -49,14 +49,14 @@ interface IdumbConfig {
       sessions: string
     }
   }
-  // GSD hierarchy mapping (mirrors GSD's milestone → phase → plan → task)
+  // Hierarchy mapping (milestone → phase → plan → task)
   hierarchy: {
     status: string[]    // ["milestone", "phase", "plan", "task"]
     agents: string[]    // ["coordinator", "governor", "validator", "builder"]
   }
-  // GSD framework integration (line 212) - traces to GSD config.json
+  // Planning system integration - reads from .planning/config.json
   frameworks: {
-    gsd: {
+    planning: {
       detected: boolean
       configPath: string
       syncEnabled: boolean
@@ -75,7 +75,7 @@ interface IdumbConfig {
   }
 }
 
-interface GSDConfig {
+interface PlanningConfig {
   mode?: "yolo" | "interactive"
   depth?: "quick" | "standard" | "comprehensive"
   profile?: "quality" | "balanced" | "budget"
@@ -130,7 +130,7 @@ function getDefaultConfig(): IdumbConfig {
       agents: ["coordinator", "governor", "validator", "builder"]
     },
     frameworks: {
-      gsd: {
+      planning: {
         detected: false,
         configPath: ".planning/config.json",
         syncEnabled: true
@@ -156,7 +156,7 @@ function getConfigPath(directory: string): string {
   return join(directory, ".idumb", "config.json")
 }
 
-function getGSDConfigPath(directory: string): string {
+function getPlanningConfigPath(directory: string): string {
   return join(directory, ".planning", "config.json")
 }
 
@@ -188,12 +188,12 @@ function saveConfig(directory: string, config: IdumbConfig): void {
   writeFileSync(configPath, JSON.stringify(config, null, 2))
 }
 
-function loadGSDConfig(directory: string): GSDConfig | null {
-  const gsdPath = getGSDConfigPath(directory)
+function loadPlanningConfig(directory: string): PlanningConfig | null {
+  const planningPath = getPlanningConfigPath(directory)
   
-  if (existsSync(gsdPath)) {
+  if (existsSync(planningPath)) {
     try {
-      return JSON.parse(readFileSync(gsdPath, "utf8"))
+      return JSON.parse(readFileSync(planningPath, "utf8"))
     } catch {
       return null
     }
@@ -203,17 +203,17 @@ function loadGSDConfig(directory: string): GSDConfig | null {
 }
 
 // Reserved keys that iDumb must not allow users to set
-// These are controlled by OpenCode or GSD, not by iDumb
+// These are controlled by OpenCode or planning systems, not by iDumb
 const RESERVED_OPENCODE_KEYS = ['models', 'provider', 'temperature', 'topP', 'topK']
-const RESERVED_GSD_KEYS = ['milestones', 'phases', 'agents', 'mode', 'depth', 'profile']
+const RESERVED_PLANNING_KEYS = ['milestones', 'phases', 'agents', 'mode', 'depth', 'profile']
 
 function isReservedKey(section: string, key: string): { reserved: boolean; owner?: string } {
-  // Check if the key matches OpenCode or GSD reserved patterns
+  // Check if the key matches OpenCode or planning reserved patterns
   if (RESERVED_OPENCODE_KEYS.some(r => key.includes(r) || r.includes(key))) {
     return { reserved: true, owner: 'OpenCode' }
   }
-  if (RESERVED_GSD_KEYS.some(r => key.includes(r) || r.includes(key))) {
-    return { reserved: true, owner: 'GSD' }
+  if (RESERVED_PLANNING_KEYS.some(r => key.includes(r) || r.includes(key))) {
+    return { reserved: true, owner: 'planning system' }
   }
   return { reserved: false }
 }
@@ -224,25 +224,25 @@ function isReservedKey(section: string, key: string): { reserved: boolean; owner
 
 // Read configuration
 export const read = tool({
-  description: "Read iDumb configuration (merges with GSD config if present)",
+  description: "Read iDumb configuration (merges with planning config if present)",
   args: {
     section: tool.schema.string().optional().describe("Specific section: user, governance, paths, hierarchy, frameworks, staleness, timestamps")
   },
   async execute(args, context) {
     const config = loadConfig(context.directory)
-    const gsdConfig = loadGSDConfig(context.directory)
+    const planningConfig = loadPlanningConfig(context.directory)
     
-    // Update GSD detection
-    config.frameworks.gsd.detected = gsdConfig !== null
+    // Update planning detection
+    config.frameworks.planning.detected = planningConfig !== null
     
     // Build merged view
     const result: any = {
       idumb: args.section ? (config as any)[args.section] : config,
-      gsd: gsdConfig || { detected: false },
+      planning: planningConfig || { detected: false },
       merged: {
         // Derive effective settings from both configs
-        mode: gsdConfig?.mode || "interactive",
-        profile: gsdConfig?.profile || "balanced",
+        mode: planningConfig?.mode || "interactive",
+        profile: planningConfig?.profile || "balanced",
         governance: config.governance.level
       }
     }
@@ -271,7 +271,7 @@ export const update = tool({
                  `To change ${reservedCheck.owner} settings, use their respective configuration.`,
         reservedKeys: {
           opencode: RESERVED_OPENCODE_KEYS,
-          gsd: RESERVED_GSD_KEYS
+          planning: RESERVED_PLANNING_KEYS
         }
       }, null, 2)
     }
@@ -323,7 +323,7 @@ export const update = tool({
 
 // Initialize configuration
 export const init = tool({
-  description: "Initialize .idumb/config.json with defaults and GSD detection",
+  description: "Initialize .idumb/config.json with defaults and planning system detection",
   args: {
     userName: tool.schema.string().optional().describe("User's preferred name"),
     language: tool.schema.string().optional().describe("Communication language (english, vietnamese, etc.)"),
@@ -344,9 +344,9 @@ export const init = tool({
       config.governance.level = args.governanceLevel as any
     }
     
-    // Detect GSD
-    const gsdConfig = loadGSDConfig(context.directory)
-    config.frameworks.gsd.detected = gsdConfig !== null
+    // Detect planning system
+    const planningConfig = loadPlanningConfig(context.directory)
+    config.frameworks.planning.detected = planningConfig !== null
     
     // Create paths
     const pathsToCreate = [
@@ -369,13 +369,13 @@ export const init = tool({
     return JSON.stringify({
       initialized: true,
       config,
-      gsdDetected: gsdConfig !== null,
+      planningDetected: planningConfig !== null,
       pathsCreated: pathsToCreate.length
     }, null, 2)
   }
 })
 
-// Get hierarchical status (from GSD STATE.md)
+// Get hierarchical status (from STATE.md)
 export const status = tool({
   description: "Get current status at each hierarchy level (milestone, phase, plan, task)",
   args: {},
@@ -386,7 +386,7 @@ export const status = tool({
       current: {}
     }
     
-    // Check GSD STATE.md
+    // Check STATE.md in .planning/
     const stateMdPath = join(context.directory, ".planning", "STATE.md")
     if (existsSync(stateMdPath)) {
       try {
@@ -424,35 +424,35 @@ export const status = tool({
         result.error = "Could not parse STATE.md"
       }
     } else {
-      result.gsdNotFound = true
+      result.planningNotFound = true
     }
     
     return JSON.stringify(result, null, 2)
   }
 })
 
-// Sync with GSD config
+// Sync with planning config
 export const sync = tool({
-  description: "Sync iDumb config with GSD .planning/config.json",
+  description: "Sync iDumb config with .planning/config.json",
   args: {},
   async execute(args, context) {
     const config = loadConfig(context.directory)
-    const gsdConfig = loadGSDConfig(context.directory)
+    const planningConfig = loadPlanningConfig(context.directory)
     
-    if (!gsdConfig) {
+    if (!planningConfig) {
       return JSON.stringify({
         synced: false,
-        reason: "GSD config not found at .planning/config.json"
+        reason: "Planning config not found at .planning/config.json"
       })
     }
     
     // Update detection
-    config.frameworks.gsd.detected = true
+    config.frameworks.planning.detected = true
     
-    // Map GSD settings to governance
-    if (gsdConfig.mode === "yolo") {
+    // Map planning settings to governance
+    if (planningConfig.mode === "yolo") {
       config.governance.level = "light"
-    } else if (gsdConfig.mode === "interactive") {
+    } else if (planningConfig.mode === "interactive") {
       config.governance.level = "moderate"
     }
     
@@ -460,7 +460,7 @@ export const sync = tool({
     
     return JSON.stringify({
       synced: true,
-      gsdConfig,
+      planningConfig,
       derivedGovernance: config.governance.level
     }, null, 2)
   }
@@ -468,20 +468,20 @@ export const sync = tool({
 
 // Default export: read full config
 export default tool({
-  description: "Read full iDumb configuration with GSD integration",
+  description: "Read full iDumb configuration with planning system integration",
   args: {},
   async execute(args, context) {
     const config = loadConfig(context.directory)
-    const gsdConfig = loadGSDConfig(context.directory)
+    const planningConfig = loadPlanningConfig(context.directory)
     
-    config.frameworks.gsd.detected = gsdConfig !== null
+    config.frameworks.planning.detected = planningConfig !== null
     
     return JSON.stringify({
       config,
-      gsd: gsdConfig || null,
+      planning: planningConfig || null,
       configPath: getConfigPath(context.directory),
-      gsdConfigPath: existsSync(getGSDConfigPath(context.directory)) 
-        ? getGSDConfigPath(context.directory) 
+      planningConfigPath: existsSync(getPlanningConfigPath(context.directory)) 
+        ? getPlanningConfigPath(context.directory) 
         : null
     }, null, 2)
   }

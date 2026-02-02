@@ -123,7 +123,7 @@ workflow:
         plan-phase: "/idumb:plan-phase {N}"
         discuss-phase: "/idumb:discuss-phase {N}"
         roadmap: "/idumb:roadmap"
-        new-project: "/gsd:new-project"
+        new-project: "/idumb:new-project"
         
     8_update_state:
       action: "Record session resume"
@@ -247,14 +247,13 @@ chains_to:
     - "/idumb:plan-phase"
     - "/idumb:discuss-phase"
     - "/idumb:roadmap"
-    - "/gsd:new-project"
+    - "/idumb:new-project"
 ```
 
 ## Integration Points
 
 ```yaml
 integration:
-  gsd_equivalent: "/gsd:resume-work"
   prompt_intercept:
     on_session_start: true
     detection: "exists('.idumb/brain/state.json')"

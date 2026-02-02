@@ -22,7 +22,7 @@ Generates a structured project roadmap with:
 - Timeline estimates
 - Resource allocation hints
 
-Integrates with GSD ROADMAP.md if present, or creates iDumb-native roadmap.
+Integrates with .planning/ROADMAP.md if present, or creates iDumb-native roadmap.
 
 ## Workflow
 
@@ -70,10 +70,10 @@ steps:
   6_store_roadmap:
     action: Save roadmap
     paths:
-      - .idumb/governance/roadmap.md
-      - .planning/ROADMAP.md (if GSD)
-      
-  7_update_state:
+       - .idumb/governance/roadmap.md
+       - .planning/ROADMAP.md (if planning framework)
+       
+   7_update_state:
     action: Record roadmap creation
     tool: idumb-state:write
     phase: roadmap_created
@@ -149,13 +149,13 @@ steps:
 /idumb:roadmap --update
 ```
 
-## Integration with GSD
+## Integration with Planning
 
-If GSD is detected:
+If planning framework is detected:
 - Reads existing ROADMAP.md from `.planning/`
-- Preserves GSD format and structure
+- Preserves planning format and structure
 - Adds iDumb governance metadata
-- Syncs with GSD STATE.md
+- Syncs with planning STATE.md
 
 ## Error Handling
 

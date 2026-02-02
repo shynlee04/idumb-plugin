@@ -77,7 +77,7 @@ workflow:
       action: "Save roadmap"
       paths:
         - ".idumb/governance/roadmap.md"
-        - ".planning/ROADMAP.md (if GSD)"
+        - ".planning/ROADMAP.md"
         
     7_update_state:
       action: "Record roadmap creation"
@@ -138,7 +138,6 @@ chains_to:
 
 ```yaml
 integration:
-  gsd_equivalent: "/gsd:roadmap"
   reads_from:
     - ".idumb/governance/research/"
     - ".planning/PROJECT.md"

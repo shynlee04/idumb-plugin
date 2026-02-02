@@ -1,5 +1,5 @@
 ---
-description: "Run full validation hierarchy - checks governance state, context integrity, and GSD alignment"
+description: "Run full validation hierarchy - checks governance state, context integrity, and planning alignment"
 agent: idumb-supreme-coordinator
 ---
 
@@ -18,9 +18,9 @@ Run the full validation hierarchy to verify governance integrity.
      - Validate .idumb/ structure integrity
      - Validate state.json schema
      - Validate anchor freshness
-     - Check for stale context (>48h)
-     - If GSD: validate alignment with .planning/
-   Report: detailed validation results
+      - Check for stale context (>48h)
+      - If planning artifacts: validate alignment with .planning/
+    Report: detailed validation results
    ```
 
 2. **Synthesize results:**
@@ -57,9 +57,9 @@ Run the full validation hierarchy to verify governance integrity.
        status: pass/fail
        stale_files: [list if any > 48h]
        
-     gsd_alignment:
-       status: pass/fail/skipped
-       details: [alignment issues]
+      planning_alignment:
+        status: pass/fail/skipped
+        details: [alignment issues]
        
    critical_issues: [list]
    warnings: [list]
@@ -74,7 +74,7 @@ Run the full validation hierarchy to verify governance integrity.
 - **Structure**: File/directory presence
 - **Schema**: JSON validity, required fields
 - **Freshness**: Context age < 48h
-- **Alignment**: GSD state matches iDumb state
+- **Alignment**: Planning state matches iDumb state
 - **Integrity**: No corrupted or inconsistent data
 
 ## CRITICAL RULES

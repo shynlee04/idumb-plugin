@@ -42,12 +42,11 @@ Defines the schema for `.idumb/config.json` - user/project configuration for iDu
     "integration": {
       "type": "object",
       "properties": {
-        "gsd": {
+        "planning": {
           "type": "object",
           "properties": {
             "enabled": { "type": "boolean", "default": true },
-            "syncState": { "type": "boolean", "default": true },
-            "passthroughCommands": { "type": "boolean", "default": true }
+            "syncState": { "type": "boolean", "default": true }
           }
         },
         "git": {
@@ -103,10 +102,9 @@ Defines the schema for `.idumb/config.json` - user/project configuration for iDu
     "stalenessWarningHours": 48
   },
   "integration": {
-    "gsd": {
+    "planning": {
       "enabled": true,
-      "syncState": true,
-      "passthroughCommands": true
+      "syncState": true
     },
     "git": {
       "trackCommits": true,
@@ -163,21 +161,17 @@ governance_levels:
       - skip conditions: always available
 ```
 
-## GSD Integration Settings
+## Planning Integration Settings
 
 ```yaml
-gsd_integration:
+planning_integration:
   enabled:
-    true: "Full integration with GSD framework"
+    true: "Full integration with .planning directory"
     false: "Standalone iDumb operation"
     
   syncState:
     true: "Keep .idumb state in sync with .planning"
     false: "Independent state tracking"
-    
-  passthroughCommands:
-    true: "Let /gsd:* commands pass through to GSD"
-    false: "Block GSD commands, require iDumb equivalents"
 ```
 
 ## Config Operations
@@ -198,24 +192,24 @@ operations:
     
   sync:
     tool: "idumb-config_sync"
-    description: "Sync with GSD config if present"
+    description: "Sync with planning config if present"
     
   status:
     tool: "idumb-config_status"
     returns: "Current status at each hierarchy level"
 ```
 
-## Merging with GSD Config
+## Merging with Planning Config
 
 ```yaml
 merge_strategy:
   description: |
-    When GSD .planning/config.json exists, iDumb config
+    When .planning/config.json exists, iDumb config
     merges with it. iDumb-specific settings take precedence.
     
   merge_rules:
-    - GSD paths → use as-is
-    - GSD project info → read-only
+    - Planning paths → use as-is
+    - Project info → read-only
     - iDumb governance → override
     - iDumb agents → iDumb-only
     

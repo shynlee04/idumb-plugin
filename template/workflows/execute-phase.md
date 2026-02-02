@@ -225,7 +225,6 @@ chains_to:
 
 ```yaml
 integration:
-  gsd_equivalent: "/gsd:execute-plan"
   reads_from:
     - ".planning/phases/{N}/*PLAN.md"
     - ".idumb/execution/{N}/progress.json"

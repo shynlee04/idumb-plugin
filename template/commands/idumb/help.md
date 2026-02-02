@@ -30,7 +30,7 @@ Display help information for the iDumb governance system.
 # Run validation
 /idumb:validate
 /idumb:validate scope:structure    # Validate only structure
-/idumb:validate scope:alignment    # Validate GSD alignment only
+/idumb:validate scope:alignment    # Validate planning alignment only
 ```
 
 ## AGENT HIERARCHY
@@ -56,14 +56,6 @@ Display help information for the iDumb governance system.
   - Creates, edits, deletes files
   - Reports changes made
 ```
-
-## GSD INTEGRATION
-
-iDumb wraps GSD transparently:
-- `/gsd:*` commands work normally
-- iDumb intercepts via plugin hooks
-- Validation runs automatically
-- State tracked in `.idumb/` (not `.planning/`)
 
 ## FILES
 

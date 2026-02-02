@@ -21,7 +21,6 @@ routing_table:
     allowed_commands:
       - /idumb:init
       - /idumb:help
-      - /gsd:*        # GSD commands always pass through
     blocked_commands:
       - /idumb:execute-phase
       - /idumb:plan-phase
@@ -39,13 +38,12 @@ routing_table:
       - /idumb:new-project
       - /idumb:help
       - /idumb:status
-      - /gsd:new-project
     blocked_commands:
       - /idumb:execute-phase
       - /idumb:plan-phase
       - /idumb:discuss-phase
     auto_redirect:
-      on_blocked: "/gsd:new-project or /idumb:new-project"
+      on_blocked: /idumb:new-project
       message: "No project defined. Create project first."
     
   # STATE: Project exists, no roadmap
@@ -56,7 +54,6 @@ routing_table:
       - /idumb:roadmap
       - /idumb:research
       - /idumb:help
-      - /gsd:*
     blocked_commands:
       - /idumb:execute-phase
       - /idumb:plan-phase
@@ -150,25 +147,6 @@ priority_matrix:
       - /idumb:roadmap
       - /idumb:debug
     behavior: "Context-dependent"
-```
-
-## GSD Pass-Through Rules
-
-```yaml
-gsd_passthrough:
-  enabled: true
-  pattern: "/gsd:*"
-  behavior:
-    - "Let GSD handle command"
-    - "Track in iDumb history"
-    - "Validate after GSD completes"
-    - "Sync state if needed"
-  
-  intercept_after:
-    - /gsd:new-project: "Trigger /idumb:init if not initialized"
-    - /gsd:complete-milestone: "Archive iDumb state"
-    - /gsd:pause-work: "Create session anchor"
-    - /gsd:resume-work: "Restore session context"
 ```
 
 ## Auto-Correction Triggers

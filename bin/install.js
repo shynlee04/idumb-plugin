@@ -2,8 +2,8 @@
 /**
  * iDumb Installer - npx @anthropic-ai/idumb
  * 
- * Installs iDumb meta-framework for OpenCode
- * Wraps GSD with hierarchical governance
+ * Installs iDumb hierarchical governance framework for OpenCode
+ * Archives any existing GSD files during install (replaced by iDumb)
  */
 
 // Node.js version check - require 18+
@@ -31,7 +31,7 @@ const TEMPLATE_DIR = join(__dirname, '..', 'template');
 
 const OPENCODE_GLOBAL = join(process.env.HOME || process.env.USERPROFILE || homedir(), '.config', 'opencode');
 const OPENCODE_LOCAL = join(process.cwd(), '.opencode');
-const GSD_REPO = 'https://github.com/glittercowboy/get-shit-done.git';
+// GSD_REPO removed - iDumb is standalone framework
 
 // ============================================================================
 // UTILITIES
@@ -45,7 +45,7 @@ function printHeader() {
     print('');
     print('╔════════════════════════════════════════════════════════════╗');
     print('║                      iDumb v0.1.0                          ║');
-    print('║    Meta-Framework for OpenCode + GSD Governance            ║');
+    print('║      Hierarchical Governance for OpenCode                  ║');
     print('╚════════════════════════════════════════════════════════════╝');
     print('');
 }
@@ -115,9 +115,9 @@ function copyDir(src, dest) {
 
 function detectProject() {
     const cwd = process.cwd();
-    const hasGSD = existsSync(join(cwd, '.planning')) || 
-                   existsSync(join(cwd, 'PROJECT.md')) ||
-                   existsSync(join(cwd, 'ROADMAP.md'));
+    const hasPlanning = existsSync(join(cwd, '.planning')) || 
+                        existsSync(join(cwd, 'PROJECT.md')) ||
+                        existsSync(join(cwd, 'ROADMAP.md'));
     const hasPackageJson = existsSync(join(cwd, 'package.json'));
     const hasSrc = existsSync(join(cwd, 'src'));
     const hasGit = existsSync(join(cwd, '.git'));
@@ -135,13 +135,9 @@ function detectProject() {
     
     return {
         isProject: hasPackageJson || hasSrc || hasGit,
-        hasGSD,
+        hasPlanning,
         projectName
     };
-}
-
-function checkGSDInstalled(targetDir) {
-    return existsSync(join(targetDir, 'commands', 'gsd'));
 }
 
 // ============================================================================
@@ -174,10 +170,10 @@ async function step2_detectProject() {
     
     if (detection.isProject) {
         print(`  ✓ Project detected: ${detection.projectName}`);
-        if (detection.hasGSD) {
-            print('  ✓ GSD already installed');
+        if (detection.hasPlanning) {
+            print('  ✓ Planning structure detected');
         } else {
-            print('  ⚠ GSD not detected');
+            print('  ⚠ No planning structure detected');
         }
     } else {
         print('  ⚠ No project detected in current directory');
@@ -186,40 +182,65 @@ async function step2_detectProject() {
     return detection;
 }
 
-async function step3_checkGSD(targetDir) {
+// step3_checkGSD REMOVED - iDumb is standalone
+
+async function step3_archiveExistingGSD(targetDir) {
     print('');
-    print('STEP 3: GSD Framework');
-    print('─────────────────────');
+    print('STEP 3: Checking for Existing GSD Files');
+    print('────────────────────────────────────────');
     
-    const hasGSD = checkGSDInstalled(targetDir);
+    const gsdAgents = join(targetDir, 'agents');
+    const gsdCommands = join(targetDir, 'commands', 'gsd');
+    const gsdDir = join(targetDir, 'get-shit-done');
     
-    if (hasGSD) {
-        print('  ✓ GSD commands found');
-        return true;
-    }
+    let archived = [];
     
-    print('  ⚠ GSD not installed at target location');
-    print('');
-    const answer = await prompt('Install GSD now? [y/n]: ', 'n');
+    const { rmSync } = await import('fs');
     
-    if (answer === 'y' || answer === 'yes') {
-        print('  Installing GSD...');
-        try {
-            const isGlobal = targetDir === OPENCODE_GLOBAL;
-            const gsdFlags = isGlobal ? '--opencode --global' : '--opencode --local';
-            execSync(`npx get-shit-done-cc ${gsdFlags}`, { stdio: 'inherit' });
-            print('  ✓ GSD installed');
-            return true;
-        } catch (e) {
-            print('  ✗ GSD installation failed');
-            print('    Run manually: npx get-shit-done-cc');
-            return false;
+    // Archive GSD agents if they exist
+    if (existsSync(gsdAgents)) {
+        const entries = readdirSync(gsdAgents);
+        for (const entry of entries) {
+            if (entry.startsWith('gsd-')) {
+                const archiveDir = join(targetDir, '.gsd-archive', 'agents');
+                mkdirSync(archiveDir, { recursive: true });
+                const src = join(gsdAgents, entry);
+                const dest = join(archiveDir, entry);
+                cpSync(src, dest);
+                rmSync(src);
+                archived.push(`agents/${entry}`);
+            }
         }
     }
     
-    print('  Skipping GSD installation');
-    print('  Note: iDumb works best with GSD');
-    return false;
+    // Archive GSD commands if they exist
+    if (existsSync(gsdCommands)) {
+        const archiveDir = join(targetDir, '.gsd-archive', 'commands');
+        mkdirSync(archiveDir, { recursive: true });
+        cpSync(gsdCommands, join(archiveDir, 'gsd'), { recursive: true });
+        rmSync(gsdCommands, { recursive: true });
+        archived.push('commands/gsd/');
+    }
+    
+    // Archive get-shit-done directory if it exists
+    if (existsSync(gsdDir)) {
+        const archiveDir = join(targetDir, '.gsd-archive');
+        mkdirSync(archiveDir, { recursive: true });
+        cpSync(gsdDir, join(archiveDir, 'get-shit-done'), { recursive: true });
+        rmSync(gsdDir, { recursive: true });
+        archived.push('get-shit-done/');
+    }
+    
+    if (archived.length > 0) {
+        print('  ⚠ GSD files found and archived to .gsd-archive/');
+        for (const item of archived) {
+            print(`    ✓ Archived: ${item}`);
+        }
+        print('');
+        print('  Note: iDumb replaces GSD. Original files preserved in .gsd-archive/');
+    } else {
+        print('  ✓ No GSD files to archive');
+    }
 }
 
 async function step4_installAgents(targetDir) {
@@ -299,73 +320,13 @@ async function step8_installSkills(targetDir) {
     print('  ✓ idumb-governance/SKILL.md - Governance protocols');
 }
 
-async function step9_installWorkflows(targetDir) {
-    print('');
-    print('STEP 9: Installing GSD Workflows');
-    print('─────────────────────────────────');
-    
-    const workflowsDir = join(targetDir, 'get-shit-done', 'workflows');
-    mkdirSync(workflowsDir, { recursive: true });
-    
-    const templateWorkflows = join(TEMPLATE_DIR, 'workflows');
-    if (existsSync(templateWorkflows)) {
-        copyDir(templateWorkflows, workflowsDir);
-        print('  ✓ Installed workflows to .opencode/get-shit-done/workflows/');
-    } else {
-        print('  ⚠ No template workflows found (skipped)');
-    }
-}
+// step9_installWorkflows REMOVED - iDumb is standalone
 
-async function step10_installTemplates(targetDir) {
-    print('');
-    print('STEP 10: Installing GSD Templates');
-    print('──────────────────────────────────');
-    
-    const templatesDir = join(targetDir, 'get-shit-done', 'templates');
-    mkdirSync(templatesDir, { recursive: true });
-    
-    const templateTemplates = join(TEMPLATE_DIR, 'templates');
-    if (existsSync(templateTemplates)) {
-        copyDir(templateTemplates, templatesDir);
-        print('  ✓ Installed templates to .opencode/get-shit-done/templates/');
-    } else {
-        print('  ⚠ No template templates found (skipped)');
-    }
-}
+// step10_installTemplates REMOVED - iDumb is standalone
 
-async function step11_installReferences(targetDir) {
-    print('');
-    print('STEP 11: Installing GSD References');
-    print('───────────────────────────────────');
-    
-    const referencesDir = join(targetDir, 'get-shit-done', 'references');
-    mkdirSync(referencesDir, { recursive: true });
-    
-    const templateReferences = join(TEMPLATE_DIR, 'references');
-    if (existsSync(templateReferences)) {
-        copyDir(templateReferences, referencesDir);
-        print('  ✓ Installed references to .opencode/get-shit-done/references/');
-    } else {
-        print('  ⚠ No template references found (skipped)');
-    }
-}
+// step11_installReferences REMOVED - iDumb is standalone
 
-async function step12_installRouter(targetDir) {
-    print('');
-    print('STEP 12: Installing GSD Router');
-    print('───────────────────────────────');
-    
-    const routerDir = join(targetDir, 'get-shit-done', 'router');
-    mkdirSync(routerDir, { recursive: true });
-    
-    const templateRouter = join(TEMPLATE_DIR, 'router');
-    if (existsSync(templateRouter)) {
-        copyDir(templateRouter, routerDir);
-        print('  ✓ Installed router to .opencode/get-shit-done/router/');
-    } else {
-        print('  ⚠ No template router found (skipped)');
-    }
-}
+// step12_installRouter REMOVED - iDumb is standalone
 
 async function step13_createIdumbDir(location) {
     print('');
@@ -436,15 +397,15 @@ async function step13_createIdumbDir(location) {
         print('');
     }
     
-    // Detect GSD phase for initial state
+    // Detect planning structure for initial state
     const detection = detectProject();
     let framework = 'none';
     let phase = 'init';
-    let gsdDetected = false;
+    let planningDetected = false;
     
-    if (detection.hasGSD) {
-        framework = 'gsd';
-        gsdDetected = true;
+    if (detection.hasPlanning) {
+        framework = 'planning';
+        planningDetected = true;
         // Try to read phase from .planning/STATE.md
         const stateMdPath = join(process.cwd(), '.planning', 'STATE.md');
         if (existsSync(stateMdPath)) {
@@ -476,7 +437,7 @@ async function step13_createIdumbDir(location) {
     }
     
     // Create config file with hierarchical paths
-    // Governance values are ALLOWED - they enforce automation and integrate with GSD mode
+    // Governance values enforce automation and integrate with planning structure
     const configFile = join(idumbDir, 'config.json');
     if (!existsSync(configFile)) {
         writeFileSync(configFile, JSON.stringify({
@@ -489,10 +450,9 @@ async function step13_createIdumbDir(location) {
                     documents: userLanguage
                 }
             },
-            // Governance settings - ALLOWED: enforces validation/automation, integrates with GSD mode
-            // GSD mode: "yolo" → level: "light", mode: "interactive" → level: "moderate"
+            // Governance settings - enforces validation/automation
             governance: {
-                level: 'moderate',        // Derived from GSD mode, enforces validation strictness
+                level: 'moderate',        // Enforces validation strictness
                 expertSkeptic: true,      // Enforces critical thinking, context-first
                 autoValidation: true      // Enables automatic governance checks
             },
@@ -512,15 +472,15 @@ async function step13_createIdumbDir(location) {
                     sessions: '.idumb/brain/context/sessions.md'
                 }
             },
-            // GSD hierarchy mapping (mirrors GSD's milestone → phase → plan → task)
+            // Hierarchy mapping (milestone → phase → plan → task)
             hierarchy: {
                 status: ['milestone', 'phase', 'plan', 'task'],
                 agents: ['coordinator', 'governor', 'validator', 'builder']
             },
-            // GSD framework integration (line 212) - traces to GSD config.json
+            // Planning framework integration - detects .planning/ structure
             frameworks: {
-                gsd: {
-                    detected: gsdDetected,
+                planning: {
+                    detected: planningDetected,
                     configPath: '.planning/config.json',
                     syncEnabled: true
                 }
@@ -564,12 +524,7 @@ async function showComplete(targetDir, location) {
     print('  ├── Commands:   4 (/idumb:init, :status, :validate, :help)');
     print('  ├── Tools:      7 (state, validate, context, config, manifest, chunker, todo)');
     print('  ├── Plugins:    1 (idumb-core.ts)');
-    print('  ├── Skills:     1 (idumb-governance/)');
-    print('  └── GSD Layer:');
-    print('      ├── workflows/   (agent delegation patterns)');
-    print('      ├── templates/   (document templates)');
-    print('      ├── references/  (framework documentation)');
-    print('      └── router/      (command routing)');
+    print('  └── Skills:     1 (idumb-governance/)');
     
     if (location.type === 'local') {
         print('');
@@ -608,13 +563,6 @@ async function showComplete(targetDir, location) {
     print('    └─→ idumb-high-governance (all)');
     print('          ├─→ idumb-low-validator (hidden subagent)');
     print('          └─→ idumb-builder (hidden subagent)');
-    print('');
-    print('GSD INTEGRATION:');
-    print('─────────────────');
-    print('  /gsd:* commands work normally');
-    print('  iDumb intercepts via plugin hooks');
-    print('  Governance state in .idumb/');
-    print('  Config syncs with .planning/config.json');
     print('');
 }
 
@@ -696,7 +644,7 @@ async function main() {
     
     // Install steps
     await step2_detectProject();
-    await step3_checkGSD(location.path);
+    await step3_archiveExistingGSD(location.path);
     
     // Check for existing installation
     const existingAgent = join(location.path, 'agents', 'idumb-supreme-coordinator.md');
@@ -716,10 +664,7 @@ async function main() {
     await step6_installTools(location.path);
     await step7_installPlugin(location.path);
     await step8_installSkills(location.path);
-    await step9_installWorkflows(location.path);
-    await step10_installTemplates(location.path);
-    await step11_installReferences(location.path);
-    await step12_installRouter(location.path);
+    // step9-12 REMOVED - standalone framework, no GSD dependency
     await step13_createIdumbDir(location);
     await showComplete(location.path, location);
 }

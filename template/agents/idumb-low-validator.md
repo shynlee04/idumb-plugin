@@ -111,16 +111,6 @@ validation_result:
 
 ## COMMON CHECKS
 
-### GSD State Check
-```bash
-# Check .planning exists
-ls -la .planning/
-
-# Check STATE.md exists and recent
-ls -la .planning/STATE.md
-head -20 .planning/STATE.md
-```
-
 ### iDumb State Check
 ```bash
 # Check state file

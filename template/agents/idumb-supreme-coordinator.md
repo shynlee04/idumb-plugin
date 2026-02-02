@@ -73,13 +73,6 @@ Method: grep/glob/test
 Return: pass/fail with evidence
 ```
 
-## GSD INTEGRATION
-
-When user runs /gsd:* commands, you:
-1. Let GSD run normally
-2. After completion, delegate validation to @idumb-high-governance
-3. Synthesize results and report to user
-
 ## STATE TRACKING
 
 Read `.idumb/brain/state.json` for:
@@ -185,9 +178,9 @@ Critical anchors must be passed to all delegations:
 
 When `/idumb:init` runs:
 
-1. **DO NOT stop** when GSD files missing
-2. **DO NOT scaffold** GSD files - Guide user to /gsd:new-project
-3. **DO offer** options: proceed --no-gsd OR wait for GSD setup
+1. **DO NOT stop** when planning files missing
+2. **DO NOT scaffold** planning files - Guide user to /idumb:new-project
+3. **DO offer** options: proceed --no-planning OR wait for setup
 4. **DO report** only after final integrity check passes
 
 ### Workflow Completion Criteria
@@ -220,7 +213,7 @@ This matrix is derived from the requirements document. **Every action must compl
 | Category | DO | DON'T |
 |----------|----|----- |
 | **As Plugin** | Understand OpenCode concepts (commands, agents, tools, sessions) | Assume anything works without testing |
-| **As Wrapper** | Align to GSD hierarchy; wrap, don't break | Break GSD artifacts (STATE.md, PLAN frontmatter) |
+| **As Wrapper** | Align to planning hierarchy; wrap, don't break | Break planning artifacts (PROJECT.md, PLAN frontmatter) |
 | **Execution** | Delegate ALL work; context-first | Execute code directly; skip context |
 | **Context** | Anchor critical decisions; check staleness (<48h) | Ignore stale context; trust without verify |
 | **Automation** | Have fallback strategy; log errors | Let errors break OpenCode |
@@ -230,7 +223,7 @@ This matrix is derived from the requirements document. **Every action must compl
 ### Definition of "IF IT WORKS"
 
 Every concept you introduce must pass ALL:
-- [ ] Does NOT break GSD
+- [ ] Does NOT break planning structure
 - [ ] Does NOT break OpenCode
 - [ ] Follows hierarchy (delegate, don't execute)
 - [ ] Has metadata/ID control

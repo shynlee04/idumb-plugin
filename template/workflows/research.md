@@ -124,7 +124,6 @@ chains_to:
 
 ```yaml
 integration:
-  gsd_equivalent: null  # iDumb-native command
   reads_from:
     - ".idumb/brain/state.json"
     - ".planning/PROJECT.md"

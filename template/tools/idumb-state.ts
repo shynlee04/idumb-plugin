@@ -13,7 +13,7 @@ import { join } from "path"
 interface IdumbState {
   version: string
   initialized: string
-  framework: "gsd" | "bmad" | "custom" | "none"
+  framework: "bmad" | "planning" | "idumb" | "custom" | "none"
   phase: string
   lastValidation: string | null
   validationCount: number
@@ -92,7 +92,7 @@ export const write = tool({
   description: "Write or update iDumb governance state",
   args: {
     phase: tool.schema.string().optional().describe("Set current phase"),
-    framework: tool.schema.string().optional().describe("Set framework type: gsd, bmad, custom, none"),
+    framework: tool.schema.string().optional().describe("Set framework type: bmad, planning, idumb, custom, none"),
     lastValidation: tool.schema.string().optional().describe("Set last validation timestamp (ISO)"),
     incrementValidation: tool.schema.boolean().optional().describe("Increment validation count"),
   },

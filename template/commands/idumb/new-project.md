@@ -10,7 +10,7 @@ Initialize a new iDumb-governed project with full governance structure.
 ## Usage
 
 ```
-/idumb:new-project [project-name] [--framework=gsd|bmad|custom] [--template=web|api|library|cli]
+/idumb:new-project [project-name] [--framework=planning|bmad|custom] [--template=web|api|library|cli]
 ```
 
 ## Description
@@ -57,7 +57,7 @@ steps:
   5_detect_existing:
     action: Check for existing frameworks
     checks:
-      - .planning/ (GSD)
+      - .planning/ (planning artifacts)
       - PROJECT.md (BMAD)
       - package.json (Node)
       - Cargo.toml (Rust)
@@ -83,8 +83,8 @@ steps:
 ## Examples
 
 ```bash
-# Initialize with GSD framework
-/idumb:new-project my-app --framework=gsd
+# Initialize with planning framework
+/idumb:new-project my-app --framework=planning
 
 # Initialize library project
 /idumb:new-project my-lib --template=library --framework=custom
@@ -113,7 +113,7 @@ On success, displays:
 |-------|-------|------------|
 | `E001` | .idumb/ already exists | Use --force to overwrite or choose different directory |
 | `E002` | Permission denied | Check directory write permissions |
-| `E003` | Invalid framework | Use: gsd, bmad, or custom |
+| `E003` | Invalid framework | Use: planning, bmad, or custom |
 
 ## Related Commands
 

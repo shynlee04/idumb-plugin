@@ -13,7 +13,7 @@ import { join } from "path"
 interface ProjectContext {
   name: string
   type: "app" | "library" | "monorepo" | "unknown"
-  framework: "gsd" | "bmad" | "both" | "none"
+  framework: "bmad" | "planning" | "both" | "none"
   language: string[]
   hasTests: boolean
   hasCI: boolean
@@ -78,23 +78,23 @@ export default tool({
     }
     
     // Detect frameworks
-    // GSD stores STATE.md and ROADMAP.md in .planning/, not project root
-    const hasGSDPlanning = existsSync(join(dir, ".planning"))
-    const hasGSDState = existsSync(join(dir, ".planning", "STATE.md"))
-    const hasGSDRoadmap = existsSync(join(dir, ".planning", "ROADMAP.md"))
-    const hasGSDConfig = existsSync(join(dir, ".planning", "config.json"))
-    const hasGSD = hasGSDPlanning && (hasGSDState || hasGSDRoadmap || hasGSDConfig)
+    // Planning system stores STATE.md and ROADMAP.md in .planning/, not project root
+    const hasPlanningDir = existsSync(join(dir, ".planning"))
+    const hasPlanningState = existsSync(join(dir, ".planning", "STATE.md"))
+    const hasPlanningRoadmap = existsSync(join(dir, ".planning", "ROADMAP.md"))
+    const hasPlanningConfig = existsSync(join(dir, ".planning", "config.json"))
+    const hasPlanning = hasPlanningDir && (hasPlanningState || hasPlanningRoadmap || hasPlanningConfig)
     
     const hasBMAD = existsSync(join(dir, "PROJECT.md")) ||
                     existsSync(join(dir, "personas")) ||
                     existsSync(join(dir, "_bmad-output"))
     
-    if (hasGSD && hasBMAD) {
+    if (hasPlanning && hasBMAD) {
       result.framework = "both"
-      result.detectedPatterns.push("GSD + BMAD detected")
-    } else if (hasGSD) {
-      result.framework = "gsd"
-      result.detectedPatterns.push("GSD framework detected")
+      result.detectedPatterns.push("Planning + BMAD detected")
+    } else if (hasPlanning) {
+      result.framework = "planning"
+      result.detectedPatterns.push("Planning system detected")
     } else if (hasBMAD) {
       result.framework = "bmad"
       result.detectedPatterns.push("BMAD framework detected")
@@ -185,11 +185,11 @@ export const summary = tool({
     lines.push(`Project: ${name}`)
     
     // Framework
-    const hasGSD = existsSync(join(dir, ".planning"))
+    const hasPlanning = existsSync(join(dir, ".planning"))
     const hasBMAD = existsSync(join(dir, "PROJECT.md"))
-    if (hasGSD) lines.push("Framework: GSD")
+    if (hasPlanning) lines.push("Framework: Planning")
     if (hasBMAD) lines.push("Framework: BMAD")
-    if (!hasGSD && !hasBMAD) lines.push("Framework: None detected")
+    if (!hasPlanning && !hasBMAD) lines.push("Framework: None detected")
     
     // iDumb state
     const idumbState = join(dir, ".idumb", "brain", "state.json")

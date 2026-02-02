@@ -14,25 +14,25 @@ You are initializing iDumb governance for this project.
 ```
 Step 1 → Step 2 → Step 3 → Step 4 ──┬→ [PASS] → Step 5 → Step 6 → Step 7
                                     │                                  ↓
-                                    │         Step 8 (Brownfield Detection)
+                                    │         Step 8 (Project Detection)
                                     │                                  ↓
                                     │    ┌────────────────┬────────────┴────────────┐
                                     │    ↓                ↓                         ↓
-                                    │ [brownfield]    [greenfield]           [existing_gsd]
+                                    │ [brownfield]    [greenfield]           [existing_planning]
                                     │    ↓                ↓                         ↓
-                                    │ Step 9 + 10     Step 9               Skip to Step 11
+                                    │ Step 9            Step 9               Skip to Step 10
                                     │    ↓                ↓                         ↓
-                                    │    └────────→ Step 11 (Menu) ←────────────────┘
+                                    │    └────────→ Step 10 (Menu) ←────────────────┘
                                     │                     ↓
-                                    └→ [FAIL] →    Step 12 → COMPLETE
+                                    └→ [FAIL] →    Step 11 → COMPLETE
                                               ↓
                                     Step 4b (guide user) → USER DECISION
                                               │
                                    ┌──────────┴───────────┐
                                    ↓                      ↓
-                           [proceed --no-gsd]     [wait for GSD]
+                           [proceed anyway]     [create planning first]
                                    ↓                      ↓
-                             Step 5...              Status: gsd_incomplete
+                             Step 5...              Status: planning_incomplete
 ```
 
 ## YOUR TASK
@@ -48,16 +48,16 @@ Delegate to @idumb-low-validator to gather project context:
 @idumb-low-validator
 Task: Gather project context
 Checks:
-  - Check .planning/ exists (GSD indicator)
-  - Check .planning/PROJECT.md exists (GSD project definition)
-  - Check .planning/STATE.md exists (GSD state file)
-  - Check .planning/ROADMAP.md exists (GSD roadmap)
-  - Check .planning/config.json exists (GSD config)
+  - Check .planning/ exists (planning indicator)
+  - Check .planning/PROJECT.md exists (project definition)
+  - Check .planning/STATE.md exists (state file)
+  - Check .planning/ROADMAP.md exists (roadmap)
+  - Check .planning/config.json exists (planning config)
   - Check PROJECT.md exists in root (BMAD indicator)
   - Check _bmad-output/ exists (BMAD output)
 Return Format:
   status: complete/partial/missing
-  gsd:
+  planning:
     detected: true/false
     files_found: [list]
     files_missing: [list]
@@ -89,8 +89,8 @@ Template for state.json:
   {
     "version": "0.1.0",
     "initialized": "[ISO timestamp]",
-    "framework": "[detected: gsd/bmad/both/none]",
-    "phase": "[from GSD STATE.md or 'init']",
+    "framework": "[detected: planning/bmad/both/none]",
+    "phase": "[from STATE.md or 'init']",
     "lastValidation": null,
     "validationCount": 0,
     "anchors": [],
@@ -118,12 +118,10 @@ Template for config.json:
         "anchors": ".idumb/anchors/"
       }
     },
-    "frameworks": {
-      "gsd": {
-        "detected": [true/false],
-        "configPath": ".planning/config.json",
-        "syncEnabled": true
-      }
+    "planning": {
+      "detected": [true/false],
+      "configPath": ".planning/config.json",
+      "syncEnabled": true
     }
   }
 Return Format:
@@ -132,74 +130,74 @@ Return Format:
   failed: [list of failed items with reasons]
 ```
 
-### Step 4: Validate structure AND framework completeness
+### Step 4: Validate structure AND planning completeness
 Delegate to @idumb-low-validator:
 ```
 @idumb-low-validator
-Task: Verify governance structure AND framework integration
+Task: Verify governance structure AND planning integration
 Checks:
   - .idumb/ directory exists
   - .idumb/brain/state.json exists and is valid JSON
   - .idumb/governance/ directory exists
   - .idumb/config.json exists and is valid JSON
-  - IF GSD detected: Check required GSD files exist
-    - .planning/PROJECT.md (REQUIRED for GSD)
+  - IF planning detected: Check required planning files exist
+    - .planning/PROJECT.md (REQUIRED for planning)
     - .planning/STATE.md (REQUIRED for workflow)
     - .planning/ROADMAP.md (REQUIRED for phases)
     - .planning/config.json (REQUIRED for settings)
 Return Format:
   status: pass/fail
   idumb_structure: pass/fail
-  gsd_completeness: pass/fail/not_applicable
-  missing_gsd_files: [list if any]
+  planning_completeness: pass/fail/not_applicable
+  missing_planning_files: [list if any]
   evidence: [specific checks performed]
 ```
 
-## ⚡ GSD INTEGRATION LOGIC (CRITICAL)
+## ⚡ PLANNING INTEGRATION LOGIC (CRITICAL)
 
-### Step 4b: IF GSD detected but incomplete
+### Step 4b: IF planning detected but incomplete
 
-**DO NOT SCAFFOLD GSD FILES. Guide user instead.**
+**DO NOT SCAFFOLD PLANNING FILES. Guide user instead.**
 
-When `gsd_completeness: fail`:
+When `planning_completeness: fail`:
 
 1. **Report the gap clearly:**
 ```yaml
-gsd_gap_detected:
+planning_gap_detected:
   status: incomplete
   files_missing:
-    - .planning/PROJECT.md → "Run /gsd:new-project to create"
-    - .planning/STATE.md → "Created by /gsd:new-project"
+    - .planning/PROJECT.md → "Run /idumb:new-project to create"
+    - .planning/STATE.md → "Created by /idumb:new-project"
     - .planning/ROADMAP.md → "Created by roadmapping phase"
-    - .planning/config.json → "Created by /gsd:new-project"
+    - .planning/config.json → "Created by /idumb:new-project"
   guidance: |
-    iDumb detected .planning/ directory but GSD setup is incomplete.
+    iDumb detected .planning/ directory but planning setup is incomplete.
     
     OPTIONS:
-    1. Complete GSD setup: Run `/gsd:new-project`
-    2. Use iDumb without GSD: Proceed with `--no-gsd` flag
-    3. Map existing codebase: Run `/gsd:map-codebase`
+    1. Complete planning setup: Run `/idumb:new-project`
+    2. Use iDumb without planning: Proceed with `--no-planning` flag
+    3. Map existing codebase: Run `/idumb:map-codebase`
   
-  recommended: "Run /gsd:new-project first, then /idumb:init"
+  recommended: "Run /idumb:new-project first, then /idumb:init"
 ```
 
 2. **Ask user for decision:**
-   - "Would you like to proceed without GSD integration?"
+   - "Would you like to proceed without planning integration?"
    - If yes: Set `framework: "idumb-only"` and continue to Step 5
-   - If no: Halt and wait for GSD setup
+   - If no: Halt and wait for planning setup
 
 3. **DO NOT create any files in .planning/**
 
 ### Step 4c: Handle user decision
 ```yaml
 user_decision:
-  proceed_without_gsd:
+  proceed_without_planning:
     - Update state.json with: framework: "idumb-only"
-    - Set gsd_ready: false in config
+    - Set planning_ready: false in config
     - Continue to Step 5
-  wait_for_gsd:
-    - Report: "Run /gsd:new-project then /idumb:init --force"
-    - Status: gsd_incomplete
+  wait_for_planning:
+    - Report: "Run /idumb:new-project then /idumb:init --force"
+    - Status: planning_incomplete
     - Do NOT continue to Step 5
 ```
 
@@ -232,14 +230,14 @@ Checks:
   - config.json exists AND valid JSON
   - At least 1 anchor exists
   - History has at least 1 entry
-  - IF GSD: All 4 required files exist
+  - IF planning: All 4 required files exist
 Return Format:
   status: pass/fail
   initialization_complete: true/false
   summary: "[brief status]"
 ```
 
-### Step 8: GSD Integration (Brownfield Detection)
+### Step 8: Project Type Detection (Brownfield Detection)
 
 **Check project type:**
 ```bash
@@ -253,90 +251,64 @@ PLANNING_EXISTS=$([ -d ".planning" ] && echo "true" || echo "false")
 project_type_detection:
   if: SRC_FILES > 5 AND PLANNING_EXISTS == false
     type: brownfield
-    action: Auto-run /gsd:map-codebase then /gsd:new-project
+    action: Run /idumb:map-codebase first
   elif: SRC_FILES <= 5 AND PLANNING_EXISTS == false
     type: greenfield
-    action: Offer /gsd:new-project
+    action: Run /idumb:new-project
   else:
-    type: existing_gsd
+    type: existing_planning
     action: Sync with existing .planning/ state
 ```
 
-### Step 9: GSD Agent Header Wrapping
+### Step 9: Auto-Trigger iDumb Flow
 
-**IF brownfield or greenfield, delegate to builder:**
-
-```
-@idumb-builder
-Task: Wrap GSD agent frontmatter with iDumb governance
-Files: .opencode/agents/gsd-*.md
-For each file:
-  1. Read current frontmatter
-  2. Add to tools section:
-     idumb-state: true
-     idumb-validate: true
-  3. Add idumb block:
-     idumb:
-       governance: true
-       sync_on_complete: true
-       report_to: idumb-supreme-coordinator
-  4. Preserve existing content
-  5. Write back
-```
-
-### Step 10: Auto-Trigger GSD Flow (Brownfield Only)
-
-**IF brownfield:**
+**IF brownfield or greenfield:**
 
 Report to user:
 ```yaml
-brownfield_detected:
-  status: "Existing codebase detected with ${SRC_FILES} source files"
-  action: "Starting GSD brownfield initialization"
-  steps:
-    1: "/gsd:map-codebase - Analyze existing code structure"
-    2: "/gsd:new-project - Create project context and roadmap"
-  governance: "iDumb will monitor and sync with GSD progress"
+project_detected:
+  type: [brownfield | greenfield]
+  status: "Project type detected with ${SRC_FILES} source files"
+  next_steps:
+    brownfield:
+      1: "/idumb:map-codebase - Analyze existing code structure"
+      2: "/idumb:new-project - Create project context and roadmap"
+    greenfield:
+      1: "/idumb:new-project - Start project planning"
+  governance: "iDumb will track and manage your project progress"
 ```
 
-Then instruct:
-```
-After this command completes, the next action is:
-1. Run: /gsd:map-codebase
-2. Then: /gsd:new-project
-3. iDumb will automatically sync state after each GSD command
-```
-
-### Step 11: Present Final Menu
+### Step 10: Present Final Menu
 
 ```yaml
 idumb_ready:
   status: complete
-  gsd_status: [ready | brownfield_pending | greenfield_pending]
+  project_status: [ready | brownfield_pending | greenfield_pending]
   next_actions:
     if_brownfield:
-      - "Run /gsd:map-codebase to analyze codebase"
-      - "Then /gsd:new-project to create roadmap"
+      - "Run /idumb:map-codebase to analyze codebase"
+      - "Then /idumb:new-project to create roadmap"
     if_greenfield:
-      - "Run /gsd:new-project to start project"
-    if_existing_gsd:
-      - "GSD already initialized - iDumb synced"
-      - "Run /gsd:progress to see current state"
+      - "Run /idumb:new-project to start project"
+    if_existing_planning:
+      - "Planning already initialized - iDumb synced"
+      - "Run /idumb:status to see current state"
   commands_available:
     - "/idumb:status - Check governance state"
     - "/idumb:validate - Run validation checks"
-    - "/gsd:* - All GSD commands now governed"
+    - "/idumb:new-project - Start new project planning"
+    - "/idumb:roadmap - Create/view roadmap"
 ```
 
-### Step 12: Report to user
+### Step 11: Report to user
 
 **ONLY report `status: complete` if Step 7 returns `pass`**
 
 ```yaml
 initialization:
-  status: [complete/partial/failed/gsd_incomplete]
-  framework_detected: [gsd/bmad/both/none/idumb-only]
-  gsd_phase: [phase if GSD detected and complete]
+  status: [complete/partial/failed/planning_incomplete]
+  framework_detected: [planning/bmad/both/none/idumb-only]
+  planning_phase: [phase if planning detected and complete]
   governance_mode: hierarchical
   structure_created:
     - .idumb/brain/state.json
@@ -349,7 +321,7 @@ initialization:
     - idumb-builder (hidden) - File operations
   next_steps:
     - "Run /idumb:status to check state anytime"
-    - "GSD commands work normally with invisible governance"
+    - "iDumb commands manage your project planning"
     - "Context anchors survive session compaction"
   warnings: [list any issues that need user attention]
 ```
@@ -366,20 +338,20 @@ initialization:
   retry_command: "/idumb:init --force"
 ```
 
-**IF status is `gsd_incomplete` (GSD detected but not fully set up):**
+**IF status is `planning_incomplete` (planning detected but not fully set up):**
 ```yaml
 initialization:
-  status: gsd_incomplete
-  framework_detected: gsd (partial)
-  gsd_files_found: [list]
-  gsd_files_missing: [list]
+  status: planning_incomplete
+  framework_detected: planning (partial)
+  planning_files_found: [list]
+  planning_files_missing: [list]
   idumb_ready: true
-  gsd_ready: false
+  planning_ready: false
   next_steps:
-    - "Run /gsd:new-project to complete GSD setup"
+    - "Run /idumb:new-project to complete planning setup"
     - "Then run /idumb:init --force to re-sync"
-    - "Or run /idumb:init --no-gsd to proceed without GSD"
-  warning: "iDumb will operate in degraded mode without full GSD"
+    - "Or run /idumb:init --no-planning to proceed without planning"
+  warning: "iDumb will operate in degraded mode without full planning"
 ```
 
 ## CRITICAL RULES
@@ -390,16 +362,16 @@ initialization:
 4. **NEVER stop when issues detected** - Guide user or fix iDumb files
 5. **NEVER report complete** unless final integrity check passes
 6. **Track retry counts** - Max 3 before escalating to user
-7. **NEVER scaffold GSD files** - Guide user to /gsd:new-project instead
-8. **GSD files are READ-ONLY** - iDumb only reads .planning/, never writes
+7. **NEVER scaffold planning files** - Guide user to /idumb:new-project instead
+8. **Planning files are READ-ONLY** - iDumb only reads .planning/, never writes
 
-## GSD DETECTION
+## PLANNING DETECTION
 
-GSD files are in `.planning/`, NOT project root:
+Planning files are in `.planning/`, NOT project root:
 - `.planning/PROJECT.md` - Project definition (REQUIRED)
 - `.planning/STATE.md` - Current phase/plan
 - `.planning/ROADMAP.md` - Phase structure
-- `.planning/config.json` - GSD configuration
+- `.planning/config.json` - Planning configuration
 - `.planning/phases/` - Phase directories
 
 $ARGUMENTS

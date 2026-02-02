@@ -4,7 +4,7 @@
  * Monitors codebase for drift, conflicts, and structural violations:
  * - File structure drift from expected patterns
  * - Overlapping or conflicting file changes
- * - GSD atomic git hash control integration
+ * - Git hash control integration for atomic commits
  * - One-version control for dependencies
  * 
  * IMPORTANT: No console.log - would pollute TUI
@@ -31,7 +31,7 @@ interface ManifestEntry {
 interface FileCategory {
   domain: string          // e.g., "components", "api", "utils", "config"
   layer: string           // e.g., "presentation", "business", "data"
-  gsdPhase?: number       // Which GSD phase created this
+  phase?: number          // Which phase created this
 }
 
 interface Manifest {
@@ -41,7 +41,7 @@ interface Manifest {
   projectRoot: string
   entries: ManifestEntry[]
   gitHead?: string
-  gsdPhase?: string
+  currentPhase?: string
 }
 
 interface DriftResult {
@@ -396,15 +396,15 @@ export const snapshot = tool({
     const entries = scanDirectory(context.directory)
     const gitHead = getGitHead(context.directory)
     
-    // Read GSD phase if present
-    let gsdPhase: string | undefined
+    // Read current phase if present
+    let currentPhase: string | undefined
     const stateMdPath = join(context.directory, ".planning", "STATE.md")
     if (existsSync(stateMdPath)) {
       try {
         const content = readFileSync(stateMdPath, "utf8")
         const match = content.match(/Phase:\s*\[(\d+)\]\s*of\s*\[(\d+)\]\s*\(([^)]+)\)/i)
         if (match) {
-          gsdPhase = `${match[1]}/${match[2]} (${match[3]})`
+          currentPhase = `${match[1]}/${match[2]} (${match[3]})`
         }
       } catch {
         // Ignore
@@ -418,7 +418,7 @@ export const snapshot = tool({
       projectRoot: context.directory,
       entries,
       gitHead: gitHead || undefined,
-      gsdPhase
+      currentPhase
     }
     
     saveManifest(context.directory, manifest)
@@ -434,7 +434,7 @@ export const snapshot = tool({
       updated: true,
       entryCount: entries.length,
       gitHead: gitHead || "not a git repo",
-      gsdPhase: gsdPhase || "not detected",
+      currentPhase: currentPhase || "not detected",
       domainBreakdown: domainCounts
     }, null, 2)
   }
@@ -494,9 +494,9 @@ export const conflicts = tool({
   }
 })
 
-// Git hash verification (for GSD atomic commits)
+// Git hash verification (for atomic commits)
 export const verifyGitHash = tool({
-  description: "Verify current git state matches expected hash (for GSD atomic commit control)",
+  description: "Verify current git state matches expected hash (for atomic commit control)",
   args: {
     expectedHash: tool.schema.string().describe("Expected git commit hash to verify against")
   },

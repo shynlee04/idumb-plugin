@@ -24,7 +24,7 @@ type Part = { type: string; text?: string }
 interface IdumbState {
   version: string
   initialized: string
-  framework: "gsd" | "bmad" | "custom" | "none"
+  framework: "idumb" | "planning" | "bmad" | "custom" | "none"
   phase: string
   lastValidation: string | null
   validationCount: number
@@ -501,17 +501,13 @@ function buildCompactionContext(directory: string): string {
 // ============================================================================
 
 // iDumb shadow file patterns for timestamp tracking
-// DESIGN: We store timestamps in .idumb/ instead of modifying GSD files
-// This prevents breaking GSD's atomic commit workflow and git hash verification
+// DESIGN: We store timestamps in .idumb/ for iDumb's own artifacts
 const IDUMB_TIMESTAMP_DIR = '.idumb/timestamps'
 
-// GSD artifacts to TRACK (not modify)
-const GSD_TRACKED_PATTERNS = [
-  /\.planning\/phases\/.*-PLAN\.md$/,
-  /\.planning\/phases\/.*-RESEARCH\.md$/,
-  /\.planning\/phases\/.*-CONTEXT\.md$/,
-  /\.planning\/STATE\.md$/,
-  /\.planning\/todos\/.*\.md$/,
+// iDumb artifacts to track (only .idumb/ files, not external frameworks)
+const IDUMB_TRACKED_PATTERNS = [
+  /\.idumb\/.*\.json$/,
+  /\.idumb\/.*\.md$/,
 ]
 
 interface FrontmatterTimestamp {
@@ -521,7 +517,7 @@ interface FrontmatterTimestamp {
 }
 
 function shouldTrackTimestamp(filePath: string): boolean {
-  return GSD_TRACKED_PATTERNS.some(pattern => pattern.test(filePath))
+  return IDUMB_TRACKED_PATTERNS.some(pattern => pattern.test(filePath))
 }
 
 function getTimestampShadowPath(directory: string, filePath: string): string {
@@ -620,110 +616,6 @@ function injectTimestampFrontmatter(content: string, existingCreated?: string): 
 }
 
 // ============================================================================
-// GSD INTEGRATION
-// ============================================================================
-
-// GSD file paths (STATE.md is in .planning/, not project root)
-const GSD_PATHS = {
-  planning: ".planning",
-  state: ".planning/STATE.md",
-  roadmap: ".planning/ROADMAP.md",
-  config: ".planning/config.json",
-  research: ".planning/research",
-  phases: ".planning/phases",
-  todos: ".planning/todos",
-}
-
-interface GSDState {
-  phase: number
-  totalPhases: number
-  phaseName: string
-  plan?: number
-  totalPlans?: number
-  status?: string
-}
-
-function detectGSDPresence(directory: string): boolean {
-  return existsSync(join(directory, GSD_PATHS.planning)) &&
-         (existsSync(join(directory, GSD_PATHS.state)) ||
-          existsSync(join(directory, GSD_PATHS.roadmap)) ||
-          existsSync(join(directory, GSD_PATHS.config)))
-}
-
-function parseGSDState(directory: string): GSDState | null {
-  // GSD STATE.md is in .planning/, not project root
-  const stateMdPath = join(directory, GSD_PATHS.state)
-  if (!existsSync(stateMdPath)) {
-    return null
-  }
-  
-  try {
-    const content = readFileSync(stateMdPath, "utf8")
-    
-    // GSD STATE.md format: "Phase: [1] of [4] (Foundation)"
-    const phaseMatch = content.match(/Phase:\s*\[(\d+)\]\s*of\s*\[(\d+)\]\s*\(([^)]+)\)/i)
-    if (!phaseMatch) {
-      // Fallback: try simpler patterns
-      const simpleMatch = content.match(/Phase[:\s]+(\d+)/i)
-      if (simpleMatch) {
-        return {
-          phase: parseInt(simpleMatch[1], 10),
-          totalPhases: 0,
-          phaseName: `Phase ${simpleMatch[1]}`,
-        }
-      }
-      return null
-    }
-    
-    const result: GSDState = {
-      phase: parseInt(phaseMatch[1], 10),
-      totalPhases: parseInt(phaseMatch[2], 10),
-      phaseName: phaseMatch[3].trim(),
-    }
-    
-    // Try to get plan info: "Plan: [2] of [3] in current phase"
-    const planMatch = content.match(/Plan:\s*\[(\d+)\]\s*of\s*\[(\d+)\]/i)
-    if (planMatch) {
-      result.plan = parseInt(planMatch[1], 10)
-      result.totalPlans = parseInt(planMatch[2], 10)
-    }
-    
-    // Try to get status
-    const statusMatch = content.match(/Status:\s*([^\n]+)/i)
-    if (statusMatch) {
-      result.status = statusMatch[1].trim()
-    }
-    
-    return result
-  } catch {
-    return null
-  }
-}
-
-function detectGSDPhase(directory: string): string | null {
-  const gsdState = parseGSDState(directory)
-  if (!gsdState) return null
-  
-  // Return formatted phase string
-  return `${gsdState.phase}/${gsdState.totalPhases} (${gsdState.phaseName})`
-}
-
-function syncWithGSD(directory: string): void {
-  const gsdPhase = detectGSDPhase(directory)
-  if (!gsdPhase) return
-  
-  const state = readState(directory)
-  if (!state) return
-  
-  // Update phase if GSD has different phase
-  if (state.phase !== gsdPhase) {
-    state.phase = gsdPhase
-    writeState(directory, state)
-    log(directory, `Synced phase with GSD: ${gsdPhase}`)
-  }
-}
-
-// ============================================================================
 // PLUGIN EXPORT
 // ============================================================================
 
@@ -744,9 +636,6 @@ export const IdumbCorePlugin: Plugin = async ({ directory, client }) => {
           
           // Initialize tracker
           getSessionTracker(sessionId as string)
-          
-          // Sync with GSD
-          syncWithGSD(directory)
           
           // Store metadata
           storeSessionMetadata(directory, sessionId as string)
@@ -786,18 +675,16 @@ export const IdumbCorePlugin: Plugin = async ({ directory, client }) => {
               tracker.governanceInjected = false  // Re-inject on next message
             }
           }
-          
-          syncWithGSD(directory)
         }
         
-        // GSD command executed (preserve existing)
+        // Command executed tracking
         if (event.type === "command.executed") {
           const command = event.properties?.command || ""
+          log(directory, `[CMD] Command executed: ${command}`)
           
-          if (command.startsWith("gsd:") || command.startsWith("gsd-")) {
-            log(directory, `[CMD] GSD command: ${command}`)
-            syncWithGSD(directory)
-            addHistoryEntry(directory, `gsd_command:${command}`, "plugin", "pass")
+          // Track iDumb commands
+          if (command.startsWith("idumb:") || command.startsWith("idumb-")) {
+            addHistoryEntry(directory, `idumb_command:${command}`, "plugin", "pass")
           }
         }
         
@@ -944,7 +831,7 @@ export const IdumbCorePlugin: Plugin = async ({ directory, client }) => {
     // ========================================================================
     //
     // DESIGN PRINCIPLE: Observe and track, minimal modification.
-    // Only inject timestamps into GSD artifacts (non-breaking metadata).
+    // Only inject timestamps into iDumb artifacts (non-breaking metadata).
     // DO NOT inject context into task prompts - it breaks agent workflows.
     //
     
@@ -1093,17 +980,13 @@ export const IdumbCorePlugin: Plugin = async ({ directory, client }) => {
           log(directory, `Task completed: ${result}`)
         }
         
-        // Sync with GSD after certain operations
-        // NOTE: Use output.title or output.metadata since args not available here
+        // Track iDumb file operations
         if (toolName === "edit" || toolName === "write") {
-          // Check if the tool output indicates GSD file modification
           const outputText = output.output || output.title || ""
           
-          if (outputText.includes("STATE.md") || 
-              outputText.includes("ROADMAP.md") ||
-              outputText.includes(".planning/")) {
-            syncWithGSD(directory)
-            log(directory, "GSD file modified - synced state")
+          // Track .idumb/ file modifications
+          if (outputText.includes(".idumb/")) {
+            log(directory, "iDumb file modified")
           }
         }
       } catch (error) {
@@ -1113,7 +996,7 @@ export const IdumbCorePlugin: Plugin = async ({ directory, client }) => {
     },
     
     // ========================================================================
-    // COMMAND INTERCEPTION (GSD GOVERNANCE)
+    // COMMAND INTERCEPTION
     // ========================================================================
     // 
     // DESIGN PRINCIPLE: 
@@ -1131,9 +1014,9 @@ export const IdumbCorePlugin: Plugin = async ({ directory, client }) => {
       try {
         const { command } = input
         
-        // Just log - don't inject anything before command runs
-        if (command.startsWith("gsd:") || command.startsWith("gsd-")) {
-          log(directory, `[CMD] GSD command starting: ${command}`)
+        // Log iDumb command execution
+        if (command.startsWith("idumb:") || command.startsWith("idumb-")) {
+          log(directory, `[CMD] iDumb command starting: ${command}`)
         }
         
         // DO NOT modify output.parts - let commands execute cleanly

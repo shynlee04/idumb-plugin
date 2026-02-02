@@ -217,7 +217,6 @@ chains_to:
 
 ```yaml
 integration:
-  gsd_equivalent: "/gsd:verify-work"
   reads_from:
     - ".planning/phases/{N}/*"
     - ".idumb/execution/{N}/"

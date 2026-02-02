@@ -131,7 +131,6 @@ chains_to:
 
 ```yaml
 integration:
-  gsd_equivalent: "/gsd:discuss-phase"
   reads_from:
     - ".planning/ROADMAP.md"
     - ".planning/PROJECT.md"

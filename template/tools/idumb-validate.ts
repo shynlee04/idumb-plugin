@@ -146,7 +146,7 @@ export const schema = tool({
       }
       
       // Framework validation
-      const validFrameworks = ["gsd", "bmad", "custom", "none"]
+      const validFrameworks = ["bmad", "planning", "idumb", "custom", "none"]
       if (state.framework && !validFrameworks.includes(state.framework)) {
         results.push({
           check: "framework_value",
@@ -279,15 +279,15 @@ export const freshness = tool({
   },
 })
 
-// Validate GSD alignment
-export const gsdAlignment = tool({
-  description: "Check if iDumb state aligns with GSD state (if GSD is present)",
+// Validate planning alignment
+export const planningAlignment = tool({
+  description: "Check if iDumb state aligns with planning state (if planning is present)",
   args: {},
   async execute(args, context) {
     const results: ValidationResult[] = []
     
-    // Check for GSD presence
-    // IMPORTANT: GSD STATE.md lives in .planning/, NOT project root
+    // Check for planning presence
+    // IMPORTANT: STATE.md lives in .planning/, NOT project root
     const planningDir = join(context.directory, ".planning")
     const projectMd = join(context.directory, "PROJECT.md")
     const roadmapMd = join(planningDir, "ROADMAP.md")  // In .planning/
@@ -298,27 +298,27 @@ export const gsdAlignment = tool({
     const hasRoadmap = existsSync(roadmapMd)
     const hasState = existsSync(stateMd)
     
-    const hasGSD = hasPlanning || hasProject || hasRoadmap || hasState
+    const hasPlanningSystem = hasPlanning || hasProject || hasRoadmap || hasState
     
-    if (!hasGSD) {
+    if (!hasPlanningSystem) {
       return JSON.stringify({
         overall: "pass",
         checks: [{
-          check: "gsd_detected",
+          check: "planning_detected",
           status: "pass",
-          message: "GSD not detected - alignment check skipped"
+          message: "No planning system detected - alignment check skipped"
         }],
-        gsdPresent: false
+        planningPresent: false
       })
     }
     
     results.push({
-      check: "gsd_detected",
+      check: "planning_detected",
       status: "pass",
-      message: "GSD framework detected"
+      message: "Planning system detected"
     })
     
-    // Check individual GSD files
+    // Check individual planning files
     if (hasPlanning) {
       results.push({
         check: "planning_dir",
@@ -357,18 +357,18 @@ export const gsdAlignment = tool({
       try {
         const idumbState = JSON.parse(readFileSync(idumbStateFile, "utf8"))
         
-        if (idumbState.framework !== "gsd") {
+        if (idumbState.framework !== "planning" && idumbState.framework !== "bmad" && idumbState.framework !== "idumb") {
           results.push({
             check: "framework_mismatch",
             status: "warning",
-            message: `iDumb framework is "${idumbState.framework}" but GSD is detected`,
+            message: `iDumb framework is "${idumbState.framework}" but planning system is detected`,
             evidence: "Consider running /idumb:init to update"
           })
         } else {
           results.push({
             check: "framework_match",
             status: "pass",
-            message: "iDumb framework correctly set to 'gsd'"
+            message: `iDumb framework correctly set to '${idumbState.framework}'`
           })
         }
       } catch {
@@ -382,7 +382,7 @@ export const gsdAlignment = tool({
       results.push({
         check: "idumb_initialized",
         status: "warning",
-        message: "iDumb not initialized but GSD present",
+        message: "iDumb not initialized but planning system present",
         evidence: "Run /idumb:init"
       })
     }
@@ -393,7 +393,7 @@ export const gsdAlignment = tool({
     return JSON.stringify({ 
       overall, 
       checks: results,
-      gsdPresent: true
+      planningPresent: true
     }, null, 2)
   },
 })
@@ -428,7 +428,7 @@ export default tool({
       await runCheck(freshness)
     }
     if (scope === "all" || scope === "alignment") {
-      await runCheck(gsdAlignment)
+      await runCheck(planningAlignment)
     }
     
     // Categorize issues

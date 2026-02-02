@@ -121,12 +121,12 @@ milestone_completion:
       action: "Archive entire milestone"
       destination: ".idumb/archive/milestones/{milestone}/"
       
-    3_gsd_sync:
-      action: "Notify GSD of completion if integrated"
+    3_planning_sync:
+      action: "Sync state with .planning if present"
       method: |
         if [ -f ".planning/STATE.md" ]; then
-          # GSD integration detected, sync state
-          echo "Milestone {milestone} complete" >> .idumb/gsd-sync.log
+          # Planning integration detected, sync state
+          echo "Milestone {milestone} complete" >> .idumb/planning-sync.log
         fi
         
     4_update_state:
@@ -203,7 +203,6 @@ chains_to:
 
 ```yaml
 integration:
-  gsd_equivalent: null  # Internal workflow
   reads_from:
     - ".planning/phases/{N}/*VERIFICATION.md"
     - ".planning/ROADMAP.md"
@@ -213,7 +212,7 @@ integration:
     - ".idumb/archive/"
     - ".idumb/brain/state.json"
   never_modifies:
-    - ".planning/ROADMAP.md"  # GSD owns this
+    - ".planning/ROADMAP.md"  # Planning owns this
     - ".planning/phases/{N}/*.md"  # Archived, not modified
 ```
 

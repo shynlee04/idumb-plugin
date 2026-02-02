@@ -196,11 +196,11 @@ export const validate = tool({
   args: {
     path: tool.schema.string().describe("Path to the file"),
     chunk: tool.schema.number().optional().describe("Chunk number to validate (or all if omitted)"),
-    rules: tool.schema.string().optional().describe("Validation rules: 'gsd' for GSD artifacts, 'frontmatter' for YAML check")
+    rules: tool.schema.string().optional().describe("Validation rules: 'governance' for governance artifacts, 'frontmatter' for YAML check")
   },
   async execute(args, context) {
     const filePath = join(context.directory, args.path)
-    const rules = args.rules || "gsd"
+    const rules = args.rules || "governance"
     
     if (!existsSync(filePath)) {
       return JSON.stringify({ error: `File not found: ${args.path}` })
@@ -209,8 +209,8 @@ export const validate = tool({
     const lines = getFileLines(filePath)
     const results: ValidationResult[] = []
     
-    // GSD validation rules
-    if (rules === "gsd" || rules === "all") {
+    // Governance validation rules
+    if (rules === "governance" || rules === "all") {
       const issues: string[] = []
       const suggestions: string[] = []
       
@@ -220,7 +220,7 @@ export const validate = tool({
         suggestions.push("Add --- at start of file")
       }
       
-      // Check for required GSD fields in frontmatter
+      // Check for required fields in frontmatter
       const frontmatterEnd = lines.findIndex((l, i) => i > 0 && l === "---")
       if (frontmatterEnd > 0) {
         const frontmatterContent = lines.slice(1, frontmatterEnd).join("\n")
@@ -396,7 +396,7 @@ export default tool({
       usage: {
         nextChunk: `Use idumb-chunker.read with chunk: 2`,
         overview: `Use idumb-chunker.overview for structure`,
-        validate: `Use idumb-chunker.validate for GSD compliance`
+        validate: `Use idumb-chunker.validate for governance compliance`
       }
     }, null, 2)
   }

@@ -40,13 +40,13 @@ chain_rules:
   project_chain:
     name: "Project Definition Prerequisites"
     rules:
-      - id: PROJ-01
+       - id: PROJ-01
         command: /idumb:roadmap
         must_before:
           - exists: ".planning/PROJECT.md"
         on_violation:
           action: block
-          message: "PROJECT.md required. Run /gsd:new-project first."
+          message: "PROJECT.md required. Run /idumb:new-project first."
           
       - id: PROJ-02
         command: /idumb:discuss-phase
@@ -123,13 +123,13 @@ chain_rules:
 /idumb:init
     │
     ▼
-/gsd:new-project ───────────────────┐
+/idumb:new-project ─────────────────┐
     │                               │
     ▼                               │
 .planning/PROJECT.md                │
     │                               │
     ▼                               │
-/idumb:roadmap OR /gsd:*-roadmap    │
+/idumb:roadmap                      │
     │                               │
     ▼                               │
 .planning/ROADMAP.md ◄──────────────┘
@@ -226,10 +226,6 @@ skip_conditions:
     behavior: "Skip all chain checks"
     logging: "CRITICAL - Chain bypass used"
     requires: "User acknowledgment"
-    
-  gsd_passthrough:
-    trigger: "Command starts with /gsd:"
-    behavior: "Let GSD handle, validate after"
     
   readonly_commands:
     commands:

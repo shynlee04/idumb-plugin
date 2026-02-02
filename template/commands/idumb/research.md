@@ -15,7 +15,7 @@ Execute comprehensive research phase using parallel agent mode.
 
 ## Description
 
-Replaces 4 GSD research agents with a single orchestrated research command that:
+Replaces 4 research agents with a single orchestrated research command that:
 - Spawns parallel research agents for different domains
 - Synthesizes findings into unified research document
 - Produces actionable insights for roadmap creation

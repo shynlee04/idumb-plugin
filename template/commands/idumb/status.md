@@ -25,7 +25,7 @@ Generate a comprehensive status report of the current governance state.
 3. **Gather context age:**
    - Check age of all files in `.idumb/`
    - Flag anything older than 48 hours
-   - Check if GSD files exist and their state
+    - Check if planning files exist and their state
 
 4. **Report format:**
    ```yaml
@@ -33,7 +33,7 @@ Generate a comprehensive status report of the current governance state.
      initialized: true/false
      version: "0.1.0"
      phase: [current phase]
-     framework: gsd/bmad/custom
+      framework: planning/bmad/custom
      
    governance:
      last_validation: [timestamp]
@@ -52,7 +52,7 @@ Generate a comprehensive status report of the current governance state.
      validator: idumb-low-validator (hidden)
      builder: idumb-builder (hidden)
      
-   gsd_integration:
+    planning_integration:
      detected: true/false
      planning_dir: exists/missing
      roadmap: exists/missing

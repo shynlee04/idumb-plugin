@@ -186,7 +186,6 @@ chains_to:
 
 ```yaml
 integration:
-  gsd_equivalent: "/gsd:plan-phase"
   reads_from:
     - ".planning/ROADMAP.md"
     - ".planning/phases/{N}/*CONTEXT.md"

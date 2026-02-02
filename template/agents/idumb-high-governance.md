@@ -92,13 +92,13 @@ Verify: [how to confirm success]
 2. Update governance state
 3. Report evidence to supreme-coordinator
 
-## GSD AWARENESS
+## PLANNING AWARENESS
 
-When working with GSD projects:
+When working with planning artifacts:
 - Preserve .planning/ structure
-- Don't modify STATE.md, ROADMAP.md directly
+- Don't modify PROJECT.md, ROADMAP.md directly
 - Use .idumb/ for iDumb-specific state
-- Respect GSD command outputs
+- Respect phase outputs
 
 ## VALIDATION PATTERNS
 

@@ -157,7 +157,7 @@ Required fields in `state.json`:
 {
   "version": "string",
   "initialized": "ISO date string",
-  "framework": "gsd | bmad | custom | none",
+  "framework": "idumb | bmad | planning | custom | none",
   "phase": "string",
   "lastValidation": "ISO date string | null",
   "validationCount": "number",
@@ -172,14 +172,14 @@ Required fields in `state.json`:
 - Stale context must be refreshed before use
 - Anchors older than 48h should be reviewed
 
-### GSD Alignment Validation
+### Planning Alignment Validation
 
-If GSD detected:
+If planning framework detected:
 
 1. Check `.planning/` exists
 2. Check `ROADMAP.md` exists
-3. Check `STATE.md` exists
-4. Verify iDumb phase matches GSD phase
+3. Check `PROJECT.md` exists
+4. Verify iDumb phase matches planning phase
 5. Report any misalignment
 
 ---
@@ -220,29 +220,29 @@ anchor:
 
 ---
 
-## GSD Integration
+## Planning Integration
 
 ### Principle: Wrap, Don't Break
 
-- GSD commands work normally
+- Planning commands work normally
 - iDumb intercepts via plugin hooks
 - Validation happens post-execution
 - State tracked separately in `.idumb/`
 
-### GSD File Locations
+### Planning File Locations
 
 | File | Purpose | iDumb Access |
 |------|---------|--------------|
-| `.planning/` | GSD planning artifacts | READ ONLY |
+| `.planning/` | Planning artifacts | READ ONLY |
 | `ROADMAP.md` | Project roadmap | READ ONLY |
-| `STATE.md` | GSD current state | READ for sync |
 | `PROJECT.md` | Project description | READ ONLY |
+| `phases/` | Phase-specific plans | READ ONLY |
 
 ### Sync Protocol
 
-After GSD operations:
+After planning operations:
 
-1. Read `STATE.md` for current phase
+1. Read `PROJECT.md` for current phase
 2. Update `.idumb/brain/state.json` phase
 3. Log sync in governance history
 
@@ -321,7 +321,7 @@ If `.idumb/` doesn't exist:
 | Tool | Purpose | Exports |
 |------|---------|---------|
 | `idumb-state` | State management | read, write, anchor, history, getAnchors |
-| `idumb-validate` | Validation runner | structure, schema, freshness, gsdAlignment, default (full) |
+| `idumb-validate` | Validation runner | structure, schema, freshness, planningAlignment, default (full) |
 | `idumb-context` | Context detection | default (classify), summary, patterns |
 
 ---
