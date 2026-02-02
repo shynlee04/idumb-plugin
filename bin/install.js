@@ -297,6 +297,7 @@ async function step9_createIdumbDir(location) {
     const contextDir = join(brainDir, 'context');
     const validationsDir = join(governanceDir, 'validations');
     const anchorsDir = join(idumbDir, 'anchors');
+    const sessionsDir = join(idumbDir, 'sessions');
     
     // Create all hierarchy paths
     mkdirSync(brainDir, { recursive: true });
@@ -305,6 +306,47 @@ async function step9_createIdumbDir(location) {
     mkdirSync(governanceDir, { recursive: true });
     mkdirSync(validationsDir, { recursive: true });
     mkdirSync(anchorsDir, { recursive: true });
+    mkdirSync(sessionsDir, { recursive: true });
+    
+    // Interactive configuration (interactive mode only)
+    let userName = 'Developer';
+    let userLanguage = 'english';
+    
+    if (process.stdin.isTTY) {
+        print('');
+        print('  User Configuration (press Enter for defaults):');
+        print('');
+        
+        // Ask for user name
+        const nameAnswer = await prompt('  Your name [Developer]: ', 'Developer');
+        userName = nameAnswer || 'Developer';
+        
+        // Show language options
+        print('');
+        print('  Available languages:');
+        print('    [1] English');
+        print('    [2] Vietnamese');
+        print('    [3] Japanese');
+        print('    [4] Chinese (Simplified)');
+        print('    [5] Spanish');
+        print('');
+        
+        const langAnswer = await prompt('  Choose language [1]: ', '1');
+        const langMap = {
+            '1': 'english',
+            '2': 'vietnamese',
+            '3': 'japanese',
+            '4': 'chinese',
+            '5': 'spanish',
+            'english': 'english',
+            'vietnamese': 'vietnamese',
+            'japanese': 'japanese',
+            'chinese': 'chinese',
+            'spanish': 'spanish'
+        };
+        userLanguage = langMap[langAnswer.toLowerCase()] || 'english';
+        print('');
+    }
     
     // Detect GSD phase for initial state
     const detection = detectProject();
@@ -353,10 +395,10 @@ async function step9_createIdumbDir(location) {
             version: '0.1.0',
             // User preferences (line 202) - allowed: "what to call user, language"
             user: {
-                name: 'Developer',
+                name: userName,
                 language: {
-                    communication: 'english',
-                    documents: 'english'
+                    communication: userLanguage,
+                    documents: userLanguage
                 }
             },
             // Governance settings - ALLOWED: enforces validation/automation, integrates with GSD mode
@@ -410,9 +452,10 @@ async function step9_createIdumbDir(location) {
     }
     
     print(`  ✓ .idumb/brain/state.json (framework: ${framework}, phase: ${phase})`);
-    print('  ✓ .idumb/config.json (user preferences, hierarchical paths)');
+    print(`  ✓ .idumb/config.json (user: ${userName}, lang: ${userLanguage})`);
     print('  ✓ .idumb/governance/');
     print('  ✓ .idumb/anchors/');
+    print('  ✓ .idumb/sessions/');
 }
 
 async function showComplete(targetDir, location) {
@@ -441,7 +484,22 @@ async function showComplete(targetDir, location) {
         print('  ├── .idumb/config.json         ✓');
         print('  ├── .idumb/brain/state.json    ✓');
         print('  ├── .idumb/governance/         ✓');
+        print('  ├── .idumb/sessions/           ✓');
         print('  └── .idumb/anchors/            ✓');
+        
+        // Read config to show user settings
+        const configPath = join(process.cwd(), '.idumb', 'config.json');
+        if (existsSync(configPath)) {
+            try {
+                const config = JSON.parse(readFileSync(configPath, 'utf8'));
+                print('');
+                print('  User Configuration:');
+                print(`  ├── Name:     ${config.user?.name || 'Developer'}`);
+                print(`  └── Language: ${config.user?.language?.communication || 'english'}`);
+            } catch (e) {
+                // Ignore config read errors
+            }
+        }
     }
     print('');
     
