@@ -7,12 +7,18 @@ iDumb là framework quản trị AI phân cấp đảm bảo phát triển code 
 ## 🚀 Bắt đầu Nhanh
 
 ```bash
-# Cài đặt toàn cục
-npx @anthropic-ai/idumb --global
+# Clone repository
+git clone https://github.com/shynlee04/idumb-plugin.git
+cd idumb-plugin
 
-# Hoặc cài đặt cho dự án hiện tại
-npx @anthropic-ai/idumb --local
+# Cài đặt cho dự án của bạn (chạy từ thư mục dự án)
+node /path/to/idumb-plugin/bin/install.js --local
+
+# Hoặc cài đặt toàn cục
+node /path/to/idumb-plugin/bin/install.js --global
 ```
+
+> **Lưu ý**: Package chưa được publish lên npm. Cài đặt từ source.
 
 ## 🎯 Tính năng Chính
 

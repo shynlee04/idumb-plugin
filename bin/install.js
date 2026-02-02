@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * iDumb Installer - npx @anthropic-ai/idumb
+ * iDumb Installer
  * 
  * Installs iDumb hierarchical governance framework for OpenCode
  * Archives any existing GSD files during install (replaced by iDumb)
@@ -615,8 +615,8 @@ async function showComplete(targetDir, location) {
     print('  └────────────────────────────────────────────────────────────┘');
     print('');
     print('  📖 Documentation:');
-    print('  ├── English:    https://github.com/anthropic-ai/idumb#readme');
-    print('  └── Tiếng Việt: https://github.com/anthropic-ai/idumb/blob/main/README.vi.md');
+    print('  ├── English:    https://github.com/shynlee04/idumb-plugin#readme');
+    print('  └── Tiếng Việt: https://github.com/shynlee04/idumb-plugin/blob/main/README.vi.md');
     print('');
 }
 

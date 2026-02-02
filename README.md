@@ -7,12 +7,18 @@ iDumb is a hierarchical AI governance framework that ensures safe, controlled, a
 ## 🚀 Quick Start
 
 ```bash
-# Install globally
-npx @anthropic-ai/idumb --global
+# Clone the repository
+git clone https://github.com/shynlee04/idumb-plugin.git
+cd idumb-plugin
 
-# Or install in current project
-npx @anthropic-ai/idumb --local
+# Install in your project (run from your project directory)
+node /path/to/idumb-plugin/bin/install.js --local
+
+# Or install globally
+node /path/to/idumb-plugin/bin/install.js --global
 ```
+
+> **Note**: This package is not yet published to npm. Install from source.
 
 ## 🎯 Key Features
 
