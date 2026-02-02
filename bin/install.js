@@ -43,10 +43,19 @@ function print(msg) {
 
 function printHeader() {
     print('');
-    print('╔════════════════════════════════════════════════════════════╗');
-    print('║                      iDumb v0.1.0                          ║');
-    print('║      Hierarchical Governance for OpenCode                  ║');
-    print('╚════════════════════════════════════════════════════════════╝');
+    print('╔══════════════════════════════════════════════════════════════════╗');
+    print('║                                                                  ║');
+    print('║   ██╗██████╗ ██╗   ██╗███╗   ███╗██████╗                         ║');
+    print('║   ██║██╔══██╗██║   ██║████╗ ████║██╔══██╗                        ║');
+    print('║   ██║██║  ██║██║   ██║██╔████╔██║██████╔╝                        ║');
+    print('║   ██║██║  ██║██║   ██║██║╚██╔╝██║██╔══██╗                        ║');
+    print('║   ██║██████╔╝╚██████╔╝██║ ╚═╝ ██║██████╔╝                        ║');
+    print('║   ╚═╝╚═════╝  ╚═════╝ ╚═╝     ╚═╝╚═════╝                         ║');
+    print('║                                                                  ║');
+    print('║        Hierarchical AI Governance Framework v0.2.0              ║');
+    print('║        "Intelligent Delegation Using Managed Boundaries"        ║');
+    print('║                                                                  ║');
+    print('╚══════════════════════════════════════════════════════════════════╝');
     print('');
 }
 
@@ -145,8 +154,10 @@ function detectProject() {
 // ============================================================================
 
 async function step1_selectLocation() {
-    print('STEP 1: Select Installation Location');
-    print('─────────────────────────────────────');
+    print('');
+    print('┌─────────────────────────────────────────────────────────────┐');
+    print('│  📍 Step 1/8: Select Installation Location                  │');
+    print('└─────────────────────────────────────────────────────────────┘');
     print('');
     print('  [g] Global  (~/.config/opencode/) - Available in all projects');
     print('  [l] Local   (./.opencode/)        - Current project only');
@@ -163,8 +174,9 @@ async function step1_selectLocation() {
 
 async function step2_detectProject() {
     print('');
-    print('STEP 2: Analyzing Project');
-    print('─────────────────────────');
+    print('┌─────────────────────────────────────────────────────────────┐');
+    print('│  🔍 Step 2/8: Analyzing Project                             │');
+    print('└─────────────────────────────────────────────────────────────┘');
     
     const detection = detectProject();
     
@@ -186,8 +198,9 @@ async function step2_detectProject() {
 
 async function step3_archiveExistingGSD(targetDir) {
     print('');
-    print('STEP 3: Checking for Existing GSD Files');
-    print('────────────────────────────────────────');
+    print('┌─────────────────────────────────────────────────────────────┐');
+    print('│  📦 Step 3/8: Checking for Legacy Files                     │');
+    print('└─────────────────────────────────────────────────────────────┘');
     
     const gsdAgents = join(targetDir, 'agents');
     const gsdCommands = join(targetDir, 'commands', 'gsd');
@@ -245,8 +258,9 @@ async function step3_archiveExistingGSD(targetDir) {
 
 async function step4_installAgents(targetDir) {
     print('');
-    print('STEP 4: Installing iDumb Agents');
-    print('────────────────────────────────');
+    print('┌─────────────────────────────────────────────────────────────┐');
+    print('│  👤 Step 4/8: Installing iDumb Agents                       │');
+    print('└─────────────────────────────────────────────────────────────┘');
     
     const agentsDir = join(targetDir, 'agents');
     mkdirSync(agentsDir, { recursive: true });
@@ -261,8 +275,9 @@ async function step4_installAgents(targetDir) {
 
 async function step5_installCommands(targetDir) {
     print('');
-    print('STEP 5: Installing iDumb Commands');
-    print('──────────────────────────────────');
+    print('┌─────────────────────────────────────────────────────────────┐');
+    print('│  🔧 Step 5/8: Installing iDumb Commands                     │');
+    print('└─────────────────────────────────────────────────────────────┘');
     
     const commandsDir = join(targetDir, 'commands', 'idumb');
     mkdirSync(commandsDir, { recursive: true });
@@ -277,8 +292,9 @@ async function step5_installCommands(targetDir) {
 
 async function step6_installTools(targetDir) {
     print('');
-    print('STEP 6: Installing iDumb Tools');
-    print('───────────────────────────────');
+    print('┌─────────────────────────────────────────────────────────────┐');
+    print('│  🛠️  Step 6/8: Installing iDumb Tools                        │');
+    print('└─────────────────────────────────────────────────────────────┘');
     
     const toolsDir = join(targetDir, 'tools');
     mkdirSync(toolsDir, { recursive: true });
@@ -296,8 +312,9 @@ async function step6_installTools(targetDir) {
 
 async function step7_installPlugin(targetDir) {
     print('');
-    print('STEP 7: Installing iDumb Plugin');
-    print('────────────────────────────────');
+    print('┌─────────────────────────────────────────────────────────────┐');
+    print('│  ⚡ Step 7/8: Installing iDumb Plugin                       │');
+    print('└─────────────────────────────────────────────────────────────┘');
     
     const pluginsDir = join(targetDir, 'plugins');
     mkdirSync(pluginsDir, { recursive: true });
@@ -309,8 +326,9 @@ async function step7_installPlugin(targetDir) {
 
 async function step8_installSkills(targetDir) {
     print('');
-    print('STEP 8: Installing iDumb Skills');
-    print('────────────────────────────────');
+    print('┌─────────────────────────────────────────────────────────────┐');
+    print('│  📚 Step 8/8: Installing iDumb Skills                       │');
+    print('└─────────────────────────────────────────────────────────────┘');
     
     const skillsDir = join(targetDir, 'skills');
     mkdirSync(skillsDir, { recursive: true });
@@ -328,10 +346,11 @@ async function step8_installSkills(targetDir) {
 
 // step12_installRouter REMOVED - iDumb is standalone
 
-async function step13_createIdumbDir(location) {
+async function step9_createIdumbDir(location) {
     print('');
-    print('STEP 13: Creating .idumb Directory & Configuration');
-    print('───────────────────────────────────────────────────');
+    print('┌─────────────────────────────────────────────────────────────┐');
+    print('│  ⚙️  Configuration: Creating .idumb Directory                │');
+    print('└─────────────────────────────────────────────────────────────┘');
     
     // For global install, don't create .idumb - let plugin create per-project on first use
     if (location.type === 'global') {
@@ -425,7 +444,7 @@ async function step13_createIdumbDir(location) {
     const stateFile = join(brainDir, 'state.json');
     if (!existsSync(stateFile)) {
         writeFileSync(stateFile, JSON.stringify({
-            version: '0.1.0',
+            version: '0.2.0',
             initialized: new Date().toISOString(),
             framework: framework,
             phase: phase,
@@ -440,67 +459,114 @@ async function step13_createIdumbDir(location) {
     // Governance values enforce automation and integrate with planning structure
     const configFile = join(idumbDir, 'config.json');
     if (!existsSync(configFile)) {
+        // Default to 'guided' experience (safest for new users)
+        const experience = 'guided';
+        
+        // Automation settings derived from experience level
+        const automationSettings = {
+            mode: 'confirmRequired',
+            expertSkeptic: {
+                enabled: true,
+                requireEvidence: true,
+                doubleCheckDelegation: true
+            },
+            contextFirst: {
+                enforced: true,
+                requiredFirstTools: ['todoread', 'idumb-state'],
+                blockWithoutContext: true
+            },
+            workflow: {
+                research: true,
+                planCheck: true,
+                verifyAfterExecution: true,
+                commitOnComplete: true
+            }
+        };
+        
         writeFileSync(configFile, JSON.stringify({
-            version: '0.1.0',
-            // User preferences (line 202) - allowed: "what to call user, language"
+            version: '0.2.0',
+            initialized: new Date().toISOString(),
+            lastModified: new Date().toISOString(),
+            
             user: {
                 name: userName,
+                experience: experience,
                 language: {
                     communication: userLanguage,
                     documents: userLanguage
                 }
             },
-            // Governance settings - enforces validation/automation
-            governance: {
-                level: 'moderate',        // Enforces validation strictness
-                expertSkeptic: true,      // Enforces critical thinking, context-first
-                autoValidation: true      // Enables automatic governance checks
-            },
-            // Hierarchical paths (lines 204-210) - required
-            paths: {
-                state: {
-                    brain: '.idumb/brain/state.json',
-                    history: '.idumb/brain/history/',
-                    anchors: '.idumb/anchors/'
+            
+            status: {
+                current: {
+                    milestone: null,
+                    phase: phase,
+                    plan: null,
+                    task: null
                 },
-                artifacts: {
-                    governance: '.idumb/governance/',
-                    validations: '.idumb/governance/validations/'
-                },
-                context: {
-                    codebase: '.idumb/brain/context/codebase.md',
-                    sessions: '.idumb/brain/context/sessions.md'
-                }
+                lastValidation: null,
+                validationsPassed: 0,
+                driftDetected: false
             },
-            // Hierarchy mapping (milestone → phase → plan → task)
+            
             hierarchy: {
-                status: ['milestone', 'phase', 'plan', 'task'],
-                agents: ['coordinator', 'governor', 'validator', 'builder']
+                levels: ['milestone', 'phase', 'plan', 'task'],
+                agents: {
+                    order: ['coordinator', 'governance', 'validator', 'builder'],
+                    permissions: {
+                        coordinator: { delegate: true, execute: false, validate: false },
+                        governance: { delegate: true, execute: false, validate: true },
+                        validator: { delegate: false, execute: false, validate: true },
+                        builder: { delegate: false, execute: true, validate: false }
+                    }
+                },
+                enforceChain: true,
+                blockOnChainBreak: true
             },
-            // Planning framework integration - detects .planning/ structure
-            frameworks: {
-                planning: {
-                    detected: planningDetected,
-                    configPath: '.planning/config.json',
-                    syncEnabled: true
-                }
+            
+            automation: automationSettings,
+            
+            paths: {
+                config: '.idumb/config.json',
+                state: '.idumb/brain/state.json',
+                brain: '.idumb/brain/',
+                history: '.idumb/brain/history/',
+                context: '.idumb/brain/context/',
+                governance: '.idumb/governance/',
+                validations: '.idumb/governance/validations/',
+                anchors: '.idumb/anchors/',
+                sessions: '.idumb/sessions/',
+                planning: '.planning/',
+                roadmap: '.planning/ROADMAP.md',
+                planningState: '.planning/STATE.md'
             },
-            // Staleness detection (line 219, 237) - for stale check
+            
             staleness: {
-                warningThresholdHours: 48,
-                purgeThresholdHours: 168
+                warningHours: 48,
+                criticalHours: 168,
+                checkOnLoad: true,
+                autoArchive: false
             },
-            // Timestamp injection settings (line 219)
+            
             timestamps: {
                 enabled: true,
                 format: 'ISO8601',
-                frontmatterInjection: true
+                injectInFrontmatter: true,
+                trackModifications: true
+            },
+            
+            enforcement: {
+                mustLoadConfig: true,
+                mustHaveState: true,
+                mustCheckHierarchy: true,
+                blockOnMissingArtifacts: false,
+                requirePhaseAlignment: true
             }
         }, null, 2));
     }
     
-    print(`  ✓ .idumb/brain/state.json (framework: ${framework}, phase: ${phase})`);
-    print(`  ✓ .idumb/config.json (user: ${userName}, lang: ${userLanguage})`);
+    print(`  ✓ .idumb/brain/state.json (v0.2.0, framework: ${framework}, phase: ${phase})`);
+    print(`  ✓ .idumb/config.json (v0.2.0, user: ${userName}, experience: guided)`);
     print('  ✓ .idumb/governance/');
     print('  ✓ .idumb/anchors/');
     print('  ✓ .idumb/sessions/');
@@ -508,61 +574,49 @@ async function step13_createIdumbDir(location) {
 
 async function showComplete(targetDir, location) {
     print('');
-    print('════════════════════════════════════════════════════════════════');
-    print('                    ✓ INSTALLATION COMPLETE                     ');
-    print('════════════════════════════════════════════════════════════════');
+    print('╔══════════════════════════════════════════════════════════════════╗');
+    print('║                    ✅ INSTALLATION SUCCESSFUL                    ║');
+    print('╚══════════════════════════════════════════════════════════════════╝');
+    print('');
+    print('  📍 Location: ' + (location.type === 'global' ? 'Global (~/.config/opencode/)' : 'Local (./.opencode/)'));
+    print('');
+    print('  📦 Components Installed:');
+    print('  ├── 👤 Agents     4  (coordinator, governance, validator, builder)');
+    print('  ├── 🔧 Commands   5  (/idumb:init, :status, :config, :validate, :help)');
+    print('  ├── 🛠️  Tools      7  (state, validate, context, config, manifest, chunker, todo)');
+    print('  ├── ⚡ Plugins    1  (idumb-core.ts)');
+    print('  └── 📚 Skills     1  (idumb-governance/)');
     print('');
     
-    // Installation summary
-    print('INSTALLATION SUMMARY:');
-    print('─────────────────────');
-    print(`  Location:        ${location.type === 'global' ? 'Global (~/.config/opencode/)' : 'Local (./.opencode/)'}`);
-    print(`  Target:          ${targetDir}`);
-    print('');
-    print('  Components Installed:');
-    print('  ├── Agents:     4 (coordinator, governance, validator, builder)');
-    print('  ├── Commands:   4 (/idumb:init, :status, :validate, :help)');
-    print('  ├── Tools:      7 (state, validate, context, config, manifest, chunker, todo)');
-    print('  ├── Plugins:    1 (idumb-core.ts)');
-    print('  └── Skills:     1 (idumb-governance/)');
-    
+    // Read config to show user settings for local install
     if (location.type === 'local') {
-        print('');
-        print('  Project Setup:');
-        print('  ├── .idumb/config.json         ✓');
-        print('  ├── .idumb/brain/state.json    ✓');
-        print('  ├── .idumb/governance/         ✓');
-        print('  ├── .idumb/sessions/           ✓');
-        print('  └── .idumb/anchors/            ✓');
-        
-        // Read config to show user settings
         const configPath = join(process.cwd(), '.idumb', 'config.json');
+        let userName = 'Developer';
+        let userLang = 'english';
         if (existsSync(configPath)) {
             try {
                 const config = JSON.parse(readFileSync(configPath, 'utf8'));
-                print('');
-                print('  User Configuration:');
-                print(`  ├── Name:     ${config.user?.name || 'Developer'}`);
-                print(`  └── Language: ${config.user?.language?.communication || 'english'}`);
-            } catch (e) {
-                // Ignore config read errors
-            }
+                userName = config.user?.name || 'Developer';
+                userLang = config.user?.language?.communication || 'english';
+            } catch (e) { /* ignore */ }
         }
+        print('  ⚙️  Configuration:');
+        print('  ├── Experience: guided (default - AI explains before actions)');
+        print(`  ├── Language:   ${userLang.charAt(0).toUpperCase() + userLang.slice(1)} (communication & documents)`);
+        print('  └── Config:     .idumb/config.json');
+        print('');
     }
-    print('');
     
-    print('NEXT STEPS:');
-    print('───────────');
-    print('1. Restart OpenCode to load new agents/commands');
-    print('2. Run /idumb:init to complete project setup');
-    print('3. Run /idumb:help for available commands');
+    print('  🚀 Quick Start:');
+    print('  ┌────────────────────────────────────────────────────────────┐');
+    print('  │  /idumb:init              # Initialize in your project    │');
+    print('  │  /idumb:config            # View/edit settings            │');
+    print('  │  /idumb:help              # Show all commands             │');
+    print('  └────────────────────────────────────────────────────────────┘');
     print('');
-    print('AGENT HIERARCHY:');
-    print('─────────────────');
-    print('  idumb-supreme-coordinator (primary)');
-    print('    └─→ idumb-high-governance (all)');
-    print('          ├─→ idumb-low-validator (hidden subagent)');
-    print('          └─→ idumb-builder (hidden subagent)');
+    print('  📖 Documentation:');
+    print('  ├── English:    https://github.com/anthropic-ai/idumb#readme');
+    print('  └── Tiếng Việt: https://github.com/anthropic-ai/idumb/blob/main/README.vi.md');
     print('');
 }
 
@@ -665,7 +719,7 @@ async function main() {
     await step7_installPlugin(location.path);
     await step8_installSkills(location.path);
     // step9-12 REMOVED - standalone framework, no GSD dependency
-    await step13_createIdumbDir(location);
+    await step9_createIdumbDir(location);
     await showComplete(location.path, location);
 }
 

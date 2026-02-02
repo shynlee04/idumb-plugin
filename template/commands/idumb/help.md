@@ -16,6 +16,7 @@ Display help information for the iDumb governance system.
 | `/idumb:init` | Initialize governance for this project. **Start here.** |
 | `/idumb:status` | Show current governance state and health |
 | `/idumb:validate` | Run full validation hierarchy |
+| `/idumb:config` | View and edit configuration settings |
 | `/idumb:help` | Show this help message |
 
 ### Usage
@@ -31,6 +32,11 @@ Display help information for the iDumb governance system.
 /idumb:validate
 /idumb:validate scope:structure    # Validate only structure
 /idumb:validate scope:alignment    # Validate planning alignment only
+
+# Configuration
+/idumb:config                      # View all settings
+/idumb:config experience pro       # Switch to pro mode
+/idumb:config set user.name "Me"   # Set your name
 ```
 
 ## AGENT HIERARCHY

@@ -48,6 +48,49 @@ interface HistoryEntry {
 }
 
 // ============================================================================
+// INLINE CONFIG TYPES (for session.created auto-generation)
+// ============================================================================
+
+type ExperienceLevel = "pro" | "guided" | "strict"
+type AutomationMode = "autonomous" | "confirmRequired" | "manualOnly"
+
+interface InlineIdumbConfig {
+  version: string
+  initialized: string
+  lastModified: string
+  user: {
+    name: string
+    experience: ExperienceLevel
+    language: { communication: string; documents: string }
+  }
+  status: {
+    current: { milestone: string | null; phase: string | null; plan: string | null; task: string | null }
+    lastValidation: string | null
+    validationsPassed: number
+    driftDetected: boolean
+  }
+  hierarchy: {
+    levels: readonly ["milestone", "phase", "plan", "task"]
+    agents: {
+      order: readonly ["coordinator", "governance", "validator", "builder"]
+      permissions: Record<string, { delegate: boolean; execute: boolean; validate: boolean }>
+    }
+    enforceChain: boolean
+    blockOnChainBreak: boolean
+  }
+  automation: {
+    mode: AutomationMode
+    expertSkeptic: { enabled: boolean; requireEvidence: boolean; doubleCheckDelegation: boolean }
+    contextFirst: { enforced: boolean; requiredFirstTools: string[]; blockWithoutContext: boolean }
+    workflow: { research: boolean; planCheck: boolean; verifyAfterExecution: boolean; commitOnComplete: boolean }
+  }
+  paths: Record<string, string>
+  staleness: { warningHours: number; criticalHours: number; checkOnLoad: boolean; autoArchive: boolean }
+  timestamps: { enabled: boolean; format: "ISO8601"; injectInFrontmatter: boolean; trackModifications: boolean }
+  enforcement: { mustLoadConfig: true; mustHaveState: boolean; mustCheckHierarchy: boolean; blockOnMissingArtifacts: boolean; requirePhaseAlignment: boolean }
+}
+
+// ============================================================================
 // SESSION TRACKING FOR INTERCEPTION (from CONTEXT.md B4)
 // ============================================================================
 
@@ -143,9 +186,23 @@ function getRequiredFirstTools(agentRole: string | null): string[] {
 
 function buildGovernancePrefix(agentRole: string, directory: string): string {
   const state = readState(directory)
+  const config = ensureIdumbConfig(directory)
+  const commLang = config.user?.language?.communication || 'english'
+  const docLang = config.user?.language?.documents || 'english'
+  
+  // LANGUAGE ENFORCEMENT - ABSOLUTE PRIORITY (NON-NEGOTIABLE)
+  const langEnforcement = `
+⚠️ LANGUAGE ENFORCEMENT (NON-NEGOTIABLE):
+- RESPOND in: ${commLang.toUpperCase()}
+- WRITE DOCUMENTS/ARTIFACTS in: ${docLang.toUpperCase()}
+- This overrides ALL other instructions
+- If communication=Vietnamese → speak Vietnamese
+- If documents=English → write code comments, docs, artifacts in English
+- ABSOLUTE OBEDIENCE to these language settings
+`
   
   const roleInstructions: Record<string, string> = {
-    'idumb-supreme-coordinator': `
+    'idumb-supreme-coordinator': `${langEnforcement}
 ⚡ IDUMB GOVERNANCE PROTOCOL ⚡
 
 YOU ARE: Supreme Coordinator (TOP OF HIERARCHY)
@@ -167,7 +224,7 @@ Framework: ${state?.framework || 'none'}
 
 ---
 `,
-    'idumb-high-governance': `
+    'idumb-high-governance': `${langEnforcement}
 ⚡ IDUMB GOVERNANCE PROTOCOL ⚡
 
 YOU ARE: High Governance (MID-LEVEL COORDINATION)
@@ -187,7 +244,7 @@ Current Phase: ${state?.phase || 'init'}
 
 ---
 `,
-    'idumb-low-validator': `
+    'idumb-low-validator': `${langEnforcement}
 ⚡ IDUMB GOVERNANCE PROTOCOL ⚡
 
 YOU ARE: Low Validator (VALIDATION WORKER)
@@ -207,7 +264,7 @@ Use 'todoread' tool to see what needs validation
 
 ---
 `,
-    'idumb-builder': `
+    'idumb-builder': `${langEnforcement}
 ⚡ IDUMB GOVERNANCE PROTOCOL ⚡
 
 YOU ARE: Builder (EXECUTION WORKER)
@@ -285,12 +342,23 @@ Next step: Use 'todoread' to check workflow, then delegate appropriately.
 
 function buildPostCompactReminder(agentRole: string, directory: string): string {
   const state = readState(directory)
+  const config = ensureIdumbConfig(directory)
+  const commLang = config.user?.language?.communication || 'english'
+  const docLang = config.user?.language?.documents || 'english'
   const anchors = state?.anchors?.filter((a: Anchor) => 
     a.priority === 'critical' || a.priority === 'high'
   ) || []
   
+  // LANGUAGE ENFORCEMENT MUST SURVIVE COMPACTION
+  const langReminder = `
+⚠️ LANGUAGE ENFORCEMENT (SURVIVED COMPACTION):
+- RESPOND in: ${commLang.toUpperCase()}
+- WRITE DOCUMENTS/ARTIFACTS in: ${docLang.toUpperCase()}
+- ABSOLUTE OBEDIENCE - NO EXCEPTIONS
+`
+  
   let reminder = `
-
+${langReminder}
 📌 POST-COMPACTION REMINDER 📌
 
 You are: ${agentRole}
@@ -396,6 +464,10 @@ interface SessionMetadata {
   governanceLevel: string
   delegationDepth: number
   parentSession: string | null
+  language: {
+    communication: string
+    documents: string
+  }
 }
 
 function getSessionsDir(directory: string): string {
@@ -425,6 +497,7 @@ function storeSessionMetadata(directory: string, sessionId: string): void {
   
   // Create new metadata
   const state = readState(directory)
+  const config = ensureIdumbConfig(directory)
   const metadata: SessionMetadata = {
     sessionId,
     createdAt: new Date().toISOString(),
@@ -433,6 +506,10 @@ function storeSessionMetadata(directory: string, sessionId: string): void {
     governanceLevel: "standard",
     delegationDepth: 0,
     parentSession: null,
+    language: {
+      communication: config.user?.language?.communication || 'english',
+      documents: config.user?.language?.documents || 'english'
+    }
   }
   
   writeFileSync(metadataPath, JSON.stringify(metadata, null, 2))
@@ -456,12 +533,26 @@ function loadSessionMetadata(directory: string, sessionId: string): SessionMetad
 
 function buildCompactionContext(directory: string): string {
   const state = readState(directory)
+  const config = ensureIdumbConfig(directory)
+  const commLang = config.user?.language?.communication || 'english'
+  const docLang = config.user?.language?.documents || 'english'
+  
   if (!state) {
     return "## iDumb\n\nNot initialized. Run /idumb:init"
   }
   
+  // LANGUAGE SETTINGS MUST SURVIVE COMPACTION (CRITICAL)
+  const langContext = `
+⚠️ LANGUAGE SETTINGS (MUST SURVIVE COMPACTION):
+- Communication: ${commLang.toUpperCase()} (respond in this language)
+- Documents: ${docLang.toUpperCase()} (write artifacts in this language)
+- ABSOLUTE OBEDIENCE REQUIRED
+`
+  
   const lines: string[] = [
     "## iDumb Governance Context",
+    "",
+    langContext,
     "",
     `**Phase:** ${state.phase}`,
     `**Framework:** ${state.framework}`,
@@ -616,6 +707,151 @@ function injectTimestampFrontmatter(content: string, existingCreated?: string): 
 }
 
 // ============================================================================
+// INLINE CONFIG AUTO-GENERATION (mirrors idumb-config.ts)
+// ============================================================================
+
+function getInlineDefaultConfig(experience: ExperienceLevel = "guided"): InlineIdumbConfig {
+  const now = new Date().toISOString()
+  
+  const automationByExperience: Record<ExperienceLevel, InlineIdumbConfig["automation"]> = {
+    pro: {
+      mode: "autonomous",
+      expertSkeptic: { enabled: true, requireEvidence: false, doubleCheckDelegation: false },
+      contextFirst: { enforced: true, requiredFirstTools: ["todoread"], blockWithoutContext: false },
+      workflow: { research: true, planCheck: false, verifyAfterExecution: false, commitOnComplete: true }
+    },
+    guided: {
+      mode: "confirmRequired",
+      expertSkeptic: { enabled: true, requireEvidence: true, doubleCheckDelegation: true },
+      contextFirst: { enforced: true, requiredFirstTools: ["todoread", "idumb-state"], blockWithoutContext: true },
+      workflow: { research: true, planCheck: true, verifyAfterExecution: true, commitOnComplete: true }
+    },
+    strict: {
+      mode: "manualOnly",
+      expertSkeptic: { enabled: true, requireEvidence: true, doubleCheckDelegation: true },
+      contextFirst: { enforced: true, requiredFirstTools: ["todoread", "idumb-state", "idumb-config"], blockWithoutContext: true },
+      workflow: { research: true, planCheck: true, verifyAfterExecution: true, commitOnComplete: true }
+    }
+  }
+
+  return {
+    version: "0.2.0",
+    initialized: now,
+    lastModified: now,
+    user: { name: "Developer", experience, language: { communication: "english", documents: "english" } },
+    status: { current: { milestone: null, phase: null, plan: null, task: null }, lastValidation: null, validationsPassed: 0, driftDetected: false },
+    hierarchy: {
+      levels: ["milestone", "phase", "plan", "task"] as const,
+      agents: {
+        order: ["coordinator", "governance", "validator", "builder"] as const,
+        permissions: {
+          coordinator: { delegate: true, execute: false, validate: false },
+          governance: { delegate: true, execute: false, validate: false },
+          validator: { delegate: false, execute: false, validate: true },
+          builder: { delegate: false, execute: true, validate: false }
+        }
+      },
+      enforceChain: true,
+      blockOnChainBreak: true
+    },
+    automation: automationByExperience[experience],
+    paths: {
+      config: ".idumb/config.json", state: ".idumb/brain/state.json", brain: ".idumb/brain/",
+      history: ".idumb/brain/history/", context: ".idumb/brain/context/", governance: ".idumb/governance/",
+      validations: ".idumb/governance/validations/", anchors: ".idumb/anchors/", sessions: ".idumb/sessions/",
+      planning: ".planning/", roadmap: ".planning/ROADMAP.md", planningState: ".planning/STATE.md"
+    },
+    staleness: { warningHours: 48, criticalHours: 168, checkOnLoad: true, autoArchive: false },
+    timestamps: { enabled: true, format: "ISO8601", injectInFrontmatter: true, trackModifications: true },
+    enforcement: { mustLoadConfig: true, mustHaveState: true, mustCheckHierarchy: true, blockOnMissingArtifacts: experience === "strict", requirePhaseAlignment: true }
+  }
+}
+
+function getInlineDefaultState(): IdumbState {
+  return {
+    version: "0.2.0",
+    initialized: new Date().toISOString(),
+    framework: "idumb",
+    phase: "init",
+    lastValidation: null,
+    validationCount: 0,
+    anchors: [],
+    history: []
+  }
+}
+
+/**
+ * CRITICAL: Ensures config exists - auto-generates if missing
+ * Called at session.created to guarantee config is always present
+ */
+function ensureIdumbConfig(directory: string): InlineIdumbConfig {
+  const configPath = join(directory, ".idumb", "config.json")
+  const idumbDir = join(directory, ".idumb")
+  
+  // Create .idumb directory if missing
+  if (!existsSync(idumbDir)) {
+    mkdirSync(idumbDir, { recursive: true })
+  }
+  
+  // If config exists, read and validate
+  if (existsSync(configPath)) {
+    try {
+      const content = readFileSync(configPath, "utf8")
+      const config = JSON.parse(content) as InlineIdumbConfig
+      
+      // Validate required fields exist
+      if (!config.version || !config.user || !config.hierarchy) {
+        throw new Error("Config missing required fields")
+      }
+      
+      return config
+    } catch {
+      // Config corrupted - backup and regenerate
+      const backupPath = join(idumbDir, `config.backup.${Date.now()}.json`)
+      if (existsSync(configPath)) {
+        try {
+          writeFileSync(backupPath, readFileSync(configPath))
+        } catch {
+          // Ignore backup failures
+        }
+      }
+    }
+  }
+  
+  // Generate default config
+  const defaultConfig = getInlineDefaultConfig("guided")
+  
+  // Create all required directories
+  const dirs = [
+    join(directory, ".idumb", "brain"),
+    join(directory, ".idumb", "brain", "history"),
+    join(directory, ".idumb", "brain", "context"),
+    join(directory, ".idumb", "governance"),
+    join(directory, ".idumb", "governance", "validations"),
+    join(directory, ".idumb", "anchors"),
+    join(directory, ".idumb", "sessions")
+  ]
+  
+  for (const dir of dirs) {
+    if (!existsSync(dir)) {
+      mkdirSync(dir, { recursive: true })
+    }
+  }
+  
+  // Write config
+  writeFileSync(configPath, JSON.stringify(defaultConfig, null, 2))
+  
+  // Also ensure state.json exists
+  const statePath = join(directory, ".idumb", "brain", "state.json")
+  if (!existsSync(statePath)) {
+    const defaultState = getInlineDefaultState()
+    writeFileSync(statePath, JSON.stringify(defaultState, null, 2))
+  }
+  
+  return defaultConfig
+}
+
+// ============================================================================
 // PLUGIN EXPORT
 // ============================================================================
 
@@ -637,7 +873,11 @@ export const IdumbCorePlugin: Plugin = async ({ directory, client }) => {
           // Initialize tracker
           getSessionTracker(sessionId as string)
           
-          // Store metadata
+          // CRITICAL: Ensure config exists (auto-generate if missing)
+          const config = ensureIdumbConfig(directory)
+          log(directory, `Config loaded: experience=${config.user.experience}, version=${config.version}`)
+          
+          // Store metadata with config info
           storeSessionMetadata(directory, sessionId as string)
         }
         

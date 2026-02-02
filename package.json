@@ -1,7 +1,7 @@
 {
   "name": "idumb-plugin",
-  "version": "0.1.0",
-  "description": "OpenCode plugin that wraps GSD framework with hierarchical governance, context anchoring, and expert-skeptic validation",
+  "version": "0.2.0",
+  "description": "Hierarchical AI Governance Framework for OpenCode - Intelligent Delegation Using Managed Boundaries",
   "type": "module",
   "bin": {
     "idumb": "./bin/install.js",
@@ -10,7 +10,8 @@
   "main": "./template/plugins/idumb-core.ts",
   "files": [
     "bin",
-    "template"
+    "template",
+    "docs"
   ],
   "scripts": {
     "install:local": "node bin/install.js --local",
@@ -23,15 +24,15 @@
   },
   "keywords": [
     "opencode",
-    "gsd",
-    "get-shit-done",
-    "ai-coding",
+    "ai-governance",
+    "hierarchical-agents",
     "agentic-coding",
     "meta-framework",
     "governance",
     "plugin",
-    "hierarchical-agents",
-    "context-anchoring"
+    "context-anchoring",
+    "delegation",
+    "validation"
   ],
   "author": "shynlee04",
   "license": "MIT",

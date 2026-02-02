@@ -1,10 +1,13 @@
 /**
- * iDumb Configuration Management Tool
+ * iDumb Master Configuration Tool
  * 
- * Manages .idumb/config.json with user preferences, hierarchical paths,
- * and planning system integration (reads from .planning/config.json)
+ * THIS IS THE SINGLE SOURCE OF TRUTH
+ * - Loaded at session start by ALL agents
+ * - Controls ALL workflow behavior
+ * - MUST exist - auto-generated if missing
+ * - Hierarchical values are linked and protected
  * 
- * IMPORTANT: No console.log - would pollute TUI
+ * CRITICAL: No console.log - would pollute TUI
  */
 
 import { tool } from "@opencode-ai/plugin"
@@ -12,69 +15,186 @@ import { existsSync, readFileSync, writeFileSync, mkdirSync } from "fs"
 import { join } from "path"
 
 // ============================================================================
-// TYPES AND SCHEMA
+// TYPES AND SCHEMA - THE SINGLE SOURCE OF TRUTH
 // ============================================================================
 
-// Config values that ENFORCE automation and INTEGRATE with planning systems are ALLOWED
-// Values that BLOCK functionality (like specific model IDs) are NOT allowed
+/**
+ * User experience levels - control automation behavior
+ * 
+ * pro: User drives, agents suggest
+ * guided: Agents give rationale, suggest paths with explanation
+ * strict: Non-negotiable guardrails, block unsafe actions
+ */
+type ExperienceLevel = "pro" | "guided" | "strict"
+
+/**
+ * Automation mode - derived from experience level
+ */
+type AutomationMode = "autonomous" | "confirmRequired" | "manualOnly"
+
+/**
+ * Agent permission definition
+ */
+interface AgentPermission {
+  delegate: boolean
+  execute: boolean
+  validate: boolean
+}
+
+/**
+ * iDumb Master Configuration Interface
+ * 
+ * THIS IS THE SINGLE SOURCE OF TRUTH
+ * - Loaded at session start by ALL agents
+ * - Controls ALL workflow behavior
+ * - MUST exist - auto-generated if missing
+ * - Hierarchical values are linked and protected
+ */
 interface IdumbConfig {
-  version: string
-  // User preferences (line 202) - allowed: "what to call user, language"
+  // ═══════════════════════════════════════════════════════════════════════════
+  // SCHEMA METADATA - Never modify directly
+  // ═══════════════════════════════════════════════════════════════════════════
+  version: string                    // Schema version "0.2.0"
+  initialized: string                // ISO timestamp of creation
+  lastModified: string               // ISO timestamp of last change
+  
+  // ═══════════════════════════════════════════════════════════════════════════
+  // USER PREFERENCES - Personalization
+  // ═══════════════════════════════════════════════════════════════════════════
   user: {
-    name: string
+    name: string                     // How to address user
+    experience: ExperienceLevel      // "pro" | "guided" | "strict"
     language: {
-      communication: string  // Language for AI responses
-      documents: string      // Language for generated artifacts
+      communication: string          // AI response language
+      documents: string              // Artifact language
     }
   }
-  // Governance settings - ALLOWED: enforces validation/automation
-  governance: {
-    level: "light" | "moderate" | "strict"  // Governance strictness level
-    expertSkeptic: boolean                   // Enforces critical thinking
-    autoValidation: boolean                  // Enables automatic governance
+  
+  // ═══════════════════════════════════════════════════════════════════════════
+  // GOVERNANCE STATUS - Current state (linked to state.json)
+  // ═══════════════════════════════════════════════════════════════════════════
+  status: {
+    current: {
+      milestone: string | null       // e.g., "M1"
+      phase: string | null           // e.g., "1/5 (Core Config)"
+      plan: string | null            // e.g., "01-02-PLAN"
+      task: string | null            // e.g., "T3"
+    }
+    lastValidation: string | null    // ISO timestamp
+    validationsPassed: number        // Count of successful validations
+    driftDetected: boolean           // True if state differs from artifacts
   }
-  // Hierarchical paths (lines 204-210) - required
-  paths: {
-    state: {
-      brain: string
-      history: string
-      anchors: string
-    }
-    artifacts: {
-      governance: string
-      validations: string
-    }
-    context: {
-      codebase: string
-      sessions: string
-    }
-  }
-  // Hierarchy mapping (milestone → phase → plan → task)
+  
+  // ═══════════════════════════════════════════════════════════════════════════
+  // HIERARCHY CONTROL - The chain that cannot break
+  // ═══════════════════════════════════════════════════════════════════════════
   hierarchy: {
-    status: string[]    // ["milestone", "phase", "plan", "task"]
-    agents: string[]    // ["coordinator", "governor", "validator", "builder"]
+    // Status progression - each level depends on prior
+    levels: readonly ["milestone", "phase", "plan", "task"]
+    
+    // Agent delegation chain - strict order
+    agents: {
+      order: readonly ["coordinator", "governance", "validator", "builder"]
+      permissions: {
+        coordinator: AgentPermission
+        governance: AgentPermission
+        validator: AgentPermission
+        builder: AgentPermission
+      }
+    }
+    
+    // Chain integrity - if broken, block operations
+    enforceChain: boolean            // Default: true
+    blockOnChainBreak: boolean       // Default: true
   }
-  // Planning system integration - reads from .planning/config.json
-  frameworks: {
-    planning: {
-      detected: boolean
-      configPath: string
-      syncEnabled: boolean
+  
+  // ═══════════════════════════════════════════════════════════════════════════
+  // AUTOMATION CONTROL - How agents behave
+  // ═══════════════════════════════════════════════════════════════════════════
+  automation: {
+    // Derived from user.experience, but can be overridden
+    mode: AutomationMode
+    
+    // Expert-skeptic mode (from governance protocol)
+    expertSkeptic: {
+      enabled: boolean               // Always verify before acting
+      requireEvidence: boolean       // Demand proof for claims
+      doubleCheckDelegation: boolean // Verify delegation chains
+    }
+    
+    // Context-first enforcement
+    contextFirst: {
+      enforced: boolean              // Must read context before acting
+      requiredFirstTools: string[]   // ["todoread", "idumb-state"]
+      blockWithoutContext: boolean   // Block if context not gathered
+    }
+    
+    // Workflow controls
+    workflow: {
+      research: boolean              // Enable research phase
+      planCheck: boolean             // Verify plans before execution
+      verifyAfterExecution: boolean  // Validate after each task
+      commitOnComplete: boolean      // Git commit on phase complete
     }
   }
-  // Staleness detection (line 219, 237) - for stale check
-  staleness: {
-    warningThresholdHours: number
-    purgeThresholdHours: number
+  
+  // ═══════════════════════════════════════════════════════════════════════════
+  // PATH CONFIGURATION - Where everything lives
+  // ═══════════════════════════════════════════════════════════════════════════
+  paths: {
+    config: string                   // This file (self-referential)
+    state: string                    // Runtime state
+    
+    // Directories
+    brain: string
+    history: string
+    context: string
+    governance: string
+    validations: string
+    anchors: string
+    sessions: string
+    
+    // Planning artifacts (read-only for iDumb)
+    planning: string
+    roadmap: string
+    planningState: string
   }
-  // Timestamp injection settings (line 219)
+  
+  // ═══════════════════════════════════════════════════════════════════════════
+  // STALENESS DETECTION - Prevent drift
+  // ═══════════════════════════════════════════════════════════════════════════
+  staleness: {
+    warningHours: number             // Warn if artifacts older than this
+    criticalHours: number            // Block if older than this
+    checkOnLoad: boolean             // Check staleness at session start
+    autoArchive: boolean             // Archive stale artifacts
+  }
+  
+  // ═══════════════════════════════════════════════════════════════════════════
+  // TIMESTAMPS - Metadata control
+  // ═══════════════════════════════════════════════════════════════════════════
   timestamps: {
     enabled: boolean
-    format: "ISO8601" | "relative"
-    frontmatterInjection: boolean
+    format: "ISO8601"
+    injectInFrontmatter: boolean     // Add to YAML headers
+    trackModifications: boolean      // Shadow tracking
+  }
+  
+  // ═══════════════════════════════════════════════════════════════════════════
+  // ENFORCEMENT FLAGS - What to check on load
+  // ═══════════════════════════════════════════════════════════════════════════
+  enforcement: {
+    mustLoadConfig: true             // ALWAYS TRUE - non-negotiable
+    mustHaveState: boolean           // state.json must exist
+    mustCheckHierarchy: boolean      // Validate hierarchy chain
+    blockOnMissingArtifacts: boolean // Block if required files missing
+    requirePhaseAlignment: boolean   // Phase in config == phase in state
   }
 }
 
+/**
+ * Planning config interface (for sync with .planning/config.json)
+ */
 interface PlanningConfig {
   mode?: "yolo" | "interactive"
   depth?: "quick" | "standard" | "comprehensive"
@@ -91,61 +211,291 @@ interface PlanningConfig {
   commit_docs?: boolean
 }
 
+/**
+ * Default state interface for state.json
+ */
+interface IdumbState {
+  version: string
+  initialized: string
+  framework: "idumb" | "planning" | "bmad" | "custom" | "none"
+  phase: string
+  lastValidation: string | null
+  validationCount: number
+  anchors: Array<{
+    id: string
+    created: string
+    type: string
+    content: string
+    priority: string
+  }>
+  history: Array<{
+    timestamp: string
+    action: string
+    agent: string
+    result: string
+  }>
+}
+
 // ============================================================================
-// DEFAULT CONFIG
+// AUTOMATION SETTINGS BY EXPERIENCE LEVEL
 // ============================================================================
 
-function getDefaultConfig(): IdumbConfig {
+/**
+ * Get automation settings based on experience level
+ */
+function getAutomationByExperience(experience: ExperienceLevel): IdumbConfig["automation"] {
+  const settings: Record<ExperienceLevel, IdumbConfig["automation"]> = {
+    pro: {
+      mode: "autonomous",
+      expertSkeptic: {
+        enabled: true,
+        requireEvidence: false,
+        doubleCheckDelegation: false
+      },
+      contextFirst: {
+        enforced: true,
+        requiredFirstTools: ["todoread"],
+        blockWithoutContext: false
+      },
+      workflow: {
+        research: true,
+        planCheck: false,
+        verifyAfterExecution: false,
+        commitOnComplete: true
+      }
+    },
+    guided: {
+      mode: "confirmRequired",
+      expertSkeptic: {
+        enabled: true,
+        requireEvidence: true,
+        doubleCheckDelegation: true
+      },
+      contextFirst: {
+        enforced: true,
+        requiredFirstTools: ["todoread", "idumb-state"],
+        blockWithoutContext: true
+      },
+      workflow: {
+        research: true,
+        planCheck: true,
+        verifyAfterExecution: true,
+        commitOnComplete: true
+      }
+    },
+    strict: {
+      mode: "manualOnly",
+      expertSkeptic: {
+        enabled: true,
+        requireEvidence: true,
+        doubleCheckDelegation: true
+      },
+      contextFirst: {
+        enforced: true,
+        requiredFirstTools: ["todoread", "idumb-state", "idumb-config"],
+        blockWithoutContext: true
+      },
+      workflow: {
+        research: true,
+        planCheck: true,
+        verifyAfterExecution: true,
+        commitOnComplete: true
+      }
+    }
+  }
+  
+  return settings[experience]
+}
+
+// ============================================================================
+// DEFAULT CONFIG GENERATOR
+// ============================================================================
+
+/**
+ * Generate default config based on experience level
+ * 
+ * @param experience - User's experience level (default: "guided")
+ * @returns Complete IdumbConfig object
+ */
+function getDefaultConfig(experience: ExperienceLevel = "guided"): IdumbConfig {
+  const now = new Date().toISOString()
+  
   return {
-    version: "0.1.0",
+    version: "0.2.0",
+    initialized: now,
+    lastModified: now,
+    
     user: {
       name: "Developer",
+      experience,
       language: {
         communication: "english",
         documents: "english"
       }
     },
-    governance: {
-      level: "moderate",
-      expertSkeptic: true,
-      autoValidation: true
-    },
-    paths: {
-      state: {
-        brain: ".idumb/brain/state.json",
-        history: ".idumb/brain/history/",
-        anchors: ".idumb/anchors/"
+    
+    status: {
+      current: {
+        milestone: null,
+        phase: null,
+        plan: null,
+        task: null
       },
-      artifacts: {
-        governance: ".idumb/governance/",
-        validations: ".idumb/governance/validations/"
-      },
-      context: {
-        codebase: ".idumb/brain/context/codebase.md",
-        sessions: ".idumb/brain/context/sessions.md"
-      }
+      lastValidation: null,
+      validationsPassed: 0,
+      driftDetected: false
     },
+    
     hierarchy: {
-      status: ["milestone", "phase", "plan", "task"],
-      agents: ["coordinator", "governor", "validator", "builder"]
+      levels: ["milestone", "phase", "plan", "task"] as const,
+      agents: {
+        order: ["coordinator", "governance", "validator", "builder"] as const,
+        permissions: {
+          coordinator: { delegate: true, execute: false, validate: false },
+          governance: { delegate: true, execute: false, validate: false },
+          validator: { delegate: false, execute: false, validate: true },
+          builder: { delegate: false, execute: true, validate: false }
+        }
+      },
+      enforceChain: true,
+      blockOnChainBreak: true
     },
-    frameworks: {
-      planning: {
-        detected: false,
-        configPath: ".planning/config.json",
-        syncEnabled: true
-      }
+    
+    automation: getAutomationByExperience(experience),
+    
+    paths: {
+      config: ".idumb/config.json",
+      state: ".idumb/brain/state.json",
+      brain: ".idumb/brain/",
+      history: ".idumb/brain/history/",
+      context: ".idumb/brain/context/",
+      governance: ".idumb/governance/",
+      validations: ".idumb/governance/validations/",
+      anchors: ".idumb/anchors/",
+      sessions: ".idumb/sessions/",
+      planning: ".planning/",
+      roadmap: ".planning/ROADMAP.md",
+      planningState: ".planning/STATE.md"
     },
+    
     staleness: {
-      warningThresholdHours: 48,
-      purgeThresholdHours: 168
+      warningHours: 48,
+      criticalHours: 168,
+      checkOnLoad: true,
+      autoArchive: false
     },
+    
     timestamps: {
       enabled: true,
       format: "ISO8601",
-      frontmatterInjection: true
+      injectInFrontmatter: true,
+      trackModifications: true
+    },
+    
+    enforcement: {
+      mustLoadConfig: true,
+      mustHaveState: true,
+      mustCheckHierarchy: true,
+      blockOnMissingArtifacts: experience === "strict",
+      requirePhaseAlignment: true
     }
   }
+}
+
+/**
+ * Get default state for state.json
+ */
+function getDefaultState(): IdumbState {
+  return {
+    version: "0.2.0",
+    initialized: new Date().toISOString(),
+    framework: "idumb",
+    phase: "init",
+    lastValidation: null,
+    validationCount: 0,
+    anchors: [],
+    history: []
+  }
+}
+
+// ============================================================================
+// CRITICAL: ENSURE CONFIG EXISTS - AUTO-GENERATE IF MISSING
+// ============================================================================
+
+/**
+ * CRITICAL: Ensures config exists - generates if missing
+ * Called at EVERY session start, by EVERY agent
+ * NEVER returns null - always creates if missing
+ * 
+ * @param directory - Project root directory
+ * @returns Complete IdumbConfig object (never null)
+ */
+function ensureConfigExists(directory: string): IdumbConfig {
+  const configPath = join(directory, ".idumb", "config.json")
+  const idumbDir = join(directory, ".idumb")
+  
+  // Create .idumb directory if missing
+  if (!existsSync(idumbDir)) {
+    mkdirSync(idumbDir, { recursive: true })
+  }
+  
+  // If config exists, read and validate
+  if (existsSync(configPath)) {
+    try {
+      const content = readFileSync(configPath, "utf8")
+      const config = JSON.parse(content) as IdumbConfig
+      
+      // Validate required fields exist
+      if (!config.version || !config.user || !config.hierarchy) {
+        throw new Error("Config missing required fields")
+      }
+      
+      // Update lastModified for this access
+      return config
+    } catch (error) {
+      // Config corrupted - backup and regenerate
+      const backupPath = join(idumbDir, `config.backup.${Date.now()}.json`)
+      if (existsSync(configPath)) {
+        try {
+          writeFileSync(backupPath, readFileSync(configPath))
+        } catch {
+          // Ignore backup failures
+        }
+      }
+    }
+  }
+  
+  // Generate default config
+  const defaultConfig = getDefaultConfig("guided")
+  
+  // Create all required directories
+  const dirs = [
+    join(directory, ".idumb", "brain"),
+    join(directory, ".idumb", "brain", "history"),
+    join(directory, ".idumb", "brain", "context"),
+    join(directory, ".idumb", "governance"),
+    join(directory, ".idumb", "governance", "validations"),
+    join(directory, ".idumb", "anchors"),
+    join(directory, ".idumb", "sessions")
+  ]
+  
+  for (const dir of dirs) {
+    if (!existsSync(dir)) {
+      mkdirSync(dir, { recursive: true })
+    }
+  }
+  
+  // Write config
+  writeFileSync(configPath, JSON.stringify(defaultConfig, null, 2))
+  
+  // Also ensure state.json exists
+  const statePath = join(directory, ".idumb", "brain", "state.json")
+  if (!existsSync(statePath)) {
+    const defaultState = getDefaultState()
+    writeFileSync(statePath, JSON.stringify(defaultState, null, 2))
+  }
+  
+  return defaultConfig
 }
 
 // ============================================================================
@@ -160,23 +510,16 @@ function getPlanningConfigPath(directory: string): string {
   return join(directory, ".planning", "config.json")
 }
 
+/**
+ * Load config - uses ensureConfigExists to guarantee a config is returned
+ */
 function loadConfig(directory: string): IdumbConfig {
-  const configPath = getConfigPath(directory)
-  
-  if (existsSync(configPath)) {
-    try {
-      const content = readFileSync(configPath, "utf8")
-      const loaded = JSON.parse(content)
-      // Merge with defaults to handle missing fields
-      return { ...getDefaultConfig(), ...loaded }
-    } catch {
-      return getDefaultConfig()
-    }
-  }
-  
-  return getDefaultConfig()
+  return ensureConfigExists(directory)
 }
 
+/**
+ * Save config with lastModified update
+ */
 function saveConfig(directory: string, config: IdumbConfig): void {
   const configPath = getConfigPath(directory)
   const idumbDir = join(directory, ".idumb")
@@ -185,9 +528,13 @@ function saveConfig(directory: string, config: IdumbConfig): void {
     mkdirSync(idumbDir, { recursive: true })
   }
   
+  config.lastModified = new Date().toISOString()
   writeFileSync(configPath, JSON.stringify(config, null, 2))
 }
 
+/**
+ * Load planning config (returns null if not found)
+ */
 function loadPlanningConfig(directory: string): PlanningConfig | null {
   const planningPath = getPlanningConfigPath(directory)
   
@@ -202,48 +549,118 @@ function loadPlanningConfig(directory: string): PlanningConfig | null {
   return null
 }
 
+/**
+ * Update config status from STATE.md
+ */
+function syncStatusFromPlanning(directory: string, config: IdumbConfig): IdumbConfig {
+  const stateMdPath = join(directory, ".planning", "STATE.md")
+  
+  if (existsSync(stateMdPath)) {
+    try {
+      const content = readFileSync(stateMdPath, "utf8")
+      
+      // Parse milestone
+      const milestoneMatch = content.match(/Milestone:\s*\[([^\]]+)\]/i)
+      if (milestoneMatch) {
+        config.status.current.milestone = milestoneMatch[1]
+      }
+      
+      // Parse phase
+      const phaseMatch = content.match(/Phase:\s*\[(\d+)\]\s*of\s*\[(\d+)\]\s*\(([^)]+)\)/i)
+      if (phaseMatch) {
+        config.status.current.phase = `${phaseMatch[1]}/${phaseMatch[2]} (${phaseMatch[3]})`
+      }
+      
+      // Parse plan
+      const planMatch = content.match(/Plan:\s*\[([^\]]+)\]/i)
+      if (planMatch) {
+        config.status.current.plan = planMatch[1]
+      }
+      
+      // Parse task
+      const taskMatch = content.match(/Task:\s*\[([^\]]+)\]/i)
+      if (taskMatch) {
+        config.status.current.task = taskMatch[1]
+      }
+    } catch {
+      // Failed to parse - keep current status
+    }
+  }
+  
+  return config
+}
+
+/**
+ * Check for drift between config status and planning artifacts
+ */
+function detectDrift(directory: string, config: IdumbConfig): boolean {
+  // Check if state.json matches config status
+  const statePath = join(directory, ".idumb", "brain", "state.json")
+  
+  if (existsSync(statePath)) {
+    try {
+      const state = JSON.parse(readFileSync(statePath, "utf8"))
+      
+      // Compare phase
+      if (state.phase && config.status.current.phase) {
+        // Simple drift detection - phases should align
+        if (!state.phase.includes(config.status.current.phase.split(" ")[0])) {
+          return true
+        }
+      }
+    } catch {
+      // Can't detect drift if state is corrupted
+    }
+  }
+  
+  return false
+}
+
 // Reserved keys that iDumb must not allow users to set
-// These are controlled by OpenCode or planning systems, not by iDumb
-const RESERVED_OPENCODE_KEYS = ['models', 'provider', 'temperature', 'topP', 'topK']
-const RESERVED_PLANNING_KEYS = ['milestones', 'phases', 'agents', 'mode', 'depth', 'profile']
+const RESERVED_OPENCODE_KEYS = ["models", "provider", "temperature", "topP", "topK"]
+const RESERVED_PLANNING_KEYS = ["milestones", "phases", "agents", "mode", "depth", "profile"]
 
 function isReservedKey(section: string, key: string): { reserved: boolean; owner?: string } {
-  // Check if the key matches OpenCode or planning reserved patterns
   if (RESERVED_OPENCODE_KEYS.some(r => key.includes(r) || r.includes(key))) {
-    return { reserved: true, owner: 'OpenCode' }
+    return { reserved: true, owner: "OpenCode" }
   }
   if (RESERVED_PLANNING_KEYS.some(r => key.includes(r) || r.includes(key))) {
-    return { reserved: true, owner: 'planning system' }
+    return { reserved: true, owner: "planning system" }
   }
   return { reserved: false }
 }
 
 // ============================================================================
-// TOOLS
+// TOOLS EXPORT - All configuration management tools
 // ============================================================================
 
-// Read configuration
+/**
+ * Read configuration (merges with planning config if present)
+ */
 export const read = tool({
   description: "Read iDumb configuration (merges with planning config if present)",
   args: {
-    section: tool.schema.string().optional().describe("Specific section: user, governance, paths, hierarchy, frameworks, staleness, timestamps")
+    section: tool.schema.string().optional().describe("Specific section: user, status, hierarchy, automation, paths, staleness, timestamps, enforcement")
   },
   async execute(args, context) {
     const config = loadConfig(context.directory)
     const planningConfig = loadPlanningConfig(context.directory)
     
-    // Update planning detection
-    config.frameworks.planning.detected = planningConfig !== null
+    // Sync status from planning if available
+    const syncedConfig = syncStatusFromPlanning(context.directory, config)
+    
+    // Check for drift
+    syncedConfig.status.driftDetected = detectDrift(context.directory, syncedConfig)
     
     // Build merged view
     const result: any = {
-      idumb: args.section ? (config as any)[args.section] : config,
+      idumb: args.section ? (syncedConfig as any)[args.section] : syncedConfig,
       planning: planningConfig || { detected: false },
       merged: {
-        // Derive effective settings from both configs
         mode: planningConfig?.mode || "interactive",
         profile: planningConfig?.profile || "balanced",
-        governance: config.governance.level
+        experience: syncedConfig.user.experience,
+        automationMode: syncedConfig.automation.mode
       }
     }
     
@@ -251,11 +668,13 @@ export const read = tool({
   }
 })
 
-// Update configuration
+/**
+ * Update configuration values
+ */
 export const update = tool({
   description: "Update iDumb configuration values",
   args: {
-    section: tool.schema.string().describe("Section to update: user, governance, paths, staleness, timestamps"),
+    section: tool.schema.string().describe("Section to update: user, automation, staleness, timestamps, enforcement"),
     key: tool.schema.string().describe("Key within section (dot notation for nested, e.g., 'language.communication')"),
     value: tool.schema.string().describe("New value (JSON parsed if valid)")
   },
@@ -273,6 +692,14 @@ export const update = tool({
           opencode: RESERVED_OPENCODE_KEYS,
           planning: RESERVED_PLANNING_KEYS
         }
+      }, null, 2)
+    }
+    
+    // Prevent modification of protected sections
+    if (["version", "initialized", "status", "hierarchy"].includes(args.section)) {
+      return JSON.stringify({
+        error: `Section '${args.section}' is protected`,
+        message: "Version, initialized, status, and hierarchy are controlled by the system."
       }, null, 2)
     }
     
@@ -305,6 +732,14 @@ export const update = tool({
       const oldValue = target[finalKey]
       target[finalKey] = parsedValue
       
+      // If experience level changed, update automation settings
+      if (args.section === "user" && args.key === "experience") {
+        const newExperience = parsedValue as ExperienceLevel
+        if (["pro", "guided", "strict"].includes(newExperience)) {
+          config.automation = getAutomationByExperience(newExperience)
+        }
+      }
+      
       saveConfig(context.directory, config)
       
       return JSON.stringify({
@@ -312,7 +747,8 @@ export const update = tool({
         section: args.section,
         key: args.key,
         oldValue,
-        newValue: parsedValue
+        newValue: parsedValue,
+        experienceTriggeredAutomationUpdate: args.key === "experience"
       }, null, 2)
       
     } catch (e) {
@@ -321,16 +757,33 @@ export const update = tool({
   }
 })
 
-// Initialize configuration
+/**
+ * Initialize configuration with defaults and planning detection
+ */
 export const init = tool({
   description: "Initialize .idumb/config.json with defaults and planning system detection",
   args: {
     userName: tool.schema.string().optional().describe("User's preferred name"),
     language: tool.schema.string().optional().describe("Communication language (english, vietnamese, etc.)"),
-    governanceLevel: tool.schema.string().optional().describe("Governance level: light, moderate, strict")
+    governanceLevel: tool.schema.string().optional().describe("DEPRECATED - use experience instead"),
+    experience: tool.schema.string().optional().describe("Experience level: pro, guided, strict")
   },
   async execute(args, context) {
-    const config = getDefaultConfig()
+    // Determine experience level
+    let experience: ExperienceLevel = "guided"
+    if (args.experience && ["pro", "guided", "strict"].includes(args.experience)) {
+      experience = args.experience as ExperienceLevel
+    } else if (args.governanceLevel) {
+      // Map old governance levels to experience
+      const mapping: Record<string, ExperienceLevel> = {
+        "light": "pro",
+        "moderate": "guided",
+        "strict": "strict"
+      }
+      experience = mapping[args.governanceLevel] || "guided"
+    }
+    
+    const config = getDefaultConfig(experience)
     
     // Apply overrides
     if (args.userName) {
@@ -340,22 +793,19 @@ export const init = tool({
       config.user.language.communication = args.language
       config.user.language.documents = args.language
     }
-    if (args.governanceLevel) {
-      config.governance.level = args.governanceLevel as any
-    }
     
     // Detect planning system
     const planningConfig = loadPlanningConfig(context.directory)
-    config.frameworks.planning.detected = planningConfig !== null
     
-    // Create paths
+    // Create all paths
     const pathsToCreate = [
       join(context.directory, ".idumb", "brain"),
       join(context.directory, ".idumb", "brain", "history"),
       join(context.directory, ".idumb", "brain", "context"),
       join(context.directory, ".idumb", "governance"),
       join(context.directory, ".idumb", "governance", "validations"),
-      join(context.directory, ".idumb", "anchors")
+      join(context.directory, ".idumb", "anchors"),
+      join(context.directory, ".idumb", "sessions")
     ]
     
     for (const path of pathsToCreate) {
@@ -366,72 +816,64 @@ export const init = tool({
     
     saveConfig(context.directory, config)
     
+    // Ensure state.json exists
+    const statePath = join(context.directory, ".idumb", "brain", "state.json")
+    if (!existsSync(statePath)) {
+      const defaultState = getDefaultState()
+      writeFileSync(statePath, JSON.stringify(defaultState, null, 2))
+    }
+    
     return JSON.stringify({
       initialized: true,
       config,
+      experience,
+      automationMode: config.automation.mode,
       planningDetected: planningConfig !== null,
       pathsCreated: pathsToCreate.length
     }, null, 2)
   }
 })
 
-// Get hierarchical status (from STATE.md)
+/**
+ * Get hierarchical status (milestone, phase, plan, task)
+ */
 export const status = tool({
   description: "Get current status at each hierarchy level (milestone, phase, plan, task)",
   args: {},
   async execute(args, context) {
     const config = loadConfig(context.directory)
-    const result: any = {
-      hierarchy: config.hierarchy.status,
-      current: {}
-    }
     
-    // Check STATE.md in .planning/
-    const stateMdPath = join(context.directory, ".planning", "STATE.md")
-    if (existsSync(stateMdPath)) {
-      try {
-        const content = readFileSync(stateMdPath, "utf8")
-        
-        // Parse phase
-        const phaseMatch = content.match(/Phase:\s*\[(\d+)\]\s*of\s*\[(\d+)\]\s*\(([^)]+)\)/i)
-        if (phaseMatch) {
-          result.current.phase = {
-            current: parseInt(phaseMatch[1]),
-            total: parseInt(phaseMatch[2]),
-            name: phaseMatch[3]
-          }
-        }
-        
-        // Parse plan
-        const planMatch = content.match(/Plan:\s*\[(\d+)\]\s*of\s*\[(\d+)\]/i)
-        if (planMatch) {
-          result.current.plan = {
-            current: parseInt(planMatch[1]),
-            total: parseInt(planMatch[2])
-          }
-        }
-        
-        // Parse task
-        const taskMatch = content.match(/Task:\s*\[(\d+)\]\s*of\s*\[(\d+)\]/i)
-        if (taskMatch) {
-          result.current.task = {
-            current: parseInt(taskMatch[1]),
-            total: parseInt(taskMatch[2])
-          }
-        }
-        
-      } catch {
-        result.error = "Could not parse STATE.md"
+    // Sync from planning artifacts
+    const syncedConfig = syncStatusFromPlanning(context.directory, config)
+    
+    // Check for drift
+    syncedConfig.status.driftDetected = detectDrift(context.directory, syncedConfig)
+    
+    const result = {
+      hierarchy: {
+        levels: syncedConfig.hierarchy.levels,
+        agents: syncedConfig.hierarchy.agents.order
+      },
+      current: syncedConfig.status.current,
+      meta: {
+        lastValidation: syncedConfig.status.lastValidation,
+        validationsPassed: syncedConfig.status.validationsPassed,
+        driftDetected: syncedConfig.status.driftDetected
+      },
+      chain: {
+        enforceChain: syncedConfig.hierarchy.enforceChain,
+        blockOnChainBreak: syncedConfig.hierarchy.blockOnChainBreak,
+        chainIntact: !syncedConfig.status.driftDetected
       }
-    } else {
-      result.planningNotFound = true
     }
     
     return JSON.stringify(result, null, 2)
   }
 })
 
-// Sync with planning config
+/**
+ * Sync with planning config
+ */
 export const sync = tool({
   description: "Sync iDumb config with .planning/config.json",
   args: {},
@@ -446,43 +888,124 @@ export const sync = tool({
       })
     }
     
-    // Update detection
-    config.frameworks.planning.detected = true
+    // Sync status from STATE.md
+    const syncedConfig = syncStatusFromPlanning(context.directory, config)
     
-    // Map planning settings to governance
+    // Map planning settings to automation
     if (planningConfig.mode === "yolo") {
-      config.governance.level = "light"
+      syncedConfig.user.experience = "pro"
+      syncedConfig.automation = getAutomationByExperience("pro")
     } else if (planningConfig.mode === "interactive") {
-      config.governance.level = "moderate"
+      syncedConfig.user.experience = "guided"
+      syncedConfig.automation = getAutomationByExperience("guided")
     }
     
-    saveConfig(context.directory, config)
+    saveConfig(context.directory, syncedConfig)
     
     return JSON.stringify({
       synced: true,
       planningConfig,
-      derivedGovernance: config.governance.level
+      derivedExperience: syncedConfig.user.experience,
+      derivedAutomationMode: syncedConfig.automation.mode,
+      currentStatus: syncedConfig.status.current
     }, null, 2)
   }
 })
 
-// Default export: read full config
+/**
+ * CRITICAL: Ensure config exists - auto-generate if missing
+ * This is the function that MUST be called at session start
+ */
+export const ensure = tool({
+  description: "Ensure config exists - auto-generates if missing. MUST be called at session start by all agents.",
+  args: {
+    experience: tool.schema.string().optional().describe("Experience level for new config: pro, guided, strict")
+  },
+  async execute(args, context) {
+    const configPath = getConfigPath(context.directory)
+    const existed = existsSync(configPath)
+    
+    // If doesn't exist and experience provided, create with that level
+    if (!existed && args.experience && ["pro", "guided", "strict"].includes(args.experience)) {
+      const config = getDefaultConfig(args.experience as ExperienceLevel)
+      
+      // Create directories
+      const dirs = [
+        join(context.directory, ".idumb", "brain"),
+        join(context.directory, ".idumb", "brain", "history"),
+        join(context.directory, ".idumb", "brain", "context"),
+        join(context.directory, ".idumb", "governance"),
+        join(context.directory, ".idumb", "governance", "validations"),
+        join(context.directory, ".idumb", "anchors"),
+        join(context.directory, ".idumb", "sessions")
+      ]
+      
+      for (const dir of dirs) {
+        if (!existsSync(dir)) {
+          mkdirSync(dir, { recursive: true })
+        }
+      }
+      
+      saveConfig(context.directory, config)
+      
+      // Ensure state.json
+      const statePath = join(context.directory, ".idumb", "brain", "state.json")
+      if (!existsSync(statePath)) {
+        const defaultState = getDefaultState()
+        writeFileSync(statePath, JSON.stringify(defaultState, null, 2))
+      }
+      
+      return JSON.stringify({
+        existed: false,
+        created: true,
+        experience: args.experience,
+        configPath,
+        message: "Config auto-generated with specified experience level"
+      }, null, 2)
+    }
+    
+    // Use ensureConfigExists for standard flow
+    const config = ensureConfigExists(context.directory)
+    
+    return JSON.stringify({
+      existed,
+      created: !existed,
+      version: config.version,
+      experience: config.user.experience,
+      automationMode: config.automation.mode,
+      configPath,
+      message: existed ? "Config loaded successfully" : "Config auto-generated with 'guided' experience level"
+    }, null, 2)
+  }
+})
+
+/**
+ * Default export: read full config with planning integration
+ */
 export default tool({
   description: "Read full iDumb configuration with planning system integration",
   args: {},
   async execute(args, context) {
-    const config = loadConfig(context.directory)
+    // CRITICAL: Ensure config exists first
+    const config = ensureConfigExists(context.directory)
     const planningConfig = loadPlanningConfig(context.directory)
     
-    config.frameworks.planning.detected = planningConfig !== null
+    // Sync status
+    const syncedConfig = syncStatusFromPlanning(context.directory, config)
+    syncedConfig.status.driftDetected = detectDrift(context.directory, syncedConfig)
     
     return JSON.stringify({
-      config,
+      config: syncedConfig,
       planning: planningConfig || null,
-      configPath: getConfigPath(context.directory),
-      planningConfigPath: existsSync(getPlanningConfigPath(context.directory)) 
-        ? getPlanningConfigPath(context.directory) 
-        : null
+      meta: {
+        configPath: getConfigPath(context.directory),
+        planningConfigPath: existsSync(getPlanningConfigPath(context.directory)) 
+          ? getPlanningConfigPath(context.directory) 
+          : null,
+        experience: syncedConfig.user.experience,
+        automationMode: syncedConfig.automation.mode,
+        chainIntact: !syncedConfig.status.driftDetected
+      }
     }, null, 2)
   }
 })
