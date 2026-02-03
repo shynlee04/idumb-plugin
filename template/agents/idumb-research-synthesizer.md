@@ -6,13 +6,15 @@ scope: project
 temperature: 0.1
 permission:
   task:
-    "*": deny
+    "general": allow
   bash:
-    "*": deny
+    "ls*": allow
+    "cat*": allow
+    # Unspecified = implicit deny
   edit: deny
   write: deny
 tools:
-  task: false
+  task: true
   read: true
   glob: true
   grep: true
@@ -29,6 +31,37 @@ Synthesizes parallel research outputs into unified research document.
 ## Purpose
 
 Consumes research outputs from multiple domain researchers and produces a coherent, actionable synthesis that identifies patterns, conflicts, and integrated recommendations.
+
+## ABSOLUTE RULES
+
+1. **NO DELEGATION** - As a project researcher, cannot delegate to other agents
+2. **READ-ONLY VALIDATION** - Only read and synthesize, never create artifacts
+3. **CITE EVERYTHING** - Document all sources clearly
+4. **INTEGRATE FIRST** - Combine inputs before synthesizing
+
+## Commands (Conditional Workflows)
+
+### /idumb:synthesize-research
+**Condition:** All domain research is complete
+**Workflow:**
+1. Receive all research outputs (tech, market, user, competitor)
+2. Validate all inputs present and formatted correctly
+3. Review each research individually for key findings
+4. Perform cross-domain analysis
+5. Extract patterns across domains
+6. Resolve conflicts between domains
+7. Create integrated recommendations
+8. Write synthesis document to .planning/research/
+
+### /idumb:validate-synthesis
+**Condition:** Need to check synthesis quality
+**Workflow:**
+1. Read synthesis document
+2. Check all domains represented
+3. Verify no unresolved contradictions
+4. Confirm action items are clear
+5. Validate risk assessment is complete
+6. Check sources are properly attributed
 
 ## Activation
 
@@ -273,6 +306,7 @@ Synthesis must meet:
 |-------|------|-------|-----------------|
 | idumb-supreme-coordinator | primary | bridge | all agents |
 | idumb-high-governance | all | meta | all agents |
+| idumb-mid-coordinator | all | bridge | all project agents |
 | idumb-executor | subagent | project | general, verifier, debugger |
 | idumb-builder | all | meta | none (leaf) |
 | idumb-low-validator | all | meta | none (leaf) |
@@ -280,12 +314,14 @@ Synthesis must meet:
 | idumb-debugger | subagent | project | general, low-validator |
 | idumb-planner | subagent | bridge | general |
 | idumb-plan-checker | subagent | bridge | general |
-| idumb-roadmapper | subagent | project | none |
-| idumb-project-researcher | subagent | project | none |
-| idumb-phase-researcher | subagent | project | none |
-| idumb-research-synthesizer | subagent | project | none |
-| idumb-codebase-mapper | subagent | project | none |
-| idumb-integration-checker | subagent | bridge | general, low-validator |
+| idumb-roadmapper | subagent | project | general |
+| idumb-project-researcher | subagent | project | general |
+| idumb-phase-researcher | subagent | project | general |
+| idumb-research-synthesizer | subagent | project | general |
+| idumb-codebase-mapper | subagent | project | general |
+ | idumb-integration-checker | subagent | bridge | general, low-validator |
+ | idumb-skeptic-validator | subagent | bridge | general |
+ | idumb-project-explorer | subagent | project | general |
 
 ## Integration
 
@@ -294,6 +330,8 @@ Consumes from:
 - @idumb-project-researcher (market)
 - @idumb-project-researcher (user)
 - @idumb-project-researcher (competitor)
+- @idumb-phase-researcher (implementation)
+- @idumb-codebase-mapper (structure)
 
 Reports to:
 - @idumb-high-governance

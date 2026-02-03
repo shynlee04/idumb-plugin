@@ -443,9 +443,7 @@ export const snapshot = tool({
 // Check for drift
 export const drift = tool({
   description: "Check for drift from the last manifest snapshot",
-  args: {
-    _placeholder: tool.schema.boolean().optional().describe("Placeholder parameter")
-  },
+  args: {},
   async execute(args, context) {
     const manifest = loadManifest(context.directory)
     
@@ -484,9 +482,7 @@ export const drift = tool({
 // Check for conflicts
 export const conflicts = tool({
   description: "Detect naming conflicts, circular dependencies, and structural issues",
-  args: {
-    _placeholder: tool.schema.boolean().optional().describe("Placeholder parameter")
-  },
+  args: {},
   async execute(args, context) {
     const conflictResults = detectConflicts(context.directory)
     
@@ -539,9 +535,7 @@ export const verifyGitHash = tool({
 // Full check (snapshot + drift + conflicts)
 export default tool({
   description: "Run full manifest check: snapshot, drift detection, and conflict detection",
-  args: {
-    _placeholder: tool.schema.boolean().optional().describe("Placeholder parameter")
-  },
+  args: {},
   async execute(args, context) {
     // Take snapshot
     const entries = scanDirectory(context.directory)

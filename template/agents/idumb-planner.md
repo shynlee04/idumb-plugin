@@ -7,7 +7,9 @@ permission:
   task:
     "general": allow
   bash:
-    "*": deny
+    "git status": allow
+    "ls*": allow
+    # Unspecified = implicit deny
   edit: deny
   write: deny
 tools:

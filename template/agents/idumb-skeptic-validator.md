@@ -7,7 +7,10 @@ permission:
   task:
     "general": allow
   bash:
-    "*": deny
+    "ls*": allow
+    "cat*": allow
+    "grep*": allow
+    # Unspecified = implicit deny
   edit: deny
   write: deny
 tools:

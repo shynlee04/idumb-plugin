@@ -1,0 +1,111 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "iDumb Brain State Schema",
+  "description": "Schema for .idumb/brain/state.json - the core governance state file",
+  "type": "object",
+  "required": ["version", "initialized", "framework", "phase"],
+  "properties": {
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Semantic version of the iDumb framework"
+    },
+    "initialized": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO8601 timestamp of initialization"
+    },
+    "framework": {
+      "type": "string",
+      "enum": ["idumb", "idumb-only", "planning", "bmad", "custom", "none"],
+      "description": "Active framework type"
+    },
+    "phase": {
+      "type": "string",
+      "description": "Current project phase (init, planning, execution, etc.)"
+    },
+    "lastValidation": {
+      "type": ["string", "null"],
+      "format": "date-time",
+      "description": "Last validation timestamp"
+    },
+    "validationCount": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Total validations passed"
+    },
+    "anchors": {
+      "type": "array",
+      "maxItems": 20,
+      "items": {
+        "$ref": "#/definitions/Anchor"
+      },
+      "description": "Critical context that survives compaction"
+    },
+    "history": {
+      "type": "array",
+      "maxItems": 50,
+      "items": {
+        "$ref": "#/definitions/HistoryEntry"
+      },
+      "description": "Recent action history (rotated at 50 entries)"
+    }
+  },
+  "definitions": {
+    "Anchor": {
+      "type": "object",
+      "required": ["id", "created", "type", "content", "priority"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^anchor-\\d+$",
+          "description": "Unique anchor identifier"
+        },
+        "created": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["decision", "context", "checkpoint", "completion"],
+          "description": "Type of anchor"
+        },
+        "content": {
+          "type": "string",
+          "maxLength": 1000,
+          "description": "Anchor content (max 1000 chars)"
+        },
+        "priority": {
+          "type": "string",
+          "enum": ["critical", "high", "normal"],
+          "description": "Priority determines survival during purge"
+        }
+      }
+    },
+    "HistoryEntry": {
+      "type": "object",
+      "required": ["timestamp", "action", "agent", "result"],
+      "properties": {
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "action": {
+          "type": "string",
+          "maxLength": 200,
+          "description": "Action description"
+        },
+        "agent": {
+          "type": "string",
+          "description": "Agent that performed the action"
+        },
+        "result": {
+          "type": "string",
+          "enum": ["pass", "fail", "partial", "warn"],
+          "description": "Action result"
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}

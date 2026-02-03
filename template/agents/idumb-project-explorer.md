@@ -11,7 +11,7 @@ permission:
     "find*": allow
     "tree": allow
     "wc*": allow
-    "*": deny
+    # Unspecified = implicit deny
   edit: deny
   write: deny
 tools:

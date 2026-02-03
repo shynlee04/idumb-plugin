@@ -23,9 +23,7 @@ interface ProjectContext {
 // Detect project type and context
 export default tool({
   description: "Analyze and classify the project context - detects framework, type, languages",
-  args: {
-    _placeholder: tool.schema.boolean().optional().describe("Placeholder parameter")
-  },
+  args: {},
   async execute(args, context) {
     const dir = context.directory
     const result: ProjectContext = {
@@ -170,9 +168,7 @@ export default tool({
 // Get summary for compaction
 export const summary = tool({
   description: "Get a brief context summary suitable for compaction injection",
-  args: {
-    _placeholder: tool.schema.boolean().optional().describe("Placeholder parameter")
-  },
+  args: {},
   async execute(args, context) {
     const dir = context.directory
     const lines: string[] = []

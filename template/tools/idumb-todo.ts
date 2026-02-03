@@ -276,9 +276,7 @@ export const list = tool({
 // Get hierarchical tree of TODOs
 export const hierarchy = tool({
   description: "Get TODOs organized by their hierarchical prefixes",
-  args: {
-    _placeholder: tool.schema.boolean().optional().describe("Placeholder parameter")
-  },
+  args: {},
   async execute(args, context) {
     const state = readTodoState(context.directory)
     
@@ -378,9 +376,7 @@ export const sync = tool({
 // Default export - list all TODOs
 export default tool({
   description: "Read iDumb hierarchical TODOs - returns all tasks with their prefixes and statuses",
-  args: {
-    _placeholder: tool.schema.boolean().optional().describe("Placeholder parameter")
-  },
+  args: {},
   async execute(args, context) {
     const state = readTodoState(context.directory)
     return JSON.stringify(state, null, 2)

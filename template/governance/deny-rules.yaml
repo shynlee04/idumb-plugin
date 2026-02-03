@@ -1,0 +1,387 @@
+# iDumb Permission Deny Rules
+# Every deny has a contextual message - NO BROAD DENIES
+# 
+# Design Principles:
+# 1. Deny must be SPECIFIC (file types, specific agents, regex patterns)
+# 2. Every deny must have a matching contextual message
+# 3. Use ALLOW-specific over deny-broad pattern
+# 4. NO ask permissions (breaks automation UX)
+
+version: "1.0.0"
+last_updated: "2026-02-04"
+author: "idumb-governance"
+
+# =============================================================================
+# BASH COMMAND RESTRICTIONS
+# =============================================================================
+# These apply to all agents unless scope is specified
+bash_denies:
+  # Catastrophic operations - BLOCK
+  - pattern: "rm -rf /"
+    message: "Root directory deletion is catastrophic and irreversible"
+    suggestion: "Use git revert for recovery, or target specific files"
+    severity: block
+    scope: all
+    
+  - pattern: "rm -rf ~"
+    message: "Home directory deletion would destroy user data"
+    suggestion: "Target specific project files only"
+    severity: block
+    scope: all
+    
+  - pattern: "rm -rf *"
+    message: "Wildcard deletion is too destructive"
+    suggestion: "Be specific about which files to delete"
+    severity: block
+    scope: all
+    
+  # Security risks - WARN
+  - pattern: "chmod 777"
+    message: "World-writable permissions are a security risk"
+    suggestion: "Use chmod 755 for directories, 644 for files"
+    severity: warn
+    scope: all
+    
+  - pattern: "chmod -R 777"
+    message: "Recursive world-writable permissions are dangerous"
+    suggestion: "Use specific permissions for each file type"
+    severity: block
+    scope: all
+
+  # Credential exposure - BLOCK
+  - pattern: "cat ~/.ssh/*"
+    message: "SSH key exposure could compromise security"
+    suggestion: "Use ssh-agent or secure key management"
+    severity: block
+    scope: all
+    
+  - pattern: "echo $.*TOKEN"
+    message: "Token exposure in logs is a security risk"
+    suggestion: "Use environment variables without echoing"
+    severity: warn
+    scope: all
+
+# =============================================================================
+# BASH COMMAND ALLOWS (Per Agent)
+# =============================================================================
+# Unspecified commands = implicit deny
+bash_allows:
+  # META agents - can run git, list, read operations
+  idumb-builder:
+    - "git *"           # All git commands
+    - "ls *"            # List directories
+    - "cat *"           # Read files
+    - "grep *"          # Search content
+    - "find *"          # Find files
+    - "pnpm test*"      # Run tests
+    - "npm test*"       # Run tests
+    - "pnpm install*"   # Install dependencies
+    - "npm install*"    # Install dependencies
+    - "mkdir *"         # Create directories
+    - "touch *"         # Create files
+    - "cp *"            # Copy files
+    - "mv *"            # Move files
+    
+  idumb-low-validator:
+    - "git status"
+    - "git diff*"
+    - "git log*"
+    - "git show*"
+    - "ls *"
+    - "cat *"
+    - "grep *"
+    - "find *"
+    - "pnpm test*"
+    - "npm test*"
+    - "wc *"            # Word/line count
+    
+  # PROJECT agents - limited to safe operations
+  idumb-executor:
+    - "git status"
+    - "git diff*"
+    - "git log*"
+    - "pnpm *"
+    - "npm *"
+    
+  idumb-verifier:
+    - "git status"
+    - "git diff*"
+    - "pnpm test*"
+    - "npm test*"
+    
+  idumb-debugger:
+    - "git status"
+    - "git diff*"
+    - "git log*"
+    - "git bisect*"
+    - "pnpm test*"
+    - "npm test*"
+    
+  # Coordinator agents - read-only
+  idumb-supreme-coordinator:
+    - "git status"
+    - "git log --oneline -5"
+    
+  idumb-high-governance:
+    - "git status"
+    - "git diff*"
+    - "pnpm test*"
+    - "npm test*"
+
+# =============================================================================
+# TASK DELEGATION RESTRICTIONS
+# =============================================================================
+# Leaf agents CANNOT delegate
+delegation_denies:
+  idumb-builder:
+    - pattern: "task"
+      message: "Builder is a leaf node and cannot delegate to other agents"
+      suggestion: "Execute the task directly or report back to coordinator"
+      severity: block
+      
+  idumb-low-validator:
+    - pattern: "task"
+      message: "Validator is a leaf node and cannot delegate to other agents"
+      suggestion: "Validate directly using read/grep/glob and report findings"
+      severity: block
+
+# =============================================================================
+# DELEGATION ALLOWS (Per Agent)
+# =============================================================================
+# Which agents can delegate to which targets
+delegation_allows:
+  idumb-supreme-coordinator:
+    targets:
+      - "idumb-high-governance"
+      - "idumb-mid-coordinator"
+      - "idumb-executor"
+      - "idumb-planner"
+      - "idumb-roadmapper"
+      - "idumb-project-researcher"
+      - "idumb-phase-researcher"
+      - "idumb-codebase-mapper"
+      - "idumb-integration-checker"
+      - "idumb-verifier"
+      - "idumb-debugger"
+      - "idumb-skeptic-validator"
+      - "idumb-project-explorer"
+      - "general"  # For project file operations
+      
+  idumb-high-governance:
+    targets:
+      - "idumb-builder"
+      - "idumb-low-validator"
+      - "idumb-executor"
+      - "idumb-verifier"
+      - "idumb-planner"
+      - "general"
+      
+  idumb-mid-coordinator:
+    targets:
+      - "idumb-executor"
+      - "idumb-verifier"
+      - "idumb-debugger"
+      - "idumb-low-validator"
+      - "general"
+      
+  idumb-executor:
+    targets:
+      - "general"           # For project file writes
+      - "idumb-verifier"
+      - "idumb-debugger"
+      
+  idumb-verifier:
+    targets:
+      - "general"
+      - "idumb-low-validator"
+      
+  idumb-debugger:
+    targets:
+      - "general"
+      - "idumb-low-validator"
+      
+  # Research agents can delegate to general for complex analysis
+  idumb-planner:
+    targets:
+      - "general"
+      
+  idumb-plan-checker:
+    targets:
+      - "general"
+      
+  idumb-integration-checker:
+    targets:
+      - "general"
+      - "idumb-low-validator"
+
+# =============================================================================
+# FILE TYPE PERMISSIONS
+# =============================================================================
+# Allow-list approach: specify what's allowed, rest is denied
+file_allows:
+  # META agents can modify framework files
+  idumb-builder:
+    meta_scope:
+      - "*.md"
+      - "*.yaml"
+      - "*.yml"
+      - "*.json"
+      - "*.ts"
+      - "*.js"
+    project_scope: []  # Cannot modify user project files
+    paths:
+      - ".idumb/**"
+      - ".opencode/**"
+      - "template/**"
+      - ".planning/**"
+      
+  idumb-low-validator:
+    meta_scope: []     # Cannot modify any files
+    project_scope: []  # Cannot modify any files
+    # Validator is READ-ONLY
+    
+  # PROJECT agents delegate to 'general' for writes
+  idumb-executor:
+    meta_scope: []     # Cannot modify meta files
+    project_scope: []  # Delegates to 'general' instead
+    
+  # Coordinators cannot write directly
+  idumb-supreme-coordinator:
+    meta_scope: []
+    project_scope: []
+    
+  idumb-high-governance:
+    meta_scope: []
+    project_scope: []
+
+# =============================================================================
+# TOOL RESTRICTIONS
+# =============================================================================
+# Tools that specific agents cannot use
+tool_denies:
+  idumb-supreme-coordinator:
+    - tool: "write"
+      message: "Coordinator cannot write files directly"
+      suggestion: "Delegate to idumb-high-governance then idumb-builder"
+    - tool: "edit"
+      message: "Coordinator cannot edit files directly"
+      suggestion: "Delegate to idumb-high-governance then idumb-builder"
+    - tool: "filesystem_write_file"
+      message: "Coordinator cannot write files directly"
+      suggestion: "Delegate to appropriate agent"
+    - tool: "filesystem_edit_file"
+      message: "Coordinator cannot edit files directly"
+      suggestion: "Delegate to appropriate agent"
+      
+  idumb-high-governance:
+    - tool: "write"
+      message: "High governance coordinates but does not execute"
+      suggestion: "Delegate to idumb-builder for META files"
+    - tool: "edit"
+      message: "High governance coordinates but does not execute"
+      suggestion: "Delegate to idumb-builder for META files"
+      
+  idumb-low-validator:
+    - tool: "write"
+      message: "Validator is read-only and cannot modify files"
+      suggestion: "Report findings to coordinator for action"
+    - tool: "edit"
+      message: "Validator is read-only and cannot modify files"
+      suggestion: "Report findings to coordinator for action"
+
+# =============================================================================
+# FIRST TOOL REQUIREMENTS
+# =============================================================================
+# Required first tools per agent for context-first methodology
+first_tool_requires:
+  idumb-supreme-coordinator:
+    tools:
+      - "todoread"
+      - "idumb-state"
+      - "idumb-context"
+      - "read"
+      - "glob"
+    message: "Coordinator must gather context before delegating"
+    
+  idumb-high-governance:
+    tools:
+      - "todoread"
+      - "idumb-state"
+      - "read"
+      - "glob"
+    message: "Governance must check state before coordinating"
+    
+  idumb-builder:
+    tools:
+      - "todoread"
+      - "read"
+    message: "Builder must read before writing"
+    
+  idumb-low-validator:
+    tools:
+      - "todoread"
+      - "idumb-validate"
+      - "read"
+      - "glob"
+      - "grep"
+    message: "Validator must gather evidence before reporting"
+
+# =============================================================================
+# ASK PERMISSIONS (Minimized)
+# =============================================================================
+# Only for truly dangerous operations that can't be reverted
+ask_permissions:
+  # These are the ONLY operations that should prompt the user
+  - operation: "git push --force"
+    message: "Force push will overwrite remote history"
+    configurable: true  # User can disable this prompt
+    
+  - operation: "npm publish"
+    message: "Publishing to npm is a public action"
+    configurable: true
+    
+  # Note: Most operations DON'T need ask because:
+  # 1. Git revert exists for recovery
+  # 2. Ask breaks automation flow
+  # 3. Users can configure exceptions
+
+# =============================================================================
+# DENY MESSAGE TEMPLATES
+# =============================================================================
+# TUI-safe message templates (NO emojis, NO box-drawing)
+message_templates:
+  tool_blocked: |
+    ## BLOCKED: {agent} cannot use {tool}
+    
+    **Reason:** {message}
+    
+    **Your Role:** {role_description}
+    
+    **Suggestion:** {suggestion}
+    
+    **Next Steps:**
+    1. Check current tasks with todoread
+    2. Delegate to appropriate agent
+    
+  bash_blocked: |
+    ## BLOCKED: Command not allowed
+    
+    **Command:** {command}
+    **Reason:** {message}
+    **Suggestion:** {suggestion}
+    
+  delegation_blocked: |
+    ## BLOCKED: Cannot delegate
+    
+    **Agent:** {agent}
+    **Target:** {target}
+    **Reason:** {message}
+    **Suggestion:** {suggestion}
+    
+  file_blocked: |
+    ## BLOCKED: Cannot modify file
+    
+    **File:** {file_path}
+    **Agent:** {agent}
+    **Reason:** {message}
+    **Suggestion:** {suggestion}

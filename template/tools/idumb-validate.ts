@@ -28,9 +28,7 @@ interface FullValidation {
 // Validate .idumb/ structure exists
 export const structure = tool({
   description: "Validate .idumb/ directory structure integrity",
-  args: {
-    _placeholder: tool.schema.boolean().optional().describe("Placeholder parameter")
-  },
+  args: {},
   async execute(args, context) {
     const results: ValidationResult[] = []
     const idumbDir = join(context.directory, ".idumb")
@@ -109,9 +107,7 @@ export const structure = tool({
 // Validate state.json schema
 export const schema = tool({
   description: "Validate state.json has required fields and valid values",
-  args: {
-    _placeholder: tool.schema.boolean().optional().describe("Placeholder parameter")
-  },
+  args: {},
   async execute(args, context) {
     const results: ValidationResult[] = []
     const stateFile = join(context.directory, ".idumb", "brain", "state.json")
@@ -286,9 +282,7 @@ export const freshness = tool({
 // Validate planning alignment
 export const planningAlignment = tool({
   description: "Check if iDumb state aligns with planning state (if planning is present)",
-  args: {
-    _placeholder: tool.schema.boolean().optional().describe("Placeholder parameter")
-  },
+  args: {},
   async execute(args, context) {
     const results: ValidationResult[] = []
     
@@ -728,9 +722,7 @@ async function validateToolIntegrations(directory: string): Promise<IntegrationR
 // Integration points validation tool
 export const integrationPoints = tool({
   description: "Validate integration points between agents, commands, and tools",
-  args: {
-    _placeholder: tool.schema.boolean().optional().describe("Placeholder parameter")
-  },
+  args: {},
   async execute(args, context) {
     const agents = await validateAgentIntegrations(context.directory)
     const commands = await validateCommandIntegrations(context.directory)
