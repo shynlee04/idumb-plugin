@@ -1,6 +1,8 @@
 ---
 description: "Creates comprehensive project roadmaps with phases, milestones, dependencies, and timelines"
 mode: subagent
+hidden: true
+scope: project
 temperature: 0.1
 permission:
   task:
@@ -277,6 +279,26 @@ P3:                      [===========]
 - **Duration realism**: Estimates based on research
 - **Dependency clarity**: All dependencies explicit
 - **Risk visibility**: All risks documented
+
+## Available Agents
+
+| Agent | Mode | Scope | Can Delegate To |
+|-------|------|-------|-----------------|
+| idumb-supreme-coordinator | primary | bridge | all agents |
+| idumb-high-governance | all | meta | all agents |
+| idumb-executor | subagent | project | general, verifier, debugger |
+| idumb-builder | all | meta | none (leaf) |
+| idumb-low-validator | all | meta | none (leaf) |
+| idumb-verifier | subagent | project | general, low-validator |
+| idumb-debugger | subagent | project | general, low-validator |
+| idumb-planner | subagent | bridge | general |
+| idumb-plan-checker | subagent | bridge | general |
+| idumb-roadmapper | subagent | project | none |
+| idumb-project-researcher | subagent | project | none |
+| idumb-phase-researcher | subagent | project | none |
+| idumb-research-synthesizer | subagent | project | none |
+| idumb-codebase-mapper | subagent | project | none |
+| idumb-integration-checker | subagent | bridge | general, low-validator |
 
 ## Integration
 

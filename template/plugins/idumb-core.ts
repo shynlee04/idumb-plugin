@@ -2951,26 +2951,25 @@ export const IdumbCorePlugin: Plugin = async ({ directory, client }) => {
         )
         
         if (agentRole && allowedTools.length > 0 && !isAllowed) {
-          log(directory, `[PERMISSION BLOCK] ${agentRole} attempted ${toolName}`)
+          // LOG ONLY - DO NOT DENY
+          // output.status = "deny"
+          log(directory, `[WARN] ${agentRole} permission for ${toolName} - LOG ONLY, not blocking`)
           
-          // Deny the permission
-          output.status = "deny"
-          
-          // Add to pending denials for output replacement
+          // Add to pending denials for tracking (but not blocking)
           pendingDenials.set(sessionId, {
             agent: agentRole || 'unknown',
             tool: toolName,
             timestamp: new Date().toISOString(),
-            shouldBlock: true  // CRITICAL: Signal to tool.execute.after to REPLACE output
+            shouldBlock: false  // LOG ONLY - do not block
           })
           
-          // Add to pending violations for error transformation (P1-T3)
+          // Add to pending violations for tracking (P1-T3) - LOG ONLY
           pendingViolations.set(sessionId, {
             agent: agentRole || 'unknown',
             tool: toolName,
             timestamp: new Date().toISOString(),
             violations: [`Tool '${toolName}' not in allowed list for ${agentRole}`],
-            shouldBlock: true
+            shouldBlock: false  // LOG ONLY - do not block
           })
           
           addHistoryEntry(

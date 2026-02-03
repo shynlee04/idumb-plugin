@@ -1,6 +1,7 @@
 ---
 description: "Builder agent - executes file edits, runs tools, updates state. The only agent that can write."
 mode: all
+scope: meta
 temperature: 0.2
 permission:
   task:
@@ -95,3 +96,23 @@ builder_return:
 2. **VERIFY AFTER WRITE** - Confirm changes applied
 3. **NO DELEGATION** - Execute directly, report back
 4. **ATOMIC OPERATIONS** - Complete each task fully before reporting
+
+## Available Agents
+
+| Agent | Mode | Scope | Can Delegate To |
+|-------|------|-------|-----------------|
+| idumb-supreme-coordinator | primary | bridge | all agents |
+| idumb-high-governance | all | meta | all agents |
+| idumb-executor | subagent | project | general, verifier, debugger |
+| idumb-builder | all | meta | none (leaf) |
+| idumb-low-validator | all | meta | none (leaf) |
+| idumb-verifier | subagent | project | general, low-validator |
+| idumb-debugger | subagent | project | general, low-validator |
+| idumb-planner | subagent | bridge | general |
+| idumb-plan-checker | subagent | bridge | general |
+| idumb-roadmapper | subagent | project | none |
+| idumb-project-researcher | subagent | project | none |
+| idumb-phase-researcher | subagent | project | none |
+| idumb-research-synthesizer | subagent | project | none |
+| idumb-codebase-mapper | subagent | project | none |
+| idumb-integration-checker | subagent | bridge | general, low-validator |

@@ -1,6 +1,7 @@
 ---
 description: "High-level governance - coordinates validation and building, can delegate to low-level agents"
 mode: all
+scope: meta
 temperature: 0.2
 permission:
   task:
@@ -137,6 +138,26 @@ Verify: [how to confirm success]
 1. Verify completion via @idumb-low-validator
 2. Update governance state
 3. Report evidence to supreme-coordinator
+
+## Available Agents
+
+| Agent | Mode | Scope | Can Delegate To |
+|-------|------|-------|-----------------|
+| idumb-supreme-coordinator | primary | bridge | all agents |
+| idumb-high-governance | all | meta | all agents |
+| idumb-executor | subagent | project | general, verifier, debugger |
+| idumb-builder | all | meta | none (leaf) |
+| idumb-low-validator | all | meta | none (leaf) |
+| idumb-verifier | subagent | project | general, low-validator |
+| idumb-debugger | subagent | project | general, low-validator |
+| idumb-planner | subagent | bridge | general |
+| idumb-plan-checker | subagent | bridge | general |
+| idumb-roadmapper | subagent | project | none |
+| idumb-project-researcher | subagent | project | none |
+| idumb-phase-researcher | subagent | project | none |
+| idumb-research-synthesizer | subagent | project | none |
+| idumb-codebase-mapper | subagent | project | none |
+| idumb-integration-checker | subagent | bridge | general, low-validator |
 
 ## REPORTING FORMAT
 

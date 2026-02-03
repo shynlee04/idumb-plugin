@@ -1,6 +1,8 @@
 ---
 description: "Maps codebase structure and generates analysis documents"
 mode: subagent
+hidden: true
+scope: project
 temperature: 0.2
 permission:
   task:
@@ -220,3 +222,23 @@ on_grep_timeout:
   action: reduce_search_scope
   fallback: use_sampling
 ```
+
+## Available Agents
+
+| Agent | Mode | Scope | Can Delegate To |
+|-------|------|-------|-----------------|
+| idumb-supreme-coordinator | primary | bridge | all agents |
+| idumb-high-governance | all | meta | all agents |
+| idumb-executor | subagent | project | general, verifier, debugger |
+| idumb-builder | all | meta | none (leaf) |
+| idumb-low-validator | all | meta | none (leaf) |
+| idumb-verifier | subagent | project | general, low-validator |
+| idumb-debugger | subagent | project | general, low-validator |
+| idumb-planner | subagent | bridge | general |
+| idumb-plan-checker | subagent | bridge | general |
+| idumb-roadmapper | subagent | project | none |
+| idumb-project-researcher | subagent | project | none |
+| idumb-phase-researcher | subagent | project | none |
+| idumb-research-synthesizer | subagent | project | none |
+| idumb-codebase-mapper | subagent | project | none |
+| idumb-integration-checker | subagent | bridge | general, low-validator |
