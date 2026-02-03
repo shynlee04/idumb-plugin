@@ -6,6 +6,22 @@ version: 0.1.0
 output_pattern: ".planning/phases/{N}/{phase-name}-SUMMARY.md"
 ---
 
+<!--
+COMPLETION CRITERIA REFERENCE:
+This template implements evidence requirements from:
+  template/governance/completion-definitions.yaml Section 6
+
+Per workflow evidence requirements for execute_phase:
+  - "SUMMARY.md with task outcomes"
+  - "progress.json checkpoint"
+  - "all tasks resolved"
+
+Every completion must have:
+  - artifact: "Measurable output proving work done"
+  - state_update: "state.json reflects new status"
+  - history_entry: "Action logged with timestamp"
+-->
+
 # Summary Template
 
 Generates the SUMMARY.md document that records execution outcomes.

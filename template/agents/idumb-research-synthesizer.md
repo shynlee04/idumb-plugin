@@ -1,19 +1,18 @@
 ---
-description: "Synthesizes parallel research outputs into unified, actionable research documents"
+description: "Synthesizes parallel research outputs from multiple researcher agents into unified, actionable research documents"
 mode: subagent
-hidden: true
-temperature: 0.2
+temperature: 0.1
 permission:
   task:
-    "*": deny
+    "*": allow
   bash:
     "*": deny
   edit: deny
   write: deny
 tools:
-  task: false
+  write: false
+  edit: false
   idumb-state: true
-  idumb-context: true
 ---
 
 # @idumb-research-synthesizer

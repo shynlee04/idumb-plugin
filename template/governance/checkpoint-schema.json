@@ -1,0 +1,198 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "iDumb Checkpoint Schema",
+  "description": "Schema for iDumb execution checkpoints - save points for recovery and state management",
+  "version": "0.2.0",
+  "type": "object",
+  "required": ["id", "version", "createdAt", "phase", "task", "type", "status", "state", "execution", "metrics", "context"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique checkpoint identifier",
+      "pattern": "^checkpoint-[a-zA-Z0-9_-]+-[a-zA-Z0-9_-]+-[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}-[0-9]{2}-[0-9]{2}-[0-9]{3}Z$",
+      "examples": ["checkpoint-phase1-P3-T4-2026-02-03T10-30-00-000Z"]
+    },
+    "version": {
+      "type": "string",
+      "description": "iDumb framework version",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "examples": ["0.2.0"]
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp when checkpoint was created"
+    },
+    "phase": {
+      "type": "string",
+      "description": "Phase number or identifier",
+      "examples": ["1", "2", "phase-1", "init"]
+    },
+    "task": {
+      "type": "string",
+      "description": "Task ID associated with this checkpoint",
+      "examples": ["P3-T4", "T1", "checkpoint-management"]
+    },
+    "type": {
+      "type": "string",
+      "enum": ["manual", "auto", "pre_task", "post_task", "emergency"],
+      "description": "Type of checkpoint"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["valid", "corrupted", "stale"],
+      "description": "Current status of the checkpoint"
+    },
+    "state": {
+      "type": "object",
+      "required": ["gitHash", "filesModified", "filesCreated", "filesDeleted"],
+      "properties": {
+        "gitHash": {
+          "type": ["string", "null"],
+          "description": "Git commit hash at checkpoint time (null if not in git repo)",
+          "pattern": "^[a-f0-9]{40}$",
+          "examples": ["a1b2c3d4e5f6..."]
+        },
+        "filesModified": {
+          "type": "array",
+          "description": "List of files modified since last checkpoint",
+          "items": {
+            "type": "string"
+          }
+        },
+        "filesCreated": {
+          "type": "array",
+          "description": "List of files created since last checkpoint",
+          "items": {
+            "type": "string"
+          }
+        },
+        "filesDeleted": {
+          "type": "array",
+          "description": "List of files deleted since last checkpoint",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "execution": {
+      "type": "object",
+      "required": ["tasksCompleted", "tasksInProgress", "tasksFailed", "currentTask"],
+      "properties": {
+        "tasksCompleted": {
+          "type": "array",
+          "description": "List of task IDs completed up to this checkpoint",
+          "items": {
+            "type": "string"
+          }
+        },
+        "tasksInProgress": {
+          "type": "array",
+          "description": "List of task IDs currently in progress",
+          "items": {
+            "type": "string"
+          }
+        },
+        "tasksFailed": {
+          "type": "array",
+          "description": "List of task IDs that failed",
+          "items": {
+            "type": "string"
+          }
+        },
+        "currentTask": {
+          "type": ["string", "null"],
+          "description": "Currently active task ID or null if none"
+        }
+      }
+    },
+    "metrics": {
+      "type": "object",
+      "required": ["iterationCount", "agentSpawns", "errorCount", "duration"],
+      "properties": {
+        "iterationCount": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Total number of iterations in this session"
+        },
+        "agentSpawns": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Total number of agent spawns"
+        },
+        "errorCount": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Total number of errors encountered"
+        },
+        "duration": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Duration in seconds since session start or last checkpoint"
+        }
+      }
+    },
+    "context": {
+      "type": "object",
+      "required": ["anchors", "notes"],
+      "properties": {
+        "anchors": {
+          "type": "array",
+          "description": "Array of context anchors at checkpoint time",
+          "items": {
+            "type": "object",
+            "required": ["id", "created", "type", "content", "priority"],
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "created": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "type": {
+                "type": "string",
+                "enum": ["decision", "context", "checkpoint"]
+              },
+              "content": {
+                "type": "string"
+              },
+              "priority": {
+                "type": "string",
+                "enum": ["critical", "high", "normal"]
+              }
+            }
+          }
+        },
+        "notes": {
+          "type": "string",
+          "description": "Human-readable context notes",
+          "maxLength": 1000
+        }
+      }
+    }
+  },
+  "definitions": {
+    "checkpointTypes": {
+      "description": "Types of checkpoints",
+      "enum": ["manual", "auto", "pre_task", "post_task", "emergency"],
+      "meanings": {
+        "manual": "Explicitly created by user request",
+        "auto": "Automatically created by system at intervals",
+        "pre_task": "Created before starting a task",
+        "post_task": "Created after completing a task",
+        "emergency": "Created when EMERGENCY_HALT is triggered"
+      }
+    },
+    "checkpointStatus": {
+      "description": "Status of a checkpoint",
+      "enum": ["valid", "corrupted", "stale"],
+      "meanings": {
+        "valid": "Checkpoint is intact and usable",
+        "corrupted": "Checkpoint data is damaged or incomplete",
+        "stale": "Checkpoint is too old (> 48 hours)"
+      }
+    }
+  }
+}

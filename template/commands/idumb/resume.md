@@ -1,59 +1,76 @@
 ---
-description: "Resume work from last session with context restoration"
-agent: idumb-supreme-coordinator
+description: "Resume a previously idle iDumb session with context recovery"
+mode: primary
+temperature: 0.1
+permission:
+  task:
+    "*": allow
+  bash:
+    "*": deny
+  edit: deny
+  write: deny
+tools:
+  write: false
+  edit: false
+  idumb-state: true
+  idumb-config: true
 ---
 
 # /idumb:resume
 
-Resume work from last session with automatic context restoration.
+## Purpose
+Resume a previously idle iDumb session, restoring context, anchors, and workflow state.
 
-## Usage
+## When to Use
+- Returning to a project after being idle for > 1 hour
+- Context was lost due to compaction
+- Need to recover previous session state
 
+## Prerequisites
+- Session metadata exists in `.idumb/sessions/`
+- State file exists at `.idumb/brain/state.json`
+
+## Workflow
+
+### Step 1: Detect Resumed Session
 ```
-/idumb:resume [--force-refresh] [--skip-validation]
-```
-
-## Description
-
-Restores project context after session break:
-- Loads state from `.idumb/brain/state.json`
-- Validates context freshness (warns if >48h stale)
-- Detects where work left off
-- Routes to appropriate workflow
-
-## Workflow Reference
-
-See: `workflows/resume-project.md`
-
-## Arguments
-
-| Argument | Description | Default |
-|----------|-------------|---------|
-| `--force-refresh` | Reload all context | `false` |
-| `--skip-validation` | Skip freshness check | `false` |
-
-## Exit Behavior
-
-Routes to one of:
-- `/idumb:execute-phase` (if plan exists, execution incomplete)
-- `/idumb:verify-work` (if execution complete, unverified)
-- `/idumb:plan-phase` (if context exists, no plan)
-- `/idumb:discuss-phase` (if roadmap exists, no context)
-- `/idumb:roadmap` (if project exists, no roadmap)
-
-## Governance
-
-**Delegation Chain:**
-```
-user → supreme-coordinator → high-governance
-  └─→ low-validator (state checks)
+Use checkIfResumedSession() to determine if this is a resumed session
 ```
 
-## Metadata
-
-```yaml
-category: session
-priority: P0
-complexity: low
-version: 0.1.0
+### Step 2: Load Session Metadata
 ```
+Load metadata from .idumb/sessions/{sessionId}.json
+```
+
+### Step 3: Build Resume Context
+```
+Use buildResumeContext() to generate context injection
+Include:
+- Idle duration
+- Previous session timestamp
+- Current phase
+- Active anchors
+- Recent history
+```
+
+### Step 4: Inject Context
+```
+Add resume context to the conversation
+Restore critical anchors
+```
+
+## Output
+- Resume context summary
+- Active anchors list
+- Recommended next steps
+- State freshness indicator
+
+## Example Usage
+```
+/idumb:resume
+```
+
+## Related Commands
+- `/idumb:status` - Check current state
+- `/idumb:validate` - Validate state freshness
+- `/idumb:help` - Show all commands

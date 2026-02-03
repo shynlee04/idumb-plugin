@@ -1,19 +1,18 @@
 ---
-description: "Creates detailed implementation plans for project phases with estimates, dependencies, and resource assignments"
+description: "Creates detailed implementation plans for project phases with task breakdown, dependency analysis, and goal-backward verification"
 mode: subagent
-hidden: true
-temperature: 0.2
+temperature: 0.1
 permission:
   task:
-    "*": deny
+    "*": allow
   bash:
     "*": deny
   edit: deny
   write: deny
 tools:
-  task: false
+  write: false
+  edit: false
   idumb-state: true
-  idumb-context: true
 ---
 
 # @idumb-planner

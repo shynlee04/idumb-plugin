@@ -1,0 +1,989 @@
+# ===============================================================================
+# iDumb Completion Definitions Specification v2.0
+# ===============================================================================
+#
+# PURPOSE: Defines COMPLETION-DRIVEN EXIT CRITERIA for every workflow.
+# VERSION: 2.0.0
+# CREATED: 2026-02-03
+# UPDATED: 2026-02-03
+#
+# PRINCIPLE: Loops exit when WORK IS COMPLETE, not when arbitrary limits hit.
+#            Stall detection triggers escalation, NEVER silent failure.
+#
+# PROHIBITED PATTERNS (removed from v1):
+#   - max_iterations: N
+#   - max_retries: N  
+#   - timeout: N minutes (as EXIT criteria)
+#   - max_X: N (arbitrary limits)
+#
+# ===============================================================================
+
+---
+version: "2.0.0"
+created: "2026-02-03"
+philosophy: |
+  A workflow is complete when its PURPOSE is achieved, not when a counter expires.
+  If progress stalls, we ESCALATE to the user with full context - we never
+  silently give up and produce half-assed results.
+
+# ===============================================================================
+# SECTION 1: COMMAND WORKFLOWS - COMPLETION-DRIVEN
+# ===============================================================================
+
+command_workflows:
+
+  # -----------------------------------------------------------------------------
+  # 1. INIT - Initialize governance
+  # -----------------------------------------------------------------------------
+  init:
+    purpose: "Establish iDumb governance infrastructure"
+    
+    exits_when:
+      all_true:
+        - condition: file_exists(".idumb/brain/state.json")
+          verification: "fs.existsSync('.idumb/brain/state.json')"
+        - condition: file_exists(".idumb/config.json")
+          verification: "fs.existsSync('.idumb/config.json')"
+        - condition: schema_valid(state.json)
+          verification: "JSON.parse() succeeds AND has version, initialized, framework fields"
+        - condition: schema_valid(config.json)
+          verification: "JSON.parse() succeeds AND has required sections"
+        - condition: state.initialized_is_valid_iso_timestamp
+          verification: "new Date(state.initialized).toISOString() === state.initialized"
+        - condition: at_least_one_anchor_exists
+          verification: "state.anchors.length >= 1"
+          
+    stall_detection:
+      trigger: "same file operation fails twice consecutively"
+      action: |
+        1. Log the specific error (permissions, disk space, path issue)
+        2. Present to user: "Cannot create {file}: {error}"
+        3. Offer options: retry with different path, fix permissions, abort
+      never: "Silently retry indefinitely or give up"
+      
+    on_completion:
+      evidence:
+        - ".idumb/brain/state.json"
+        - ".idumb/config.json"
+      state_update: "history += 'init_complete'"
+      next_action:
+        brownfield: "/idumb:map-codebase"
+        greenfield: "/idumb:new-project"
+        
+  # -----------------------------------------------------------------------------
+  # 2. NEW-PROJECT - Start new project planning  
+  # -----------------------------------------------------------------------------
+  new_project:
+    purpose: "Create PROJECT.md with project definition"
+    
+    exits_when:
+      all_true:
+        - condition: file_exists(".planning/PROJECT.md")
+          verification: "fs.existsSync('.planning/PROJECT.md')"
+        - condition: PROJECT.md.has_required_sections
+          sections: ["name", "description", "objectives", "scope"]
+          verification: "grep for each required section header"
+        - condition: file_exists(".planning/config.json")
+          verification: "fs.existsSync('.planning/config.json')"
+        - condition: state.framework_is_set
+          verification: "state.framework !== 'none' && state.framework !== null"
+          
+    stall_detection:
+      trigger: "user has not responded to clarifying question for 2+ cycles"
+      action: |
+        1. Save draft PROJECT.md with [PLACEHOLDER] markers
+        2. Present: "Saved partial PROJECT.md. Please provide: {missing_info}"
+        3. Await user input OR explicit "continue with placeholders"
+      never: "Invent project details without user input"
+      
+    on_completion:
+      evidence:
+        - ".planning/PROJECT.md"
+        - ".planning/config.json"
+      state_update: "phase = 'project_defined'"
+      
+  # -----------------------------------------------------------------------------
+  # 3. MAP-CODEBASE - Scan existing code
+  # -----------------------------------------------------------------------------
+  map_codebase:
+    purpose: "Create codebase map for brownfield projects"
+    
+    exits_when:
+      all_true:
+        - condition: file_exists(".idumb/codebase-map.json")
+          verification: "fs.existsSync('.idumb/codebase-map.json')"
+        - condition: at_least_one_source_file_analyzed
+          verification: "codebase_map.files.length >= 1"
+        - condition: language_detection_complete
+          verification: "codebase_map.languages.length >= 1 OR codebase_map.languages = ['unknown']"
+        - condition: structure_mapped
+          verification: "codebase_map.structure !== null"
+          
+    stall_detection:
+      trigger: "no new files discovered after scanning all accessible directories"
+      action: |
+        1. Save partial map with discovered files
+        2. Report: "Mapped {N} files. Could not access: {inaccessible_paths}"
+        3. Complete with available data
+      never: "Hang trying to access inaccessible directories"
+      
+    large_codebase_handling:
+      trigger: "file_count > 500"
+      action: |
+        1. Switch to summary-only mode for large directories
+        2. Detail only entry points and config files
+        3. Note: "Large codebase - summarized {N} files"
+        
+    on_completion:
+      evidence:
+        - ".idumb/codebase-map.json"
+      state_update: "codebase_mapped = true"
+      
+  # -----------------------------------------------------------------------------
+  # 4. RESEARCH - Research before planning
+  # -----------------------------------------------------------------------------
+  research:
+    purpose: "Gather information across multiple domains before planning"
+    
+    exits_when:
+      all_true:
+        - condition: research_artifact_exists
+          verification: "glob('.idumb/governance/research/*-*.md').length >= 1"
+        - condition: synthesis_section_populated
+          verification: "research_doc contains ## Synthesis with content"
+        - condition: at_least_two_domain_findings
+          verification: "findings.length >= 2"
+        - condition: has_actionable_recommendations
+          verification: "## Recommendations section exists with bullet points"
+          
+    per_researcher_completion:
+      exits_when:
+        all_true:
+          - condition: output_file.line_count >= 20
+            verification: "wc -l output_file >= 20"
+          - condition: output_file.has_required_sections
+            sections: ["Sources", "Key Findings", "Relevance"]
+            verification: "grep for section headers"
+          - condition: sources_cited >= 1
+            verification: "count of [source] or URL references >= 1"
+            
+      stall_detection:
+        trigger: "no new information found after exhausting search strategies"
+        action: |
+          1. Document what WAS found (even if minimal)
+          2. Note: "Search exhausted. Confidence: LOW"
+          3. Return partial findings to synthesis
+        never: "Return empty result without explanation"
+        
+    synthesis_completion:
+      exits_when:
+        all_true:
+          - condition: SUMMARY.md_exists_or_inline
+            verification: "synthesis section populated"
+          - condition: all_researcher_outputs_incorporated
+            verification: "each researcher output referenced in synthesis"
+          - condition: synthesis.has_recommendations
+            verification: "recommendations list is non-empty"
+            
+    stall_detection:
+      trigger: "all researchers returned LOW confidence or empty"
+      action: |
+        1. Present: "Research inconclusive for: {domains}"
+        2. Offer: "Proceed with user input" OR "Try different search terms"
+      never: "Synthesize nothing into fake insights"
+      
+    on_completion:
+      evidence:
+        - ".idumb/governance/research/{timestamp}-*.md"
+      confidence_rating: "HIGH|MEDIUM|LOW based on source quality"
+      
+  # -----------------------------------------------------------------------------
+  # 5. ROADMAP - Create project roadmap
+  # -----------------------------------------------------------------------------
+  roadmap:
+    purpose: "Define phases and milestones for the project"
+    
+    exits_when:
+      all_true:
+        - condition: file_exists(".planning/ROADMAP.md")
+          verification: "fs.existsSync('.planning/ROADMAP.md')"
+        - condition: at_least_one_phase_defined
+          verification: "grep '## Phase' ROADMAP.md | wc -l >= 1"
+        - condition: each_phase_has_objectives
+          verification: "each phase section contains 'Objectives:' with items"
+        - condition: no_circular_dependencies
+          verification: "dependency_graph.hasCycles() === false"
+        - condition: milestone_markers_present
+          verification: "at least one [MILESTONE] marker in roadmap"
+          
+    stall_detection:
+      trigger: "circular dependency detected AND cannot auto-resolve"
+      action: |
+        1. Present: "Circular dependency: {phase_A} <-> {phase_B}"
+        2. Show current roadmap structure
+        3. Ask: "How should these be ordered?" OR "Can they be merged?"
+      never: "Silently break the cycle arbitrarily"
+      
+    on_completion:
+      evidence:
+        - ".planning/ROADMAP.md"
+      state_update: "phase = 'roadmap_created'"
+      
+  # -----------------------------------------------------------------------------
+  # 6. DISCUSS-PHASE - Refine phase with user
+  # -----------------------------------------------------------------------------
+  discuss_phase:
+    purpose: "Capture complete context for phase {N} from user"
+    
+    exits_when:
+      all_true:
+        - condition: CONTEXT.md_exists
+          verification: "fs.existsSync('.planning/phases/{N}/*CONTEXT.md')"
+        - condition: CONTEXT.md.has_all_sections
+          sections: ["Goal", "Scope", "Constraints", "Success Criteria", "Non-Goals"]
+          verification: "each section header present with content"
+        - condition: user_confirmed_understanding
+          verification: "user said 'yes'/'correct'/'proceed' or similar affirmation"
+          
+    stall_detection:
+      trigger: "context seems incomplete but user stopped providing input"
+      action: |
+        1. Summarize: "I have captured: {summary}"
+        2. Ask: "Is this complete, or should we clarify: {missing_areas}?"
+        3. Accept explicit "good enough" from user
+      never: "Assume silence means approval"
+      
+    on_completion:
+      evidence:
+        - ".planning/phases/{N}/*CONTEXT.md"
+      state_update: "phaseStatus = 'discussed'"
+      
+  # -----------------------------------------------------------------------------
+  # 7. PLAN-PHASE - Create phase execution plan (PLANNER-CHECKER LOOP)
+  # -----------------------------------------------------------------------------
+  plan_phase:
+    purpose: "Create validated execution plan for phase {N}"
+    
+    exits_when:
+      all_true:
+        - condition: PLAN.md_exists
+          verification: "fs.existsSync('.planning/phases/{N}/*PLAN.md')"
+        - condition: plan_checker.status == "PASS"
+          verification: "plan_checker returned {status: 'PASS'}"
+        - condition: plan.has_all_required_sections
+          sections: ["Tasks", "Dependencies", "Acceptance Criteria", "Estimates"]
+          verification: "each section present with content"
+        - condition: plan.task_count > 0
+          verification: "tasks.length >= 1"
+        - condition: plan.dependencies_valid
+          verification: "no missing dependencies, no cycles"
+        - condition: plan.no_blocking_issues
+          verification: "plan_checker.blocking_issues.length === 0"
+          
+    planner_checker_loop:
+      exits_when:
+        any_true:
+          - condition: plan_checker.status == "PASS"
+          - condition: plan_checker.status == "PASS_WITH_WARNINGS" AND user_accepts
+          
+      stall_detection:
+        trigger: "plan_checker.issues unchanged for 3 consecutive cycles"
+        hash_check: "sha256(issues.sort().join()) unchanged"
+        action: |
+          1. Present current plan to user
+          2. Show: "These issues persist: {issues}"
+          3. Ask: "Accept plan as-is, provide guidance, or abort?"
+          4. Options:
+             - accept: Mark issues as acknowledged, proceed
+             - guide: User provides direction, one more planner cycle
+             - abort: Return to discuss-phase
+        never: "Keep looping hoping for different result"
+        
+      improvement_tracking:
+        track: "plan_checker.score across cycles"
+        if_no_improvement:
+          trigger: "score unchanged or decreased for 2 cycles"
+          action: "Escalate with current best plan"
+          
+    on_completion:
+      evidence:
+        - ".planning/phases/{N}/*PLAN.md"
+        - "plan_checker_report inline or logged"
+      state_update: "phaseStatus = 'planned'"
+      
+  # -----------------------------------------------------------------------------
+  # 8. EXECUTE-PHASE - Execute the plan (TASK LOOP)
+  # -----------------------------------------------------------------------------
+  execute_phase:
+    purpose: "Complete all tasks in phase {N} plan"
+    
+    exits_when:
+      # Phase completes when ALL tasks are resolved
+      all_true:
+        - condition: all_tasks.status in ["complete", "blocked_documented"]
+          verification: |
+            tasks.every(t => 
+              t.status === 'complete' || 
+              (t.status === 'blocked' && t.blocked_reason)
+            )
+        - condition: SUMMARY.md_exists
+          verification: "fs.existsSync('.planning/phases/{N}/*SUMMARY.md')"
+        - condition: no_unresolved_blockers
+          verification: "blocked tasks have documented reasons"
+          
+    per_task_completion:
+      exits_when:
+        any_true:
+          - condition: task.verified == true
+            verification: "validator confirmed task output matches acceptance criteria"
+          - condition: task.marked_blocked_with_reason == true
+            verification: "task.status = 'blocked' AND task.blocked_reason.length > 10"
+            
+      stall_detection:
+        trigger: "same error repeated 3 times for this task"
+        error_hash: "sha256(error.message + error.stack)"
+        action: |
+          1. Log: "Task '{task.name}' failing repeatedly: {error}"
+          2. Spawn debugger agent for diagnosis
+          3. Present diagnosis to user
+          4. Options:
+             - fix: Apply debugger recommendation
+             - skip: Mark task blocked with reason
+             - manual: User will fix manually
+        never: "Keep retrying same failing operation"
+        
+    consecutive_failure_detection:
+      trigger: "3 tasks failed in a row (not same task)"
+      action: |
+        1. HALT execution immediately
+        2. Present: "3 consecutive tasks failed: {task_names}"
+        3. Hypotheses:
+           - Environment issue (missing deps, wrong branch)
+           - Plan flaw (tasks poorly defined)
+           - Scope issue (tasks too complex)
+        4. Await user direction before resuming
+      never: "Continue executing into guaranteed failures"
+      
+    checkpoint_protocol:
+      on_each_task_complete: "Save progress to .idumb/execution/{N}/progress.json"
+      on_stall: "Save checkpoint with full state"
+      enables: "Resume from exact point after interruption"
+      
+    on_completion:
+      evidence:
+        - ".planning/phases/{N}/*SUMMARY.md"
+        - ".idumb/execution/{N}/progress.json"
+      state_update: "phaseStatus = 'executed'"
+      
+  # -----------------------------------------------------------------------------
+  # 9. VERIFY-WORK - Verify execution results
+  # -----------------------------------------------------------------------------
+  verify_work:
+    purpose: "Validate all acceptance criteria are met for phase {N}"
+    
+    exits_when:
+      all_true:
+        - condition: all_acceptance_criteria.checked == true
+          verification: "each criterion in plan has pass/fail status"
+        - condition: VERIFICATION.md.status in ["PASS", "FAIL_WITH_EVIDENCE"]
+          verification: "verification doc has conclusive status"
+        - condition: evidence_documented == true
+          verification: "each criterion has evidence reference"
+          
+    verification_protocol:
+      for_each_criterion:
+        exits_when:
+          any_true:
+            - condition: evidence_found_and_validates
+              verification: "grep/glob found artifact matching criterion"
+            - condition: evidence_not_found_documented
+              verification: "criterion marked FAIL with 'not found' evidence"
+              
+      stall_detection:
+        trigger: "cannot determine pass/fail for criterion"
+        action: |
+          1. Log: "Criterion '{criterion}' ambiguous"
+          2. Present to user: "I found: {partial_evidence}"
+          3. Ask: "Does this satisfy '{criterion}'? (yes/no/clarify)"
+        never: "Guess or assume pass without evidence"
+        
+    on_completion:
+      evidence:
+        - ".planning/phases/{N}/*VERIFICATION.md"
+      state_update: "phaseStatus = 'verified'"
+      verification_status: "PASS | PARTIAL | FAIL"
+      
+  # -----------------------------------------------------------------------------
+  # 10. DEBUG - Debug issues
+  # -----------------------------------------------------------------------------
+  debug:
+    purpose: "Diagnose root cause and propose fixes"
+    
+    exits_when:
+      any_true:
+        - condition: root_cause_identified_high_confidence
+          verification: "diagnosis.confidence >= 0.7 AND diagnosis.root_cause defined"
+        - condition: fix_applied_and_validated
+          verification: "fix.applied == true AND retest.passed == true"
+        - condition: user_satisfied_with_diagnosis
+          verification: "user confirmed 'that explains it' or similar"
+          
+    hypothesis_testing:
+      protocol: |
+        1. Generate hypothesis
+        2. Identify test to confirm/refute
+        3. Run test
+        4. Record: {hypothesis, test, result, conclusion}
+        5. If refuted, next hypothesis
+        
+      stall_detection:
+        trigger: "5 hypotheses tested, none confirmed, no new hypotheses"
+        action: |
+          1. Present: "Tested hypotheses: {list with results}"
+          2. Present: "Unable to determine root cause"
+          3. Ask: "Do you have additional context? Or should we try: {alternative_approaches}"
+        never: "Keep generating wild guesses"
+        
+    on_completion:
+      evidence:
+        - "debug_report inline"
+        - "hypotheses_tested list"
+      return_to: "original failing workflow step"
+      
+  # -----------------------------------------------------------------------------
+  # 11. VALIDATE - Run validation checks
+  # -----------------------------------------------------------------------------
+  validate:
+    purpose: "Execute governance validation checks"
+    
+    exits_when:
+      all_true:
+        - condition: all_checks.executed == true
+          verification: "each check in scope has result"
+        - condition: results.documented == true
+          verification: "validation report populated"
+          
+    notes: |
+      Validation ALWAYS completes - it reports status, never loops.
+      A validation returning "FAIL" is a successful validation (it found issues).
+      
+    on_completion:
+      evidence:
+        - "validation_report inline"
+      state_update: "lastValidation = ISO timestamp"
+      
+  # -----------------------------------------------------------------------------
+  # 12. RESUME - Resume interrupted work
+  # -----------------------------------------------------------------------------
+  resume:
+    purpose: "Restore context and route to appropriate workflow"
+    
+    exits_when:
+      any_true:
+        - condition: routed_to_workflow
+          verification: "identified resume point and user confirmed"
+        - condition: user_chose_fresh_start
+          verification: "user declined resume, chose /idumb:init"
+          
+    state_recovery:
+      protocol: |
+        1. Read state.json
+        2. Check for checkpoints in .idumb/execution/
+        3. Determine last successful step
+        4. Present: "You were at: {step}. Resume here?"
+        
+      stall_detection:
+        trigger: "state corrupted or unreadable"
+        action: |
+          1. Present: "Cannot read previous state: {error}"
+          2. Options:
+             - recover: Attempt to rebuild from artifacts
+             - fresh: Start over with /idumb:init --force
+        never: "Crash or hang on bad state"
+        
+    on_completion:
+      routes_to: "appropriate /idumb:* command"
+
+# ===============================================================================
+# SECTION 2: INTERNAL AGENT LOOPS - COMPLETION-DRIVEN
+# ===============================================================================
+
+agent_loops:
+
+  # -----------------------------------------------------------------------------
+  # PLANNER -> CHECKER LOOP
+  # -----------------------------------------------------------------------------
+  planner_checker_loop:
+    purpose: "Iteratively improve plan until checker passes"
+    
+    participants:
+      planner: "@idumb-planner"
+      checker: "@idumb-plan-checker"
+      
+    exits_when:
+      all_true:
+        - condition: plan_checker.status == "PASS"
+        - condition: plan.has_all_required_sections == true
+        - condition: plan.task_count > 0
+        - condition: plan.dependencies_valid == true
+        - condition: plan.no_blocking_issues == true
+        
+    acceptable_exit:
+      condition: plan_checker.status == "PASS_WITH_WARNINGS"
+      requires: user_acknowledgment_of_warnings
+      
+    stall_detection:
+      trigger: "plan_checker.issues unchanged for 3 consecutive cycles"
+      detection_method: |
+        issues_hash = sha256(JSON.stringify(issues.sort()))
+        if (issues_hash === previous_issues_hash) stall_count++
+        if (stall_count >= 3) trigger_stall()
+        
+      action: |
+        CREATE CHECKPOINT:
+          - current_plan.md
+          - issues_list
+          - cycle_count
+          - improvement_history
+          
+        PRESENT TO USER:
+          "Plan has stalled. Persistent issues:
+           {issues.map(i => '- ' + i).join('\n')}
+           
+           Options:
+           1. Accept plan with noted issues
+           2. Provide guidance (one more cycle)
+           3. Return to discuss-phase for scope change"
+           
+      never: "Continue cycling hoping for magic improvement"
+      
+    improvement_tracking:
+      metric: "plan_checker.score"
+      track_history: true
+      stagnation_detection:
+        trigger: "score decreased or unchanged for 2 cycles"
+        action: "Present best-scoring plan, offer accept or abort"
+        
+  # -----------------------------------------------------------------------------
+  # VALIDATOR -> FIX LOOP (within task execution)
+  # -----------------------------------------------------------------------------
+  validator_fix_loop:
+    purpose: "Validate task output and fix until passing"
+    
+    participants:
+      validator: "@idumb-low-validator"
+      fixer: "@idumb-builder"
+      
+    exits_when:
+      any_true:
+        - condition: task.verified == true
+          verification: "validator confirms acceptance criteria met"
+        - condition: task.marked_blocked_with_reason == true
+          verification: "user or system marked task blocked"
+          
+    stall_detection:
+      trigger: "same error repeated 3 times"
+      detection_method: |
+        error_hash = sha256(error.message + error.location)
+        if (error_hash === last_error_hash) repeat_count++
+        if (repeat_count >= 3) trigger_stall()
+        
+      action: |
+        SPAWN DEBUGGER:
+          - Pass: error details, task context, attempted fixes
+          - Await: diagnosis
+          
+        PRESENT TO USER:
+          "Task '{task.name}' failing repeatedly:
+           Error: {error.message}
+           Diagnosis: {debugger.diagnosis}
+           
+           Options:
+           1. Apply fix: {debugger.recommended_fix}
+           2. Mark blocked: I'll record reason and continue
+           3. Manual: You fix, tell me when done"
+           
+      never: "Keep applying same failing fix"
+      
+  # -----------------------------------------------------------------------------
+  # RESEARCH -> SYNTHESIS LOOP
+  # -----------------------------------------------------------------------------
+  research_synthesis_loop:
+    purpose: "Gather research from multiple domains and synthesize"
+    
+    participants:
+      researchers: "@idumb-researcher (multiple)"
+      synthesizer: "@idumb-synthesizer"
+      
+    per_researcher_exits_when:
+      all_true:
+        - condition: output_file.line_count >= 20
+          verification: "wc -l >= 20"
+        - condition: output_file.has_required_sections == true
+          sections: ["Sources", "Findings", "Relevance"]
+        - condition: sources_cited >= 1
+          verification: "URL or citation count >= 1"
+          
+    per_researcher_stall_detection:
+      trigger: "no new information found after exhausting search strategies"
+      detection_method: |
+        strategies_tried = [web_search, doc_search, example_search]
+        if (all_exhausted && findings.length < minimum) trigger_stall()
+        
+      action: |
+        DOCUMENT PARTIAL FINDINGS:
+          - What was searched
+          - What was found (even if minimal)
+          - Confidence: LOW
+          
+        RETURN TO SYNTHESIS:
+          "Domain '{domain}' research inconclusive.
+           Searched: {strategies}
+           Found: {partial_findings}
+           Recommendation: {alternative_approach or 'user input needed'}"
+           
+      never: "Return empty without explanation"
+      
+    synthesis_exits_when:
+      all_true:
+        - condition: SUMMARY.md exists
+          verification: "synthesis document created"
+        - condition: all_researcher_outputs_incorporated == true
+          verification: "each researcher output referenced"
+        - condition: synthesis.has_recommendations == true
+          verification: "recommendations section non-empty"
+          
+    synthesis_stall_detection:
+      trigger: "all researchers returned LOW confidence or empty"
+      action: |
+        PRESENT TO USER:
+          "Research inconclusive across all domains.
+           Attempted: {domains}
+           Results: {per_domain_summary}
+           
+           Options:
+           1. Proceed with user-provided context
+           2. Retry with different search terms: {suggestions}
+           3. Skip research, go directly to roadmap"
+           
+      never: "Synthesize nothing into fake insights"
+      
+  # -----------------------------------------------------------------------------
+  # DELEGATION CYCLE (generic)
+  # -----------------------------------------------------------------------------
+  delegation_cycle:
+    purpose: "Coordinator delegates to worker, awaits result"
+    
+    exits_when:
+      all_true:
+        - condition: delegated_agent.returned_result == true
+          verification: "agent.response !== null"
+        - condition: result.status in ["complete", "blocked", "needs_escalation"]
+          verification: "response has recognized status"
+          
+    stall_detection:
+      trigger: "no response after reasonable processing time"
+      detection_method: |
+        // "reasonable" = 2x expected duration for task complexity
+        if (elapsed > expected * 2 && no_progress_signal) trigger_stall()
+        
+      action: |
+        CHECK AGENT STATUS:
+          - Is agent still running?
+          - Any partial output?
+          - Any error logs?
+          
+        IF STUCK:
+          1. Attempt graceful termination
+          2. Collect any partial work
+          3. Report to coordinator with context
+          
+        ESCALATE:
+          "Agent '{agent}' not responding.
+           Task: {task}
+           Last known state: {partial}
+           Options: retry, different agent, manual"
+           
+      never: "Wait forever OR silently fail"
+      
+    circular_delegation_detection:
+      track: "agent call stack"
+      trigger: "agent A delegates to B which delegates back to A (or longer cycle)"
+      action: |
+        HARD BLOCK:
+          "Circular delegation detected: {call_stack}
+           This indicates a design flaw in task decomposition.
+           Cannot proceed until resolved."
+           
+      never: "Allow infinite delegation loops"
+      
+    depth_limit_detection:
+      track: "delegation depth from root coordinator"
+      trigger: "depth > 3"
+      action: |
+        SOFT BLOCK:
+          "Delegation too deep. Attempting work at current level.
+           Chain: {coordinator -> agent1 -> agent2 -> agent3 -> ?}
+           Task may be over-decomposed."
+           
+      never: "Delegate infinitely deep"
+
+# ===============================================================================
+# SECTION 3: UNIVERSAL STALL ESCALATION
+# ===============================================================================
+
+universal_stall_handling:
+  
+  principle: |
+    When ANY workflow or loop stalls, we NEVER silently give up.
+    We ALWAYS escalate to the user with full context and options.
+    
+  any_loop_stalls:
+    required_actions:
+      1_checkpoint: |
+        Save complete current state:
+          - What was attempted
+          - What succeeded
+          - What is stuck
+          - All relevant context
+          
+      2_document: |
+        Create stall report:
+          - Workflow/loop name
+          - Stall trigger (what condition matched)
+          - Attempts made
+          - Partial results available
+          
+      3_present_options: |
+        Always offer user:
+          - "Continue with current best effort" (accept partial)
+          - "Provide additional guidance" (user input + retry)
+          - "Abort and rollback" (clean exit)
+          - "Debug mode" (deep investigation)
+          
+    never:
+      - "Silently give up and produce half-assed result"
+      - "Return empty/null without explanation"
+      - "Crash without saving state"
+      - "Loop forever hoping for different result"
+      
+  stall_report_format:
+    template: |
+      ## Workflow Stall Report
+      
+      **Workflow:** {workflow_name}
+      **Loop/Phase:** {current_loop}
+      **Stall Reason:** {trigger_description}
+      
+      ### Progress Made
+      {completed_steps}
+      
+      ### Current State
+      {current_state_summary}
+      
+      ### Partial Results Available
+      {partial_results}
+      
+      ### Options
+      1. **Accept partial:** {what_you_get}
+      2. **Provide guidance:** {what_would_help}
+      3. **Abort:** {what_gets_cleaned_up}
+      4. **Debug:** Launch /idumb:debug
+
+# ===============================================================================
+# SECTION 4: PROHIBITED PATTERNS
+# ===============================================================================
+
+prohibited_patterns:
+  
+  never_use:
+    - pattern: "max_iterations: N"
+      reason: "Arbitrary limits don't define completion"
+      replace_with: "exits_when: {measurable conditions}"
+      
+    - pattern: "max_retries: N"
+      reason: "Retries should stop when fixed OR stall detected"
+      replace_with: "stall_detection: {same error 3 times}"
+      
+    - pattern: "timeout: N minutes (as EXIT criteria)"
+      reason: "Time doesn't define task completion"
+      replace_with: "exits_when: {task verified} + stall_detection"
+      note: "Timeouts OK for ALERTING, not for EXIT"
+      
+    - pattern: "max_X: N where N is arbitrary"
+      reason: "Numbers should come from completion state, not guesses"
+      replace_with: "Completion condition based on actual goal"
+      
+  allowed_uses:
+    - pattern: "alert after N minutes"
+      context: "To notify user of long-running operation"
+      action: "Log, check progress, continue if making progress"
+      
+    - pattern: "resource limits"
+      context: "Prevent runaway resource consumption"
+      examples:
+        - "max_file_size: 10MB (for safety, not completion)"
+        - "max_concurrent_agents: 5 (resource management)"
+
+# ===============================================================================
+# SECTION 5: STALL DETECTION PATTERNS
+# ===============================================================================
+
+stall_detection_patterns:
+  
+  output_hash_unchanged:
+    description: "Same output produced across multiple cycles"
+    implementation: |
+      let hash_history = []
+      
+      after_each_cycle:
+        current_hash = sha256(output)
+        if (hash_history.slice(-2).every(h => h === current_hash)):
+          trigger_stall("output unchanged for 3 cycles")
+        hash_history.push(current_hash)
+        
+    applicable_to:
+      - planner_checker_loop (issues hash)
+      - validator_fix_loop (error hash)
+      - any iterative improvement loop
+      
+  no_progress_signal:
+    description: "No measurable progress indicator changing"
+    implementation: |
+      track:
+        - files_created
+        - tasks_completed
+        - criteria_checked
+        - score_improved
+        
+      if (all_metrics_unchanged_for: 2_cycles):
+        trigger_stall("no progress detected")
+        
+    applicable_to:
+      - execute_phase (task completion count)
+      - verify_work (criteria checked count)
+      
+  error_repetition:
+    description: "Same error occurring repeatedly"
+    implementation: |
+      let error_history = []
+      
+      on_error:
+        error_sig = sha256(error.message + error.type)
+        error_history.push(error_sig)
+        
+        if (error_history.slice(-3).every(e => e === error_sig)):
+          trigger_stall("same error 3 times", {error})
+          
+    applicable_to:
+      - task execution
+      - file operations
+      - external tool calls
+      
+  user_non_response:
+    description: "User not responding to interactive prompts"
+    implementation: |
+      on_prompt_sent:
+        start_timer()
+        
+      after_2_additional_prompts_with_no_response:
+        trigger_stall("user not responding", {
+          save_draft: true,
+          await_explicit_continue: true
+        })
+        
+    applicable_to:
+      - discuss_phase
+      - any user-interactive workflow
+
+# ===============================================================================
+# SECTION 6: COMPLETION EVIDENCE REQUIREMENTS
+# ===============================================================================
+
+evidence_requirements:
+  
+  every_completion_must_have:
+    - artifact: "Measurable output proving work done"
+    - state_update: "state.json reflects new status"
+    - history_entry: "Action logged with timestamp"
+    
+  per_workflow_evidence:
+    init:
+      - ".idumb/brain/state.json exists and valid"
+      - ".idumb/config.json exists and valid"
+      
+    new_project:
+      - ".planning/PROJECT.md with required sections"
+      - ".planning/config.json"
+      
+    research:
+      - ".idumb/governance/research/*-*.md"
+      - "synthesis section with recommendations"
+      
+    roadmap:
+      - ".planning/ROADMAP.md with phases"
+      - "no circular dependencies"
+      
+    discuss_phase:
+      - ".planning/phases/{N}/*CONTEXT.md"
+      - "all sections populated"
+      
+    plan_phase:
+      - ".planning/phases/{N}/*PLAN.md"
+      - "plan_checker PASS status"
+      
+    execute_phase:
+      - ".planning/phases/{N}/*SUMMARY.md"
+      - ".idumb/execution/{N}/progress.json"
+      - "all tasks resolved"
+      
+    verify_work:
+      - ".planning/phases/{N}/*VERIFICATION.md"
+      - "all criteria checked"
+      - "evidence for each criterion"
+      
+  evidence_verification:
+    protocol: |
+      For each evidence requirement:
+        1. Check file exists (fs.existsSync)
+        2. Check content valid (JSON.parse or grep sections)
+        3. Check state updated (read state.json)
+        4. Log verification result
+
+# ===============================================================================
+# SECTION 7: QUICK REFERENCE - COMPLETION CONDITIONS
+# ===============================================================================
+
+quick_reference:
+  
+  when_is_it_done:
+    init: "state.json AND config.json exist and are valid"
+    new_project: "PROJECT.md has all required sections"
+    research: "synthesis exists with recommendations"
+    roadmap: "ROADMAP.md with phases, no circular deps"
+    discuss_phase: "CONTEXT.md complete, user confirmed"
+    plan_phase: "plan_checker returns PASS"
+    execute_phase: "all tasks complete or blocked with reason"
+    verify_work: "all criteria checked with evidence"
+    debug: "root cause identified OR user satisfied"
+    
+  when_does_it_stall:
+    planner_checker: "same issues for 3 cycles"
+    task_execution: "same error 3 times"
+    research: "no new info after all strategies"
+    user_interaction: "no response after 2 prompts"
+    delegation: "no response, agent not progressing"
+    
+  what_happens_on_stall:
+    always:
+      - "Checkpoint current state"
+      - "Document what was attempted"
+      - "Present to user with options"
+    never:
+      - "Silently fail"
+      - "Return partial without explanation"
+      - "Loop hoping for magic"
+
+# ===============================================================================
+# END OF SPECIFICATION
+# ===============================================================================

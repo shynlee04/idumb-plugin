@@ -1,136 +1,86 @@
 ---
-name: research
-description: "Orchestrates parallel research agents to gather comprehensive project intelligence"
-type: workflow
-version: 0.1.0
-last_updated: 2026-02-03
+description: "Research workflow for gathering domain knowledge before planning"
+created: "2026-02-03"
+version: "1.0.0"
 ---
 
 # Research Workflow
 
-Orchestrates parallel research agents to gather comprehensive intelligence for project planning.
+## Purpose
+Systematic research process for gathering domain knowledge, best practices, and implementation approaches before creating plans.
 
-## Entry Conditions
+## When to Use
+- Starting a new project or phase
+- Unfamiliar with the technology/domain
+- Need to validate approach before planning
+- Complex integration requirements
 
-```yaml
-entry_conditions:
-  must_have:
-    - exists: ".idumb/brain/state.json"
-    - state: "initialized = true"
-  should_have:
-    - exists: ".planning/PROJECT.md"
-  blocked_when:
-    - condition: "!exists('.idumb/brain/state.json')"
-      redirect: "/idumb:init"
-      message: "iDumb not initialized"
-```
+## Input
+- Research topic or question
+- Target technology/domain
+- Specific constraints or requirements
 
-## Workflow Steps
+## Output
+- Research summary document (RESEARCH.md)
+- Key findings and recommendations
+- Implementation approaches evaluated
+- Risk assessment
 
-```yaml
-workflow:
-  name: research
-  interactive: false  # Agent-driven
-  
-  steps:
-    1_validate_context:
-      action: "Check project initialization"
-      tool: idumb-validate:structure
-      
-    2_determine_scope:
-      action: "Analyze research request"
-      extract:
-        - topic_domain
-        - depth_requirement
-        - focus_areas
-        
-    3_spawn_researchers:
-      action: "Delegate to parallel research agents"
-      parallel: true
-      agents:
-        - idumb-project-researcher (tech)
-        - idumb-project-researcher (market)
-        - idumb-project-researcher (user)
-        - idumb-project-researcher (competitor)
-      timeout: 300s
-      
-    4_collect_findings:
-      action: "Gather research outputs"
-      wait_for: all_agents
-      
-    5_synthesize:
-      action: "Delegate to research synthesizer"
-      agent: idumb-research-synthesizer
-      inputs: all_research_outputs
-      
-    6_validate_synthesis:
-      action: "Check synthesis completeness"
-      agent: idumb-low-validator
-      checks:
-        - coverage_all_domains
-        - actionable_insights
-        - source_attribution
-        
-    7_store_research:
-      action: "Save research document"
-      path: ".idumb/governance/research/{timestamp}-{topic}.md"
-      
-    8_update_state:
-      action: "Record research completion"
-      tool: idumb-state:history
-      action_name: research_completed
-```
+## Steps
 
-## Output Artifact
+### Step 1: Define Research Scope
+**Agent:** @idumb-project-researcher or @idumb-phase-researcher
 
-```yaml
-artifact:
-  name: "{timestamp}-{topic}.md"
-  path: ".idumb/governance/research/"
-  sections:
-    - executive_summary: "2-3 paragraph overview"
-    - technical_findings: "Options, recommendations, risks"
-    - market_findings: "Trends, opportunities, threats"
-    - user_findings: "Personas, needs, priorities"
-    - competitor_findings: "Landscape, gaps, differentiation"
-    - synthesis: "Key insights, action items, open questions"
-    - sources: "Attribution list"
-```
+Define:
+- Research questions
+- Scope boundaries
+- Success criteria
+- Time budget
 
-## Exit Conditions
+### Step 2: Gather Information
+**Agent:** Researcher
 
-```yaml
-exit_conditions:
-  success:
-    - artifact_created: true
-    - synthesis_validated: true
-    - state_updated: true
-  failure:
-    - timeout: "Report partial results"
-    - no_sources: "Warn and suggest manual research"
-```
+Activities:
+- Search documentation
+- Review best practices
+- Analyze similar implementations
+- Identify potential pitfalls
 
-## Chain Rules
+### Step 3: Synthesize Findings
+**Agent:** @idumb-research-synthesizer
 
-```yaml
-chains_to:
-  on_success:
-    command: "/idumb:roadmap --from-research"
-    message: "Research complete. Create roadmap?"
-    auto: false
-```
+Consolidate:
+- Multiple research sources
+- Conflicting information
+- Key insights
+- Recommendations
 
-## Integration Points
+### Step 4: Document Results
+**Agent:** Researcher
 
-```yaml
-integration:
-  reads_from:
-    - ".idumb/brain/state.json"
-    - ".planning/PROJECT.md"
-  writes_to:
-    - ".idumb/governance/research/"
-    - ".idumb/brain/state.json"
-```
+Create RESEARCH.md with:
+- Executive summary
+- Detailed findings
+- Implementation options
+- Risk analysis
+- Recommendations
 
----
-*Workflow: research v0.1.0*
+## Research Checklist
+
+- [ ] Research scope defined
+- [ ] Sources identified and reviewed
+- [ ] Best practices documented
+- [ ] Implementation options compared
+- [ ] Risks assessed
+- [ ] Recommendations made
+- [ ] RESEARCH.md created
+
+## Success Criteria
+1. Research answers the original questions
+2. Implementation approach is validated
+3. Risks are identified and mitigated
+4. Findings are documented for team reference
+
+## Related Workflows
+- Planning Workflow - Uses research output
+- Roadmap Workflow - Incorporates research findings

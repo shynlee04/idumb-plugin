@@ -6,6 +6,22 @@ version: 0.1.0
 output_pattern: ".planning/phases/{N}/{phase-name}-VERIFICATION.md"
 ---
 
+<!--
+COMPLETION CRITERIA REFERENCE:
+This template implements evidence requirements from:
+  template/governance/completion-definitions.yaml Section 6
+
+Per workflow evidence requirements for verify_work:
+  - "VERIFICATION.md with all criteria checked"
+  - "evidence for each criterion"
+  - "PASS | PARTIAL | FAIL status"
+
+Every completion must have:
+  - artifact: "Measurable output proving work done"
+  - state_update: "state.json reflects new status"
+  - history_entry: "Action logged with timestamp"
+-->
+
 # Verification Template
 
 Generates the VERIFICATION.md document that proves phase completion through evidence.

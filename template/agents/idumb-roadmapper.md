@@ -1,19 +1,18 @@
 ---
 description: "Creates comprehensive project roadmaps with phases, milestones, dependencies, and timelines"
 mode: subagent
-hidden: true
-temperature: 0.2
+temperature: 0.1
 permission:
   task:
-    "*": deny
+    "*": allow
   bash:
     "*": deny
   edit: deny
   write: deny
 tools:
-  task: false
+  write: false
+  edit: false
   idumb-state: true
-  idumb-context: true
 ---
 
 # @idumb-roadmapper

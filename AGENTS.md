@@ -196,21 +196,76 @@ const step2_installAgents = async () => { /* ... */ }
 ```
 idumb-supreme-coordinator (YOU if primary)
   │
-  └─→ idumb-high-governance (mid-level delegation)
+  └─→ idumb-high-governance (mid-level coordination)
         │
-        ├─→ idumb-low-validator (read-only: grep, glob, test)
+        ├─→ idumb-executor (phase execution)
+        │     └─→ idumb-builder (file operations)
+        │     └─→ idumb-low-validator (validation)
         │
-        └─→ idumb-builder (write: file edits, tool execution)
+        ├─→ idumb-planner (planning)
+        ├─→ idumb-plan-checker (plan validation)
+        ├─→ idumb-verifier (verification)
+        ├─→ idumb-debugger (debugging)
+        ├─→ idumb-integration-checker (integration)
+        ├─→ idumb-codebase-mapper (codebase analysis)
+        │
+        ├─→ idumb-project-researcher (domain research)
+        ├─→ idumb-phase-researcher (phase research)
+        ├─→ idumb-research-synthesizer (synthesize research)
+        │
+        └─→ idumb-roadmapper (create roadmaps)
 ```
 
 ### Permission Matrix
 
-| Agent | edit | write | bash | delegate |
-|-------|------|-------|------|----------|
-| supreme-coordinator | ❌ | ❌ | ❌ | ✅ |
-| high-governance | ❌ | ❌ | ❌ | ✅ |
-| low-validator | ❌ | ❌ | read | ❌ |
-| builder | ✅ | ✅ | ✅ | ❌ |
+| Agent | edit | write | bash | delegate | task |
+|-------|------|-------|------|----------|------|
+| supreme-coordinator | ❌ | ❌ | ❌ | ✅ | ✅ |
+| high-governance | ❌ | ❌ | ❌ | ✅ | ✅ |
+| executor | ❌ | ❌ | ❌ | ✅ | ✅ |
+| verifier | ❌ | ❌ | ❌ | ✅ | ✅ |
+| debugger | ❌ | ❌ | ❌ | ✅ | ✅ |
+| planner | ❌ | ❌ | ❌ | ❌ | ❌ |
+| plan-checker | ❌ | ❌ | ❌ | ❌ | ❌ |
+| integration-checker | ❌ | ❌ | ❌ | ❌ | ❌ |
+| codebase-mapper | ❌ | ❌ | ❌ | ❌ | ❌ |
+| project-researcher | ❌ | ❌ | ❌ | ❌ | ❌ |
+| phase-researcher | ❌ | ❌ | ❌ | ❌ | ❌ |
+| research-synthesizer | ❌ | ❌ | ❌ | ❌ | ❌ |
+| roadmapper | ❌ | ❌ | ❌ | ❌ | ❌ |
+| low-validator | ❌ | ❌ | read | ❌ | ❌ |
+| builder | ✅ | ✅ | ✅ | ❌ | ❌ |
+
+## Agent Descriptions
+
+### Coordinator Agents (Delegation Only)
+These agents coordinate work but never execute directly:
+- **idumb-supreme-coordinator**: Top-level orchestration, receives user requests, delegates all work
+- **idumb-high-governance**: Mid-level coordination, validates and delegates to worker agents
+- **idumb-executor**: Phase execution coordination, manages task workflows and delegates to builders/validators
+- **idumb-verifier**: Verification coordination, validates completion criteria are met
+- **idumb-debugger**: Debug coordination, diagnoses issues and proposes fixes
+
+### Planning Agents (Research/Analysis)
+These agents create and validate plans:
+- **idumb-planner**: Creates detailed execution plans for phases
+- **idumb-plan-checker**: Validates plans before execution, checks for completeness
+- **idumb-roadmapper**: Creates project roadmaps with phases and milestones
+- **idumb-codebase-mapper**: Analyzes existing codebases for brownfield projects
+
+### Research Agents (Information Gathering)
+These agents gather information before planning:
+- **idumb-project-researcher**: Domain ecosystem research (tech, market, user, competitor)
+- **idumb-phase-researcher**: Phase-specific implementation research
+- **idumb-research-synthesizer**: Synthesizes research outputs from multiple researchers
+
+### Integration Agents
+- **idumb-integration-checker**: Validates cross-component integration and E2E flows
+
+### Worker Agents (Leaf Nodes)
+These agents perform the actual work:
+- **idumb-low-validator**: Read-only validation (grep, glob, test, read)
+- **idumb-builder**: File operations (write, edit, bash) - only agent that can modify files
 
 ---
 
@@ -285,4 +340,4 @@ try {
 
 ---
 
-*Last updated: 2026-02-03 | Version: 0.1.0*
+*Last updated: 2026-02-03 | Version: 0.2.0*

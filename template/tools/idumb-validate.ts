@@ -454,3 +454,589 @@ export default tool({
     return JSON.stringify(validation, null, 2)
   },
 })
+
+// ============================================================================
+// P2-T1: INTEGRATION POINT VALIDATOR
+// ============================================================================
+
+interface IntegrationResult {
+  tier: "agent" | "command" | "tool"
+  name: string
+  status: "pass" | "fail" | "warning"
+  issues: string[]
+  delegations?: string[]
+  bindings?: string[]
+  exports?: string[]
+}
+
+interface IntegrationReport {
+  timestamp: string
+  overall: "pass" | "fail" | "warning"
+  agents: IntegrationResult[]
+  commands: IntegrationResult[]
+  tools: IntegrationResult[]
+  summary: {
+    total: number
+    pass: number
+    fail: number
+    warning: number
+  }
+}
+
+// Extract YAML frontmatter from markdown content
+function extractYamlFrontmatter(content: string): Record<string, any> | null {
+  const match = content.match(/^---\s*\n([\s\S]*?)\n---/)
+  if (!match) return null
+  
+  const yaml = match[1]
+  const result: Record<string, any> = {}
+  
+  // Simple YAML parser for basic types
+  const lines = yaml.split('\n')
+  let currentKey = ''
+  let currentObj: Record<string, any> = result
+  const objStack: { key: string; obj: Record<string, any> }[] = []
+  
+  for (const line of lines) {
+    const trimmed = line.trim()
+    if (!trimmed || trimmed.startsWith('#')) continue
+    
+    // Check for nested object start
+    if (trimmed.endsWith(':') && !trimmed.includes(': ')) {
+      const key = trimmed.slice(0, -1)
+      currentObj[key] = {}
+      objStack.push({ key: currentKey, obj: currentObj })
+      currentKey = key
+      currentObj = currentObj[key]
+      continue
+    }
+    
+    // Check for key-value pair
+    const colonIndex = trimmed.indexOf(': ')
+    if (colonIndex > 0) {
+      const key = trimmed.slice(0, colonIndex)
+      let value: any = trimmed.slice(colonIndex + 2).trim()
+      
+      // Remove quotes
+      if ((value.startsWith('"') && value.endsWith('"')) ||
+          (value.startsWith("'") && value.endsWith("'"))) {
+        value = value.slice(1, -1)
+      }
+      
+      // Parse booleans
+      if (value === 'true') value = true
+      else if (value === 'false') value = false
+      // Parse numbers
+      else if (!isNaN(Number(value)) && value !== '') value = Number(value)
+      
+      currentObj[key] = value
+    }
+  }
+  
+  return result
+}
+
+// Validate agent integrations
+async function validateAgentIntegrations(directory: string): Promise<IntegrationResult[]> {
+  const results: IntegrationResult[] = []
+  const agentsDir = join(directory, "template", "agents")
+  
+  if (!existsSync(agentsDir)) {
+    return [{
+      tier: "agent",
+      name: "agents_dir",
+      status: "fail",
+      issues: ["template/agents/ directory does not exist"]
+    }]
+  }
+  
+  const files = readdirSync(agentsDir).filter(f => f.startsWith("idumb-") && f.endsWith(".md"))
+  
+  for (const file of files) {
+    const filePath = join(agentsDir, file)
+    const content = readFileSync(filePath, "utf8")
+    const frontmatter = extractYamlFrontmatter(content)
+    
+    const agentName = file.replace(".md", "")
+    const issues: string[] = []
+    const delegations: string[] = []
+    
+    if (!frontmatter) {
+      issues.push("Missing or invalid YAML frontmatter")
+    } else {
+      // Check for permission.task delegations
+      if (frontmatter.permission?.task) {
+        const taskPerms = frontmatter.permission.task
+        for (const [task, perm] of Object.entries(taskPerms)) {
+          if (perm === "allow" || perm === "ask") {
+            delegations.push(task)
+          }
+        }
+      }
+      
+      // Flag agents with no delegations
+      if (delegations.length === 0) {
+        issues.push("Agent has no task delegations defined")
+      }
+      
+      // Check for required fields
+      if (!frontmatter.description) {
+        issues.push("Missing required field: description")
+      }
+      if (!frontmatter.mode) {
+        issues.push("Missing required field: mode")
+      }
+    }
+    
+    const status = issues.length === 0 ? "pass" : 
+                   issues.some(i => i.includes("required")) ? "fail" : "warning"
+    
+    results.push({
+      tier: "agent",
+      name: agentName,
+      status,
+      issues,
+      delegations: delegations.length > 0 ? delegations : undefined
+    })
+  }
+  
+  return results
+}
+
+// Validate command integrations
+async function validateCommandIntegrations(directory: string): Promise<IntegrationResult[]> {
+  const results: IntegrationResult[] = []
+  const commandsDir = join(directory, "template", "commands", "idumb")
+  
+  if (!existsSync(commandsDir)) {
+    return [{
+      tier: "command",
+      name: "commands_dir",
+      status: "fail",
+      issues: ["template/commands/idumb/ directory does not exist"]
+    }]
+  }
+  
+  const files = readdirSync(commandsDir).filter(f => f.endsWith(".md"))
+  
+  for (const file of files) {
+    const filePath = join(commandsDir, file)
+    const content = readFileSync(filePath, "utf8")
+    const frontmatter = extractYamlFrontmatter(content)
+    
+    const commandName = file.replace(".md", "")
+    const issues: string[] = []
+    let agentBinding: string | undefined
+    
+    if (!frontmatter) {
+      issues.push("Missing or invalid YAML frontmatter")
+    } else {
+      // Check for agent binding
+      if (frontmatter.agent) {
+        agentBinding = frontmatter.agent
+      } else {
+        issues.push("Command has no agent binding defined")
+      }
+      
+      // Check for required fields
+      if (!frontmatter.description) {
+        issues.push("Missing required field: description")
+      }
+    }
+    
+    const status = issues.length === 0 ? "pass" : 
+                   issues.some(i => i.includes("required")) ? "fail" : "warning"
+    
+    results.push({
+      tier: "command",
+      name: commandName,
+      status,
+      issues,
+      bindings: agentBinding ? [agentBinding] : undefined
+    })
+  }
+  
+  return results
+}
+
+// Validate tool integrations
+async function validateToolIntegrations(directory: string): Promise<IntegrationResult[]> {
+  const results: IntegrationResult[] = []
+  const toolsDir = join(directory, "template", "tools")
+  
+  if (!existsSync(toolsDir)) {
+    return [{
+      tier: "tool",
+      name: "tools_dir",
+      status: "fail",
+      issues: ["template/tools/ directory does not exist"]
+    }]
+  }
+  
+  const files = readdirSync(toolsDir).filter(f => f.startsWith("idumb-") && f.endsWith(".ts"))
+  
+  for (const file of files) {
+    const filePath = join(toolsDir, file)
+    const content = readFileSync(filePath, "utf8")
+    
+    const toolName = file.replace(".ts", "")
+    const issues: string[] = []
+    const exports: string[] = []
+    
+    // Check for exported tools
+    const exportMatches = content.match(/export\s+(?:const|function|default)\s+(\w+)/g)
+    if (exportMatches) {
+      for (const match of exportMatches) {
+        const nameMatch = match.match(/export\s+(?:const|function|default)\s+(\w+)/)
+        if (nameMatch) {
+          exports.push(nameMatch[1])
+        }
+      }
+    }
+    
+    // Flag tools with no exports
+    if (exports.length === 0) {
+      issues.push("Tool has no exports defined")
+    }
+    
+    // Check for tool() wrapper usage
+    if (!content.includes("tool({")) {
+      issues.push("Tool does not use @opencode-ai/plugin tool() wrapper")
+    }
+    
+    const status = issues.length === 0 ? "pass" : 
+                   issues.some(i => i.includes("no exports")) ? "fail" : "warning"
+    
+    results.push({
+      tier: "tool",
+      name: toolName,
+      status,
+      issues,
+      exports: exports.length > 0 ? exports : undefined
+    })
+  }
+  
+  return results
+}
+
+// Integration points validation tool
+export const integrationPoints = tool({
+  description: "Validate integration points between agents, commands, and tools",
+  args: {},
+  async execute(args, context) {
+    const agents = await validateAgentIntegrations(context.directory)
+    const commands = await validateCommandIntegrations(context.directory)
+    const tools = await validateToolIntegrations(context.directory)
+    
+    const allResults = [...agents, ...commands, ...tools]
+    const pass = allResults.filter(r => r.status === "pass").length
+    const fail = allResults.filter(r => r.status === "fail").length
+    const warning = allResults.filter(r => r.status === "warning").length
+    
+    const overall = fail > 0 ? "fail" : warning > 0 ? "warning" : "pass"
+    
+    const report: IntegrationReport = {
+      timestamp: new Date().toISOString(),
+      overall,
+      agents,
+      commands,
+      tools,
+      summary: {
+        total: allResults.length,
+        pass,
+        fail,
+        warning
+      }
+    }
+    
+    return JSON.stringify(report, null, 2)
+  }
+})
+
+// ============================================================================
+// P2-T2: SCHEMA VALIDATION TOOLS
+// ============================================================================
+
+interface SchemaField {
+  name: string
+  type: "string" | "number" | "boolean" | "array" | "object"
+  required: boolean
+  allowedValues?: string[]
+}
+
+interface ArtifactSchema {
+  name: string
+  fields: SchemaField[]
+}
+
+// Schema definitions
+const AGENT_SCHEMA: ArtifactSchema = {
+  name: "agent",
+  fields: [
+    { name: "description", type: "string", required: true },
+    { name: "mode", type: "string", required: true, allowedValues: ["primary", "subagent", "all"] },
+    { name: "temperature", type: "number", required: false },
+    { name: "permission", type: "object", required: true },
+    { name: "tools", type: "object", required: false }
+  ]
+}
+
+const COMMAND_SCHEMA: ArtifactSchema = {
+  name: "command",
+  fields: [
+    { name: "description", type: "string", required: true },
+    { name: "agent", type: "string", required: true },
+    { name: "triggers", type: "array", required: false }
+  ]
+}
+
+const PLAN_SCHEMA: ArtifactSchema = {
+  name: "plan",
+  fields: [
+    { name: "phase", type: "string", required: true },
+    { name: "goal", type: "string", required: true },
+    { name: "tasks", type: "array", required: true }
+  ]
+}
+
+// Validate frontmatter against schema
+function validateFrontmatterAgainstSchema(
+  frontmatter: Record<string, any>,
+  schema: ArtifactSchema
+): string[] {
+  const errors: string[] = []
+  
+  for (const field of schema.fields) {
+    const value = frontmatter[field.name]
+    
+    // Check required fields
+    if (field.required && (value === undefined || value === null)) {
+      errors.push(`Missing required field: ${field.name}`)
+      continue
+    }
+    
+    // Skip type validation if field is missing and not required
+    if (value === undefined || value === null) {
+      continue
+    }
+    
+    // Validate type
+    const actualType = Array.isArray(value) ? "array" : typeof value
+    if (actualType !== field.type) {
+      errors.push(`Field '${field.name}' should be ${field.type}, got ${actualType}`)
+      continue
+    }
+    
+    // Validate allowed values
+    if (field.allowedValues && !field.allowedValues.includes(String(value))) {
+      errors.push(`Field '${field.name}' value '${value}' not in allowed values: ${field.allowedValues.join(", ")}`)
+    }
+  }
+  
+  return errors
+}
+
+// Frontmatter validation tool
+export const frontmatter = tool({
+  description: "Validate YAML frontmatter against schema",
+  args: {
+    path: tool.schema.string().describe("Path to markdown file"),
+    type: tool.schema.string().describe("Schema type: agent, command, or plan")
+  },
+  async execute(args, context) {
+    const { path: filePath, type: schemaType } = args
+    const fullPath = join(context.directory, filePath)
+    
+    // Select schema
+    let schema: ArtifactSchema
+    switch (schemaType) {
+      case "agent":
+        schema = AGENT_SCHEMA
+        break
+      case "command":
+        schema = COMMAND_SCHEMA
+        break
+      case "plan":
+        schema = PLAN_SCHEMA
+        break
+      default:
+        return JSON.stringify({
+          error: true,
+          message: `Unknown schema type: ${schemaType}. Use: agent, command, or plan`
+        })
+    }
+    
+    // Check file exists
+    if (!existsSync(fullPath)) {
+      return JSON.stringify({
+        error: true,
+        message: `File not found: ${filePath}`
+      })
+    }
+    
+    // Read and parse
+    const content = readFileSync(fullPath, "utf8")
+    const frontmatterData = extractYamlFrontmatter(content)
+    
+    if (!frontmatterData) {
+      return JSON.stringify({
+        error: true,
+        message: "Could not extract YAML frontmatter from file"
+      })
+    }
+    
+    // Validate
+    const errors = validateFrontmatterAgainstSchema(frontmatterData, schema)
+    
+    return JSON.stringify({
+      file: filePath,
+      schema: schemaType,
+      valid: errors.length === 0,
+      errors: errors.length > 0 ? errors : undefined,
+      frontmatter: frontmatterData
+    }, null, 2)
+  }
+})
+
+// Config schema validation tool
+export const configSchema = tool({
+  description: "Validate config file against schema",
+  args: {
+    configType: tool.schema.string().describe("Config type: state, config, etc.")
+  },
+  async execute(args, context) {
+    const { configType } = args
+    
+    if (configType === "state") {
+      const stateFile = join(context.directory, ".idumb", "brain", "state.json")
+      
+      if (!existsSync(stateFile)) {
+        return JSON.stringify({
+          error: true,
+          message: "state.json does not exist"
+        })
+      }
+      
+      try {
+        const content = readFileSync(stateFile, "utf8")
+        const state = JSON.parse(content)
+        const errors: string[] = []
+        
+        // Required fields for state.json
+        const requiredFields = ["version", "initialized", "framework", "phase"]
+        for (const field of requiredFields) {
+          if (state[field] === undefined) {
+            errors.push(`Missing required field: ${field}`)
+          }
+        }
+        
+        // Type validations
+        if (state.version !== undefined && typeof state.version !== "string") {
+          errors.push("Field 'version' should be string")
+        }
+        if (state.initialized !== undefined && typeof state.initialized !== "string") {
+          errors.push("Field 'initialized' should be string (ISO date)")
+        }
+        if (state.framework !== undefined && typeof state.framework !== "string") {
+          errors.push("Field 'framework' should be string")
+        }
+        if (state.phase !== undefined && typeof state.phase !== "string") {
+          errors.push("Field 'phase' should be string")
+        }
+        
+        // Valid framework values
+        const validFrameworks = ["bmad", "planning", "idumb", "custom", "none"]
+        if (state.framework && !validFrameworks.includes(state.framework)) {
+          errors.push(`Framework '${state.framework}' not in valid values: ${validFrameworks.join(", ")}`)
+        }
+        
+        // Anchors should be array
+        if (state.anchors !== undefined && !Array.isArray(state.anchors)) {
+          errors.push("Field 'anchors' should be an array")
+        }
+        
+        return JSON.stringify({
+          configType: "state",
+          file: ".idumb/brain/state.json",
+          valid: errors.length === 0,
+          errors: errors.length > 0 ? errors : undefined,
+          state: {
+            version: state.version,
+            framework: state.framework,
+            phase: state.phase,
+            initialized: state.initialized
+          }
+        }, null, 2)
+        
+      } catch (e) {
+        return JSON.stringify({
+          error: true,
+          message: `Failed to parse state.json: ${(e as Error).message}`
+        })
+      }
+    }
+    
+    if (configType === "config") {
+      const configFile = join(context.directory, ".idumb", "config.json")
+      
+      if (!existsSync(configFile)) {
+        return JSON.stringify({
+          error: true,
+          message: "config.json does not exist"
+        })
+      }
+      
+      try {
+        const content = readFileSync(configFile, "utf8")
+        const config = JSON.parse(content)
+        const errors: string[] = []
+        
+        // Required fields for config.json
+        if (config.user === undefined) {
+          errors.push("Missing required field: user")
+        }
+        if (config.governance === undefined) {
+          errors.push("Missing required field: governance")
+        }
+        
+        // Type validations
+        if (config.user !== undefined) {
+          if (typeof config.user.name !== "string") {
+            errors.push("Field 'user.name' should be string")
+          }
+          if (typeof config.user.language !== "string") {
+            errors.push("Field 'user.language' should be string")
+          }
+        }
+        
+        if (config.governance !== undefined) {
+          if (typeof config.governance.level !== "string") {
+            errors.push("Field 'governance.level' should be string")
+          }
+          const validLevels = ["strict", "standard", "minimal"]
+          if (config.governance.level && !validLevels.includes(config.governance.level)) {
+            errors.push(`Governance level '${config.governance.level}' not in valid values: ${validLevels.join(", ")}`)
+          }
+        }
+        
+        return JSON.stringify({
+          configType: "config",
+          file: ".idumb/config.json",
+          valid: errors.length === 0,
+          errors: errors.length > 0 ? errors : undefined
+        }, null, 2)
+        
+      } catch (e) {
+        return JSON.stringify({
+          error: true,
+          message: `Failed to parse config.json: ${(e as Error).message}`
+        })
+      }
+    }
+    
+    return JSON.stringify({
+      error: true,
+      message: `Unknown config type: ${configType}. Use: state, config`
+    })
+  }
+})

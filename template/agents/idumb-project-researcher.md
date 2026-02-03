@@ -1,19 +1,18 @@
 ---
-description: "Parallel research agent for domain-specific investigation (tech, market, user, competitor)"
+description: "Researches domain ecosystem before roadmap creation - produces files in .planning/research/"
 mode: subagent
-hidden: true
-temperature: 0.2
+temperature: 0.1
 permission:
   task:
-    "*": deny
+    "*": allow
   bash:
     "*": deny
   edit: deny
   write: deny
 tools:
-  task: false
+  write: false
+  edit: false
   idumb-state: true
-  idumb-context: true
 ---
 
 # @idumb-project-researcher
