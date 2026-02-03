@@ -1204,8 +1204,12 @@ function getAllowedTools(agentRole: string | null): string[] {
     'idumb-builder': builderTools
   }
   
-  // Return allowed tools or a safe default set for unknown agents
-  return toolPermissions[agentRole || ''] || tier3Tools
+  // Return allowed tools - EMPTY ARRAY means ALLOW ALL (no enforcement)
+  // For unknown agents, return empty to disable enforcement entirely
+  if (!agentRole || !agentRole.startsWith('idumb-')) {
+    return []  // Empty = allow all, no enforcement for non-iDumb agents
+  }
+  return toolPermissions[agentRole] || []  // Empty = allow all for unknown iDumb agents
 }
 
 function getRequiredFirstTools(agentRole: string | null): string[] {
@@ -1233,8 +1237,11 @@ function getRequiredFirstTools(agentRole: string | null): string[] {
     'idumb-low-validator': ['todoread', 'idumb-validate', 'read', 'glob', 'grep'],
     'idumb-builder': ['todoread', 'read']
   }
-  // Default fallback allows basic context gathering
-  return firstTools[agentRole || ''] || ['todoread', 'read']
+  // Default fallback - EMPTY = skip first-tool enforcement entirely
+  if (!agentRole || !agentRole.startsWith('idumb-')) {
+    return []  // Empty = skip enforcement for non-iDumb agents
+  }
+  return firstTools[agentRole] || []  // Empty = skip for unknown iDumb agents
 }
 
 // ============================================================================
@@ -1528,57 +1535,14 @@ Recommendation: Delegate to @idumb-builder for fix`,
     documentationLinks: ["- AGENTS.md (hierarchy overview)", "- template/router/chain-enforcement.md"]
   }
   
-  return `
-🚫 GOVERNANCE VIOLATION - TOOL BLOCKED 🚫
+  // SIMPLIFIED: No emojis, no box-drawing chars to prevent TUI breaking
+  return `BLOCKED: ${agent} cannot use ${tool}
 
-Agent: ${agent}
-Tool Attempted: ${tool}
-Status: OUTPUT REPLACED (tool ran but output discarded)
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-ROLE-SPECIFIC GUIDANCE
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-${info.specificGuidance}
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-YOU CANNOT USE THIS TOOL. DELEGATE INSTEAD:
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Role: ${info.specificGuidance}
 
 Delegate to: ${info.target}
 
-Example delegation format:
-\`\`\`
-${info.example}
-\`\`\`
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-ACTIONABLE NEXT STEPS
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-${info.actionableSteps.join('\n')}
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-HIERARCHY REMINDER
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-┌─ Supreme Coordinator ──┐     ┌─ Documentation ──────────────┐
-│  DELEGATE ONLY         │  ❌  │ ${info.documentationLinks[0] || ''}
-│  Never execute         │     │ ${info.documentationLinks[1] || ''}
-├─ High Governance ──────┤     │ ${info.documentationLinks[2] || ''}
-│  Coordinate, delegate  │  ❌  └──────────────────────────────┘
-│  Never modify files    │     
-├─ Low Validator ────────┤     
-│  Validate, investigate │  ❌  
-│  Never modify files    │     
-└─ Builder ──────────────┘     
-   Execute, modify files  │  ✅  
-   No delegation         │     
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-NEXT STEP: Use 'todoread' first, then delegate appropriately.
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-`
+Next: Use todoread, then delegate to appropriate agent.`
 }
 
 function buildPostCompactReminder(agentRole: string, directory: string): string {
@@ -3053,91 +3017,55 @@ export const IdumbCorePlugin: Plugin = async ({ directory, client }) => {
           
           const requiredFirst = getRequiredFirstTools(agentRole)
           
-          if (!requiredFirst.includes(toolName)) {
+          // SKIP enforcement if empty array (non-iDumb or unknown agent)
+          if (requiredFirst.length > 0 && !requiredFirst.includes(toolName)) {
             tracker.violationCount++
-            
-            log(directory, `[VIOLATION] ${agentRole} used ${toolName} as first tool (required: ${requiredFirst.join(', ')})`)
-            
-            pendingDenials.set(sessionId, {
-              agent: agentRole || 'unknown',
-              tool: toolName,
-              timestamp: new Date().toISOString(),
-              shouldBlock: true  // CRITICAL: Signal to tool.execute.after to REPLACE output
-            })
-            
+            log(directory, `[WARN] ${agentRole} used ${toolName} as first tool (expected: ${requiredFirst.join(', ')})`)
+            // LOG ONLY - NO BLOCKING
             addHistoryEntry(
               directory,
-              `violation:first_tool:${agentRole}:${toolName}`,
+              `warn:first_tool:${agentRole}:${toolName}`,
               'interceptor',
-              'fail'
+              'warn'
             )
           } else {
-            log(directory, `[OK] ${agentRole} correctly used ${toolName} as first tool`)
+            log(directory, `[OK] ${agentRole} used ${toolName} as first tool`)
           }
         }
         
         // ==========================================
-        // FILE MODIFICATION ENFORCEMENT
+        // FILE MODIFICATION ENFORCEMENT - LOG ONLY, NO BLOCKING
         // ==========================================
         
-        if ((toolName === 'edit' || toolName === 'write') && agentRole !== 'idumb-builder') {
-          log(directory, `[BLOCKED] ${agentRole} attempted file modification`)
-          
-          // CRITICAL: Add to pendingDenials so tool.execute.after REPLACES output
-          pendingDenials.set(sessionId, {
-            agent: agentRole || 'unknown',
-            tool: toolName,
-            timestamp: new Date().toISOString(),
-            shouldBlock: true  // Signal to tool.execute.after to REPLACE output
-          })
-          
-          output.args = {
-            __BLOCKED_BY_GOVERNANCE__: true,
-            __VIOLATION__: `${agentRole} cannot use ${toolName}`,
-            __DELEGATE_TO__: 'idumb-builder'
-          }
-          
+        if ((toolName === 'edit' || toolName === 'write') && agentRole && agentRole.startsWith('idumb-') && agentRole !== 'idumb-builder') {
+          log(directory, `[WARN] ${agentRole} attempted file modification - LOG ONLY`)
+          // LOG ONLY - NO BLOCKING - let the tool run
           addHistoryEntry(
             directory,
-            `violation:file_mod:${agentRole}:${toolName}`,
+            `warn:file_mod:${agentRole}:${toolName}`,
             'interceptor',
-            'fail'
+            'warn'
           )
-          
-          return
+          // DO NOT return - let tool proceed
         }
         
         // ==========================================
-        // GENERAL PERMISSION CHECK
+        // GENERAL PERMISSION CHECK - LOG ONLY, NO BLOCKING
         // ==========================================
         
         const allowedTools = getAllowedTools(agentRole)
         
-        if (agentRole && allowedTools.length > 0 && !allowedTools.includes(toolName)) {
-          log(directory, `[DENIED] ${agentRole} attempted unauthorized tool: ${toolName}`)
-          
-          // CRITICAL: Add to pendingDenials so tool.execute.after REPLACES output
-          pendingDenials.set(sessionId, {
-            agent: agentRole || 'unknown',
-            tool: toolName,
-            timestamp: new Date().toISOString(),
-            shouldBlock: true  // Signal to tool.execute.after to REPLACE output
-          })
-          
-          output.args = {
-            __BLOCKED_BY_GOVERNANCE__: true,
-            __VIOLATION__: `${agentRole} cannot use ${toolName}`,
-            __ALLOWED_TOOLS__: allowedTools
-          }
-          
+        // Only log if known iDumb agent and tool not in allowed list
+        if (agentRole && agentRole.startsWith('idumb-') && allowedTools.length > 0 && !allowedTools.includes(toolName)) {
+          log(directory, `[WARN] ${agentRole} used tool not in allowed list: ${toolName} - LOG ONLY`)
+          // LOG ONLY - NO BLOCKING - let the tool run
           addHistoryEntry(
             directory,
-            `violation:general:${agentRole}:${toolName}`,
+            `warn:general:${agentRole}:${toolName}`,
             'interceptor',
-            'fail'
+            'warn'
           )
-          
-          return
+          // DO NOT return - let tool proceed
         }
         
         // ==========================================
