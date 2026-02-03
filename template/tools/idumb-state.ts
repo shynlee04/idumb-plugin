@@ -80,7 +80,9 @@ function writeState(directory: string, state: IdumbState): void {
 // Read state
 export const read = tool({
   description: "Read current iDumb governance state from .idumb/brain/state.json",
-  args: {},
+  args: {
+    _placeholder: tool.schema.boolean().optional().describe("Placeholder parameter")
+  },
   async execute(args, context) {
     const state = readState(context.directory)
     return JSON.stringify(state, null, 2)

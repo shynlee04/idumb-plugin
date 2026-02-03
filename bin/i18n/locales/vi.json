@@ -1,0 +1,228 @@
+{
+  "meta": {
+    "language": "Tiếng Việt",
+    "code": "vi",
+    "direction": "ltr"
+  },
+  "installer": {
+    "welcome": {
+      "title": "iDumb - Framework Quản Trị AI Phân Cấp",
+      "version": "v{{version}}",
+      "tagline": "Ủy Quyền Thông Minh Trong Ranh Giới Quản Lý",
+      "selectLanguage": "🌐 Select Language / Chọn Ngôn Ngữ",
+      "languagePrompt": "Chọn [1-2]:"
+    },
+    "steps": {
+      "language": {
+        "number": "0",
+        "title": "Chọn Ngôn Ngữ",
+        "english": "English",
+        "vietnamese": "Tiếng Việt"
+      },
+      "path": {
+        "number": "1",
+        "title": "Xác Định Đường Dẫn Dự Án",
+        "currentPath": "Đường dẫn hiện tại:",
+        "detected": "Phát hiện:",
+        "packageJson": "package.json",
+        "srcDir": "thư mục src/",
+        "gitRepo": "kho lưu trữ .git/",
+        "isCorrectPath": "Đây có phải thư mục gốc dự án không?",
+        "yes": "Đúng - tiếp tục với đường dẫn này",
+        "no": "Không - đây là thư mục con, lùi lên 1 cấp",
+        "custom": "Khác - nhập đường dẫn tùy chỉnh",
+        "prompt": "Chọn [1]:"
+      },
+      "structure": {
+        "number": "2",
+        "title": "Cấu Trúc Thư Mục",
+        "explanation": "iDumb sẽ tạo cấu trúc sau:",
+        "brain": ".idumb-brain/        ← Bộ não AI (phiên, trạng thái, ngữ cảnh)",
+        "brainState": "├── state.json       ← Trạng thái quản trị chính",
+        "brainSessions": "├── sessions/        ← Lịch sử phiên làm việc",
+        "brainContext": "├── context/         ← Bộ nhớ ngữ cảnh",
+        "brainDrift": "└── drift/           ← Phát hiện thay đổi",
+        "output": ".idumb-project-output/ ← Artifacts dự án (thay thế .planning/)",
+        "outputProject": "├── PROJECT.md       ← Định nghĩa dự án",
+        "outputRoadmap": "├── ROADMAP.md       ← Lộ trình thực hiện",
+        "outputPhases": "└── phases/          ← Kế hoạch từng giai đoạn",
+        "modules": ".idumb-modules/      ← [TÙY CHỌN] Modules mở rộng",
+        "modulesNote": "└── (tự động tạo)    ← Tools, templates, skills bổ sung",
+        "opencode": ".opencode/           ← Templates framework (chỉ đọc)",
+        "createModules": "Tạo .idumb-modules/ (modules mở rộng)?",
+        "prompt": "[y/n]:"
+      },
+      "governance": {
+        "number": "3",
+        "title": "Cấu Hình Quản Trị",
+        "level": {
+          "title": "1️⃣ MỨC ĐỘ QUẢN TRỊ:",
+          "efficient": {
+            "name": "[1] HIỆU QUẢ",
+            "desc": "Xác thực unit, integration, node",
+            "note": "Không tăng dần, nhanh nhất",
+            "fit": "Phù hợp: Dự án nhỏ, prototype"
+          },
+          "strict": {
+            "name": "[2] NGHIÊM NGẶT",
+            "desc": "Như trên + xác thực tăng dần",
+            "note": "Mỗi bước phải pass trước khi tiếp",
+            "fit": "Phù hợp: Production, dự án team"
+          },
+          "intelligent": {
+            "name": "[3] THÔNG MINH",
+            "desc": "Toàn diện + đánh giá global/local",
+            "note": "Phân cấp hợp lý, AI quyết định",
+            "fit": "Phù hợp: Dự án phức tạp, enterprise"
+          },
+          "prompt": "Chọn [2]:"
+        },
+        "autoExpert": {
+          "title": "2️⃣ CHẾ ĐỘ TỰ ĐỘNG:",
+          "default": {
+            "name": "[1] MẶC ĐỊNH",
+            "desc": "Đưa lựa chọn với đề xuất + lý do",
+            "note": "Bạn quyết định, AI giải thích",
+            "fit": "Phù hợp: Người mới, muốn kiểm soát"
+          },
+          "advanced": {
+            "name": "[2] NÂNG CAO",
+            "desc": "AI-first, quyết định theo điểm số",
+            "note": "AI quyết định, bạn giám sát",
+            "fit": "Phù hợp: Có kinh nghiệm, tin tưởng AI"
+          },
+          "prompt": "Chọn [1]:"
+        },
+        "research": {
+          "title": "3️⃣ MỨC NGHIÊN CỨU:",
+          "minimal": {
+            "name": "[1] TỐI THIỂU",
+            "desc": "Tìm kiếm web cơ bản",
+            "note": "Dùng: Tavily search"
+          },
+          "standard": {
+            "name": "[2] TIÊU CHUẨN",
+            "desc": "Tài liệu + web",
+            "note": "Dùng: Context7 + Tavily"
+          },
+          "comprehensive": {
+            "name": "[3] TOÀN DIỆN",
+            "desc": "Nghiên cứu toàn stack",
+            "note": "Dùng: Context7 + Tavily + DeepWiki",
+            "extra": "AI sử dụng tất cả để nghiên cứu sâu"
+          },
+          "prompt": "Chọn [3]:"
+        }
+      },
+      "mcp": {
+        "number": "4",
+        "title": "MCP Servers (Công cụ Nghiên cứu)",
+        "checking": "Đang kiểm tra opencode.json...",
+        "configured": "Đã cấu hình",
+        "notConfigured": "CHƯA cấu hình",
+        "context7": {
+          "name": "Context7",
+          "purpose": "Tài liệu thư viện mới nhất",
+          "tools": "Tools: resolve-library-id, query-docs"
+        },
+        "tavily": {
+          "name": "Tavily",
+          "purpose": "Tìm kiếm web, crawl, extract",
+          "tools": "Tools: search, extract, crawl, map, research"
+        },
+        "deepwiki": {
+          "name": "DeepWiki",
+          "purpose": "Hiểu codebase GitHub",
+          "tools": "Tools: ask_question, read_wiki_structure"
+        },
+        "researchLevel": "Bạn đã chọn Mức Nghiên cứu: {{level}}",
+        "requirement": "Cần tối thiểu 2 MCP servers. Hiện có: {{current}}/3",
+        "installPrompt": "Cài đặt {{server}}?",
+        "prompt": "[y/n]:"
+      },
+      "git": {
+        "number": "5",
+        "title": "Tích Hợp Git",
+        "detected": "Phát hiện Git repository:",
+        "branch": "Branch:",
+        "commits": "Commits:",
+        "clean": "Sạch:",
+        "cleanYes": "Có (không có thay đổi chưa commit)",
+        "cleanNo": "Không (có thay đổi chưa commit)",
+        "remote": "Remote:",
+        "features": "iDumb sẽ sử dụng Git cho:",
+        "feature1": "✓ Atomic commits với metadata quản trị",
+        "feature2": "✓ Branch isolation cho mỗi phase",
+        "feature3": "✓ Hash verification cho tính nguyên vẹn",
+        "feature4": "✓ Context intelligence từ lịch sử commit",
+        "format": "Định dạng Commit:",
+        "formatExample": "[idumb:XX-YY][task-XXX] type(scope): mô_tả",
+        "example": "Ví dụ:",
+        "exampleCommit": "[idumb:02-01][task-003] feat(auth): triển khai JWT token",
+        "enablePrompt": "Bật tích hợp Git?",
+        "prompt": "[Y/n]:"
+      },
+      "install": {
+        "agents": {
+          "number": "6",
+          "title": "Cài Đặt iDumb Agents"
+        },
+        "commands": {
+          "number": "7",
+          "title": "Cài Đặt iDumb Commands"
+        },
+        "tools": {
+          "number": "8",
+          "title": "Cài Đặt iDumb Tools"
+        },
+        "plugin": {
+          "number": "9",
+          "title": "Cài Đặt iDumb Plugin"
+        },
+        "skills": {
+          "number": "10",
+          "title": "Cài Đặt iDumb Skills"
+        },
+        "brain": {
+          "number": "11",
+          "title": "Tạo Thư Mục .idumb-brain"
+        }
+      }
+    },
+    "complete": {
+      "title": "CÀI ĐẶT THÀNH CÔNG",
+      "location": "Vị trí:",
+      "global": "Toàn cục (~/.config/opencode/)",
+      "local": "Cục bộ (./.opencode/)",
+      "components": "Thành phần đã cài đặt:",
+      "agents": "Agents",
+      "commands": "Commands",
+      "tools": "Tools",
+      "plugins": "Plugins",
+      "skills": "Skills",
+      "config": "Cấu hình:",
+      "experience": "Trải nghiệm:",
+      "language": "Ngôn ngữ:",
+      "governance": "Quản trị:",
+      "research": "Nghiên cứu:",
+      "quickStart": "Bắt đầu nhanh:",
+      "cmd1": "/idumb:init              # Khởi tạo trong dự án",
+      "cmd2": "/idumb:config            # Xem/sửa cài đặt",
+      "cmd3": "/idumb:help              # Hiển thị tất cả lệnh",
+      "documentation": "Tài liệu:",
+      "docEn": "English:",
+      "docVi": "Tiếng Việt:"
+    },
+    "prompts": {
+      "overwrite": "Đã phát hiện cài đặt iDumb. Ghi đè?",
+      "timeout": "Hết thời gian - Sử dụng mặc định:",
+      "nonInteractive": "Không tương tác - Sử dụng mặc định:"
+    },
+    "errors": {
+      "nodeVersion": "Lỗi: Yêu cầu Node.js 18 trở lên.",
+      "currentVersion": "Phiên bản hiện tại:",
+      "upgradeLink": "Vui lòng nâng cấp: https://nodejs.org/",
+      "installFailed": "Cài đặt thất bại:"
+    }
+  }
+}

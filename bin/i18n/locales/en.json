@@ -1,0 +1,228 @@
+{
+  "meta": {
+    "language": "English",
+    "code": "en",
+    "direction": "ltr"
+  },
+  "installer": {
+    "welcome": {
+      "title": "iDumb - Hierarchical AI Governance Framework",
+      "version": "v{{version}}",
+      "tagline": "Intelligent Delegation Using Managed Boundaries",
+      "selectLanguage": "🌐 Select Language / Chọn Ngôn Ngữ",
+      "languagePrompt": "Choose [1-2]:"
+    },
+    "steps": {
+      "language": {
+        "number": "0",
+        "title": "Language Selection",
+        "english": "English",
+        "vietnamese": "Tiếng Việt"
+      },
+      "path": {
+        "number": "1",
+        "title": "Project Path Detection",
+        "currentPath": "Current path:",
+        "detected": "Detected:",
+        "packageJson": "package.json",
+        "srcDir": "src/ directory",
+        "gitRepo": ".git/ repository",
+        "isCorrectPath": "Is this the correct project root?",
+        "yes": "Yes - continue with this path",
+        "no": "No - this is a subdirectory, go up one level",
+        "custom": "Other - enter custom path",
+        "prompt": "Choose [1]:"
+      },
+      "structure": {
+        "number": "2",
+        "title": "Directory Structure",
+        "explanation": "iDumb will create the following structure:",
+        "brain": ".idumb-brain/        ← AI Brain (sessions, state, context)",
+        "brainState": "├── state.json       ← Master governance state",
+        "brainSessions": "├── sessions/        ← Work session history",
+        "brainContext": "├── context/         ← Context memory",
+        "brainDrift": "└── drift/           ← Change detection",
+        "output": ".idumb-project-output/ ← Project Artifacts (replaces .planning/)",
+        "outputProject": "├── PROJECT.md       ← Project definition",
+        "outputRoadmap": "├── ROADMAP.md       ← Implementation roadmap",
+        "outputPhases": "└── phases/          ← Phase plans",
+        "modules": ".idumb-modules/      ← [OPTIONAL] Custom extensions",
+        "modulesNote": "└── (auto-generated) ← Extra tools, templates, skills",
+        "opencode": ".opencode/           ← Framework templates (read-only)",
+        "createModules": "Create .idumb-modules/ (custom extensions)?",
+        "prompt": "[y/n]:"
+      },
+      "governance": {
+        "number": "3",
+        "title": "Governance Configuration",
+        "level": {
+          "title": "1️⃣ GOVERNANCE LEVEL:",
+          "efficient": {
+            "name": "[1] EFFICIENT",
+            "desc": "Unit, integration, node validation",
+            "note": "Non-incremental, fastest",
+            "fit": "Best for: Small projects, prototypes"
+          },
+          "strict": {
+            "name": "[2] STRICT",
+            "desc": "Above + incremental validation",
+            "note": "Each step must pass before next",
+            "fit": "Best for: Production, team projects"
+          },
+          "intelligent": {
+            "name": "[3] INTELLIGENT",
+            "desc": "Full coverage + global/local assessment",
+            "note": "Hierarchical rational approach",
+            "fit": "Best for: Complex, enterprise projects"
+          },
+          "prompt": "Choose [2]:"
+        },
+        "autoExpert": {
+          "title": "2️⃣ AUTO EXPERT MODE:",
+          "default": {
+            "name": "[1] DEFAULT",
+            "desc": "Choices with recommendations + rationale",
+            "note": "You decide, AI explains",
+            "fit": "Best for: Learning, wanting control"
+          },
+          "advanced": {
+            "name": "[2] ADVANCED",
+            "desc": "AI-first decisions based on scoring",
+            "note": "AI decides, you supervise",
+            "fit": "Best for: Experienced, trusting AI"
+          },
+          "prompt": "Choose [1]:"
+        },
+        "research": {
+          "title": "3️⃣ RESEARCH LEVEL:",
+          "minimal": {
+            "name": "[1] MINIMAL",
+            "desc": "Basic web search only",
+            "note": "Uses: Tavily search"
+          },
+          "standard": {
+            "name": "[2] STANDARD",
+            "desc": "Documentation + web",
+            "note": "Uses: Context7 + Tavily"
+          },
+          "comprehensive": {
+            "name": "[3] COMPREHENSIVE",
+            "desc": "Full stack research",
+            "note": "Uses: Context7 + Tavily + DeepWiki",
+            "extra": "AI uses all tools for deep research"
+          },
+          "prompt": "Choose [3]:"
+        }
+      },
+      "mcp": {
+        "number": "4",
+        "title": "MCP Servers (Research Tools)",
+        "checking": "Checking opencode.json...",
+        "configured": "Configured",
+        "notConfigured": "NOT configured",
+        "context7": {
+          "name": "Context7",
+          "purpose": "Latest library documentation",
+          "tools": "Tools: resolve-library-id, query-docs"
+        },
+        "tavily": {
+          "name": "Tavily",
+          "purpose": "Web search, crawl, extract",
+          "tools": "Tools: search, extract, crawl, map, research"
+        },
+        "deepwiki": {
+          "name": "DeepWiki",
+          "purpose": "Understand GitHub codebases",
+          "tools": "Tools: ask_question, read_wiki_structure"
+        },
+        "researchLevel": "You selected Research Level: {{level}}",
+        "requirement": "Requires minimum 2 MCP servers. Current: {{current}}/3",
+        "installPrompt": "Install {{server}}?",
+        "prompt": "[y/n]:"
+      },
+      "git": {
+        "number": "5",
+        "title": "Git Integration",
+        "detected": "Git repository detected:",
+        "branch": "Branch:",
+        "commits": "Commits:",
+        "clean": "Clean:",
+        "cleanYes": "Yes (no uncommitted changes)",
+        "cleanNo": "No (uncommitted changes)",
+        "remote": "Remote:",
+        "features": "iDumb will use Git for:",
+        "feature1": "✓ Atomic commits with governance metadata",
+        "feature2": "✓ Branch isolation per phase",
+        "feature3": "✓ Hash verification for integrity",
+        "feature4": "✓ Context intelligence from commit history",
+        "format": "Commit Format:",
+        "formatExample": "[idumb:XX-YY][task-XXX] type(scope): description",
+        "example": "Example:",
+        "exampleCommit": "[idumb:02-01][task-003] feat(auth): implement JWT token",
+        "enablePrompt": "Enable Git integration?",
+        "prompt": "[Y/n]:"
+      },
+      "install": {
+        "agents": {
+          "number": "6",
+          "title": "Installing iDumb Agents"
+        },
+        "commands": {
+          "number": "7",
+          "title": "Installing iDumb Commands"
+        },
+        "tools": {
+          "number": "8",
+          "title": "Installing iDumb Tools"
+        },
+        "plugin": {
+          "number": "9",
+          "title": "Installing iDumb Plugin"
+        },
+        "skills": {
+          "number": "10",
+          "title": "Installing iDumb Skills"
+        },
+        "brain": {
+          "number": "11",
+          "title": "Creating .idumb-brain Directory"
+        }
+      }
+    },
+    "complete": {
+      "title": "INSTALLATION SUCCESSFUL",
+      "location": "Location:",
+      "global": "Global (~/.config/opencode/)",
+      "local": "Local (./.opencode/)",
+      "components": "Components Installed:",
+      "agents": "Agents",
+      "commands": "Commands",
+      "tools": "Tools",
+      "plugins": "Plugins",
+      "skills": "Skills",
+      "config": "Configuration:",
+      "experience": "Experience:",
+      "language": "Language:",
+      "governance": "Governance:",
+      "research": "Research:",
+      "quickStart": "Quick Start:",
+      "cmd1": "/idumb:init              # Initialize in your project",
+      "cmd2": "/idumb:config            # View/edit settings",
+      "cmd3": "/idumb:help              # Show all commands",
+      "documentation": "Documentation:",
+      "docEn": "English:",
+      "docVi": "Tiếng Việt:"
+    },
+    "prompts": {
+      "overwrite": "Existing iDumb installation detected. Overwrite?",
+      "timeout": "Timeout - Using default:",
+      "nonInteractive": "Non-interactive - Using default:"
+    },
+    "errors": {
+      "nodeVersion": "Error: Node.js 18 or higher is required.",
+      "currentVersion": "Current version:",
+      "upgradeLink": "Please upgrade: https://nodejs.org/",
+      "installFailed": "Installation failed:"
+    }
+  }
+}

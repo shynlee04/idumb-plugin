@@ -839,7 +839,9 @@ export const init = tool({
  */
 export const status = tool({
   description: "Get current status at each hierarchy level (milestone, phase, plan, task)",
-  args: {},
+  args: {
+    _placeholder: tool.schema.boolean().optional().describe("Placeholder parameter")
+  },
   async execute(args, context) {
     const config = loadConfig(context.directory)
     
@@ -876,7 +878,9 @@ export const status = tool({
  */
 export const sync = tool({
   description: "Sync iDumb config with .planning/config.json",
-  args: {},
+  args: {
+    _placeholder: tool.schema.boolean().optional().describe("Placeholder parameter")
+  },
   async execute(args, context) {
     const config = loadConfig(context.directory)
     const planningConfig = loadPlanningConfig(context.directory)
@@ -984,7 +988,9 @@ export const ensure = tool({
  */
 export default tool({
   description: "Read full iDumb configuration with planning system integration",
-  args: {},
+  args: {
+    _placeholder: tool.schema.boolean().optional().describe("Placeholder parameter")
+  },
   async execute(args, context) {
     // CRITICAL: Ensure config exists first
     const config = ensureConfigExists(context.directory)
