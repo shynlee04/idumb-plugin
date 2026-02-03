@@ -5,15 +5,29 @@ hidden: true
 temperature: 0.2
 permission:
   task:
+    "idumb-builder": allow
+    "idumb-low-validator": allow
+    "idumb-verifier": allow
+    "idumb-debugger": allow
     "*": deny
   bash:
+    "git status": allow
+    "git diff*": allow
+    "git log*": allow
+    "npm test": allow
+    "npm run test*": allow
     "*": deny
   edit: deny
   write: deny
 tools:
-  task: false
+  task: true
   idumb-state: true
+  idumb-state_anchor: true
   idumb-context: true
+  idumb-todo: true
+  read: true
+  glob: true
+  grep: true
 ---
 
 # @idumb-executor

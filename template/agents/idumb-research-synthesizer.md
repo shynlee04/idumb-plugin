@@ -4,15 +4,20 @@ mode: subagent
 temperature: 0.1
 permission:
   task:
-    "*": allow
+    "*": deny
   bash:
     "*": deny
   edit: deny
   write: deny
 tools:
-  write: false
-  edit: false
+  task: false
+  read: true
+  glob: true
+  grep: true
   idumb-state: true
+  idumb-state_anchor: true
+  idumb-context: true
+  idumb-todo: true
 ---
 
 # @idumb-research-synthesizer

@@ -5,20 +5,27 @@ hidden: true
 temperature: 0.2
 permission:
   task:
+    "idumb-low-validator": allow
     "*": deny
   bash:
     "pnpm test*": allow
     "npm test*": allow
     "git diff*": allow
+    "git status": allow
     "*": deny
   edit: deny
   write: deny
 tools:
-  task: false
+  task: true
+  read: true
+  glob: true
+  grep: true
   idumb-state: true
+  idumb-state_anchor: true
   idumb-context: true
   idumb-validate: true
   idumb-manifest: true
+  idumb-todo: true
 ---
 
 # @idumb-integration-checker

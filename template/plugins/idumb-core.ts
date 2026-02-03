@@ -1121,39 +1121,120 @@ function extractToolName(tool: any): string {
 // ============================================================================
 
 function getAllowedTools(agentRole: string | null): string[] {
+  // TIER 1: Coordinators - can delegate (task tool) + read context
+  const tier1Tools = [
+    'task', 'todoread', 'todowrite',
+    'read', 'glob', 'grep',  // Context gathering - MUST ALLOW
+    'idumb-state', 'idumb-state_read', 'idumb-state_anchor', 'idumb-state_getAnchors', 'idumb-state_history',
+    'idumb-context', 'idumb-context_summary',
+    'idumb-config', 'idumb-config_read', 'idumb-config_status',
+    'idumb-todo', 'idumb-todo_list', 'idumb-todo_hierarchy',
+    'idumb-validate', 'idumb-manifest', 'idumb-chunker'
+  ]
+  
+  // TIER 2: Executors/Planners - can delegate to leaf nodes + read
+  const tier2Tools = [
+    'task', 'todoread', 'todowrite',
+    'read', 'glob', 'grep',
+    'idumb-state', 'idumb-state_read', 'idumb-state_anchor', 'idumb-state_getAnchors',
+    'idumb-context', 'idumb-config', 'idumb-config_read',
+    'idumb-todo', 'idumb-todo_list',
+    'idumb-validate', 'idumb-chunker'
+  ]
+  
+  // TIER 3: Researchers/Validators - read-only + anchoring
+  const tier3Tools = [
+    'todoread',
+    'read', 'glob', 'grep',
+    'idumb-state', 'idumb-state_read', 'idumb-state_anchor',
+    'idumb-context', 'idumb-config_read',
+    'idumb-todo', 'idumb-todo_list',
+    'idumb-validate', 'idumb-chunker'
+  ]
+  
+  // LEAF: Builder - write permissions
+  const builderTools = [
+    'todoread', 'todowrite',
+    'read', 'write', 'edit', 'bash',
+    'filesystem_write_file', 'filesystem_edit_file', 'filesystem_read_file',
+    'filesystem_read_text_file', 'filesystem_read_multiple_files',
+    'filesystem_create_directory', 'filesystem_list_directory',
+    'idumb-state', 'idumb-state_anchor', 'idumb-state_history',
+    'idumb-todo', 'idumb-todo_complete', 'idumb-todo_update'
+  ]
+  
+  // LEAF: Validator - read-only validation
+  const validatorTools = [
+    'todoread',
+    'read', 'glob', 'grep', 'bash',
+    'filesystem_read_file', 'filesystem_read_text_file', 'filesystem_read_multiple_files',
+    'filesystem_list_directory', 'filesystem_list_directory_with_sizes',
+    'filesystem_directory_tree', 'filesystem_search_files', 'filesystem_get_file_info',
+    'idumb-state', 'idumb-state_read', 'idumb-state_anchor',
+    'idumb-validate', 'idumb-validate_structure', 'idumb-validate_schema',
+    'idumb-validate_freshness', 'idumb-validate_integrationPoints',
+    'idumb-context', 'idumb-config_read',
+    'idumb-todo', 'idumb-todo_list',
+    'idumb-manifest', 'idumb-manifest_drift', 'idumb-manifest_conflicts',
+    'idumb-chunker', 'idumb-chunker_read', 'idumb-chunker_validate'
+  ]
+  
   const toolPermissions: Record<string, string[]> = {
-    'idumb-supreme-coordinator': [
-      'todoread', 'todowrite',
-      'idumb-state', 'idumb-context', 'idumb-config', 'idumb-manifest',
-      'task', 'read', 'glob'
-    ],
-    'idumb-high-governance': [
-      'todoread', 'todowrite',
-      'idumb-state', 'idumb-context', 'idumb-config',
-      'task', 'read', 'glob', 'grep'
-    ],
-    'idumb-low-validator': [
-      'todoread',
-      'idumb-validate', 'idumb-state',
-      'read', 'glob', 'grep', 'bash'
-    ],
-    'idumb-builder': [
-      'todoread',
-      'idumb-state',
-      'read', 'write', 'edit', 'bash'
-    ]
+    // TIER 1: Coordinators
+    'idumb-supreme-coordinator': tier1Tools,
+    'idumb-high-governance': tier1Tools,
+    
+    // TIER 2: Executors/Planners (can delegate)
+    'idumb-executor': tier2Tools,
+    'idumb-verifier': tier2Tools,
+    'idumb-debugger': tier2Tools,
+    'idumb-planner': tier3Tools,  // Planner doesn't delegate
+    'idumb-plan-checker': tier3Tools,
+    'idumb-roadmapper': tier3Tools,
+    
+    // TIER 3: Researchers/Validators (read-only)
+    'idumb-integration-checker': tier3Tools,
+    'idumb-project-researcher': tier3Tools,
+    'idumb-phase-researcher': tier3Tools,
+    'idumb-research-synthesizer': tier3Tools,
+    'idumb-codebase-mapper': tier3Tools,
+    
+    // LEAF NODES
+    'idumb-low-validator': validatorTools,
+    'idumb-builder': builderTools
   }
-  return toolPermissions[agentRole || ''] || []
+  
+  // Return allowed tools or a safe default set for unknown agents
+  return toolPermissions[agentRole || ''] || tier3Tools
 }
 
 function getRequiredFirstTools(agentRole: string | null): string[] {
   const firstTools: Record<string, string[]> = {
-    'idumb-supreme-coordinator': ['todoread', 'idumb-state', 'idumb-context'],
-    'idumb-high-governance': ['todoread', 'idumb-state'],
-    'idumb-low-validator': ['todoread', 'idumb-validate'],
-    'idumb-builder': ['read']
+    // TIER 1: Coordinators - state awareness first
+    'idumb-supreme-coordinator': ['todoread', 'idumb-state', 'idumb-context', 'read', 'glob'],
+    'idumb-high-governance': ['todoread', 'idumb-state', 'read', 'glob'],
+    
+    // TIER 2: Executors/Planners
+    'idumb-executor': ['todoread', 'idumb-state', 'read'],
+    'idumb-verifier': ['todoread', 'idumb-state', 'read'],
+    'idumb-debugger': ['todoread', 'idumb-state', 'read', 'grep'],
+    'idumb-planner': ['todoread', 'idumb-state', 'read'],
+    'idumb-plan-checker': ['todoread', 'idumb-validate', 'read'],
+    'idumb-roadmapper': ['todoread', 'idumb-state', 'read'],
+    
+    // TIER 3: Researchers/Validators
+    'idumb-integration-checker': ['todoread', 'idumb-validate', 'read', 'grep'],
+    'idumb-project-researcher': ['todoread', 'read', 'glob'],
+    'idumb-phase-researcher': ['todoread', 'read', 'glob'],
+    'idumb-research-synthesizer': ['todoread', 'read'],
+    'idumb-codebase-mapper': ['todoread', 'read', 'glob', 'grep'],
+    
+    // LEAF NODES
+    'idumb-low-validator': ['todoread', 'idumb-validate', 'read', 'glob', 'grep'],
+    'idumb-builder': ['todoread', 'read']
   }
-  return firstTools[agentRole || ''] || ['todoread']
+  // Default fallback allows basic context gathering
+  return firstTools[agentRole || ''] || ['todoread', 'read']
 }
 
 // ============================================================================

@@ -17,11 +17,13 @@ tools:
   glob: true
   grep: true
   idumb-state: true
+  idumb-state_anchor: true
   idumb-context: true
   idumb-config: true
   idumb-manifest: true
   idumb-todo: true
   idumb-validate: true
+  idumb-chunker: true
 ---
 
 # iDumb Supreme Coordinator

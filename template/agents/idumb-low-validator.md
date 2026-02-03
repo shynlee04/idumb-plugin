@@ -25,8 +25,10 @@ tools:
   glob: true
   grep: true
   idumb-state: true
+  idumb-state_anchor: true
   idumb-validate: true
   idumb-context: true
+  idumb-todo: true
 ---
 
 # iDumb Low-Level Validator

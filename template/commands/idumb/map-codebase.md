@@ -1,6 +1,6 @@
 ---
 description: "Map codebase structure and generate analysis documents"
-agent: "idumb-codebase-mapper"
+agent: "idumb-supreme-coordinator"
 triggers: ["/idumb:map-codebase", "/map-codebase"]
 ---
 

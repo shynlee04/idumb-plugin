@@ -18,6 +18,8 @@ tools:
   write: true
   edit: true
   idumb-state: true
+  idumb-state_anchor: true
+  idumb-todo: true
 ---
 
 # iDumb Builder

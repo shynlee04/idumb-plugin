@@ -4,17 +4,23 @@ mode: subagent
 temperature: 0.2
 permission:
   task:
-    "*": allow
+    "*": deny
   bash:
-    read: allow
-    write: deny
-  edit: false
-  write: false
+    "ls*": allow
+    "find*": allow
+    "wc*": allow
+    "*": deny
+  edit: deny
+  write: deny
 tools:
+  task: false
   read: true
   glob: true
   grep: true
   idumb-state: true
+  idumb-state_anchor: true
+  idumb-context: true
+  idumb-todo: true
 ---
 
 # idumb-codebase-mapper
