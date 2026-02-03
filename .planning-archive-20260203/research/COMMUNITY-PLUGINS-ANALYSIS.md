@@ -278,7 +278,7 @@ Defaults → Global (~/.config/opencode/dcp.jsonc)
 
 ```typescript
 // Critical tools protected by default
-['task', 'todowrite', 'todoread', 'discard', 'extract', 'batch', 'write', 'edit']
+['task', 'todowrite', 'idumb-todo', 'discard', 'extract', 'batch', 'write', 'edit']
 ```
 
 #### Cache Impact Trade-off

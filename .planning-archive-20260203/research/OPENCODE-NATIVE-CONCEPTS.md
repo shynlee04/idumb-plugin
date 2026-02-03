@@ -35,7 +35,7 @@ OpenCode provides 14 built-in tools for AI agents to interact with the codebase:
 | `patch` | Apply patch files | `edit` | Controlled by `edit` permission |
 | `skill` | Load SKILL.md files | `skill` | Native skill loading |
 | `todowrite` | Manage todo lists | `todowrite` | Disabled for subagents by default |
-| `todoread` | Read todo lists | `todoread` | Disabled for subagents by default |
+| `idumb-todo` | Read todo lists | `idumb-todo` | Disabled for subagents by default |
 | `webfetch` | Fetch web content | `webfetch` | HTTP/HTTPS requests |
 | `question` | Ask user questions | `question` | Interactive user prompts |
 
@@ -679,7 +679,7 @@ Save as `.opencode/commands/help.md` → overrides `/help`
 | `task` | Subagent type | Yes |
 | `skill` | Skill name | Yes |
 | `lsp` | LSP operation | No |
-| `todoread` | - | No |
+| `idumb-todo` | - | No |
 | `todowrite` | - | No |
 | `webfetch` | URL | Yes |
 | `websearch` | Query | Yes |

@@ -188,8 +188,8 @@ const sessionFirstTool = new Map<string, boolean>()
     
     // ENFORCE ROLE-BASED FIRST TOOL
     const allowedFirstTools = {
-      'idumb-supreme-coordinator': ['todoread', 'idumb-state', 'idumb-context', 'task'],
-      'idumb-high-governance': ['todoread', 'idumb-state', 'task'],
+      'idumb-supreme-coordinator': ['idumb-todo', 'idumb-state', 'idumb-context', 'task'],
+      'idumb-high-governance': ['idumb-todo', 'idumb-state', 'task'],
       'idumb-low-validator': ['grep', 'glob', 'read', 'idumb-validate'],
       'idumb-builder': ['read', 'write', 'edit']
     }
@@ -215,7 +215,7 @@ const sessionFirstTool = new Map<string, boolean>()
           `Required first: ${allowed.join(', ')}\n` +
           `\nDELEGATION HIERARCHY:\n` +
           `coordinator → high-governance → low-validator/builder\n` +
-          `\nUse todoread first, then delegate appropriately.`
+          `\nUse idumb-todo first, then delegate appropriately.`
       })
       
       // Make tool fail by providing invalid args
@@ -326,7 +326,7 @@ event: async ({ event }) => {
 
 | Entry Point | Strategy 1 (Message) | Strategy 2 (First Tool) | Strategy 3 (Errors) |
 |-------------|---------------------|------------------------|---------------------|
-| **1. Session Start** | Prepend governance to first user message | Force `todoread` as first tool | N/A |
+| **1. Session Start** | Prepend governance to first user message | Force `idumb-todo` as first tool | N/A |
 | **2. Post-Compact** | Inject hierarchy reminder after summary | Force context re-verification | N/A |
 | **3. Delegation** | Modify task prompt with delegation context | Track delegation depth | Permission check on task spawn |
 | **4. Tool Decision** | Tool whitelist in system prompt | Block non-context tools first | Transform denials to guidance |
@@ -391,7 +391,7 @@ event: async ({ event }) => {
 [New Session]
 User: "Create a file"
 Expected: Coordinator sees governance prefix BEFORE user message
-Expected: Coordinator uses todoread first
+Expected: Coordinator uses idumb-todo first
 Expected: Coordinator delegates to builder for file creation
 ```
 

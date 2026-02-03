@@ -308,6 +308,7 @@ async function step6_installTools(targetDir) {
     print('  ✓ idumb-manifest.ts - Drift/conflict detection');
     print('  ✓ idumb-chunker.ts - Chunk reading for long docs');
     print('  ✓ idumb-todo.ts - Hierarchical TODO management');
+    print('  ✓ idumb-todo.ts - Compatibility wrapper for idumb-todo');
 }
 
 async function step7_installPlugin(targetDir) {
@@ -472,7 +473,7 @@ async function step9_createIdumbDir(location) {
             },
             contextFirst: {
                 enforced: true,
-                requiredFirstTools: ['todoread', 'idumb-state'],
+                requiredFirstTools: ['idumb-todo', 'idumb-state'],
                 blockWithoutContext: true
             },
             workflow: {
@@ -583,7 +584,7 @@ async function showComplete(targetDir, location) {
     print('  📦 Components Installed:');
     print('  ├── 👤 Agents     4  (coordinator, governance, validator, builder)');
     print('  ├── 🔧 Commands   5  (/idumb:init, :status, :config, :validate, :help)');
-    print('  ├── 🛠️  Tools      7  (state, validate, context, config, manifest, chunker, todo)');
+    print('  ├── 🛠️  Tools      8  (state, validate, context, config, manifest, chunker, todo, idumb-todo)');
     print('  ├── ⚡ Plugins    1  (idumb-core.ts)');
     print('  └── 📚 Skills     1  (idumb-governance/)');
     print('');

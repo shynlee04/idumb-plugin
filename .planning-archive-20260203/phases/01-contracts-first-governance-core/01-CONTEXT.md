@@ -115,9 +115,9 @@ agent: idumb-supreme-coordinator
   - If first tool NOT in allowed list → BLOCK by invalidating args
   - Log violation, inject reminder message
 - **Required first tools by role:**
-  - Coordinator: `todoread`, `idumb-state`, `idumb-context`
-  - High-governance: `todoread`, `idumb-state`
-  - Validator: `todoread`, `idumb-validate`
+  - Coordinator: `idumb-todo`, `idumb-state`, `idumb-context`
+  - High-governance: `idumb-todo`, `idumb-state`
+  - Validator: `idumb-todo`, `idumb-validate`
   - Builder: `read`
 
 **Strategy 3: Error Transformation** (`permission.ask` + `tool.execute.after`)
@@ -132,9 +132,9 @@ agent: idumb-supreme-coordinator
 
 | Agent | Can Read | Can Write | Can Delegate | Must Start With |
 |-------|----------|-----------|--------------|-----------------|
-| Supreme Coordinator | ✅ | ❌ | ✅ | todoread |
-| High Governance | ✅ | ❌ | ✅ | todoread |
-| Low Validator | ✅ | ❌ | ❌ | todoread |
+| Supreme Coordinator | ✅ | ❌ | ✅ | idumb-todo |
+| High Governance | ✅ | ❌ | ✅ | idumb-todo |
+| Low Validator | ✅ | ❌ | ❌ | idumb-todo |
 | Builder | ✅ | ✅ | ❌ | read |
 
 #### B4. Session Tracking State
@@ -180,7 +180,7 @@ interface SessionTracker {
 4. **Manipulate first tool use**
    - Track session state
    - Block non-context-gathering first tools
-   - Force todoread before any action
+   - Force idumb-todo before any action
 
 5. **Permission deny + message modify**
    - When role drifts, deny tool

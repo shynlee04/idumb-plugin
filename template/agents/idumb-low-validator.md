@@ -21,7 +21,7 @@ permission:
   write: deny
 tools:
   task: false
-  todoread: true
+  idumb-todo: true
   read: true
   glob: true
   grep: true

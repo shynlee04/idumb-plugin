@@ -65,22 +65,22 @@ function detectAgentFromMessages(messages: any[]): string | null {
 function getAllowedTools(agentRole: string | null): string[] {
   const toolPermissions: Record<string, string[]> = {
     'idumb-supreme-coordinator': [
-      'todoread', 'todowrite',
+      'idumb-todo', 'todowrite',
       'idumb-state', 'idumb-context', 'idumb-config', 'idumb-manifest',
       'task', 'read', 'glob'  // Read-only tools + delegation
     ],
     'idumb-high-governance': [
-      'todoread', 'todowrite',
+      'idumb-todo', 'todowrite',
       'idumb-state', 'idumb-context', 'idumb-config',
       'task', 'read', 'glob', 'grep'
     ],
     'idumb-low-validator': [
-      'todoread',
+      'idumb-todo',
       'idumb-validate', 'idumb-state',
       'read', 'glob', 'grep', 'bash'  // Validation tools only
     ],
     'idumb-builder': [
-      'todoread',
+      'idumb-todo',
       'idumb-state',
       'read', 'write', 'edit', 'bash'  // Execution tools
     ]
@@ -90,12 +90,12 @@ function getAllowedTools(agentRole: string | null): string[] {
 
 function getRequiredFirstTools(agentRole: string | null): string[] {
   const firstTools: Record<string, string[]> = {
-    'idumb-supreme-coordinator': ['todoread', 'idumb-state', 'idumb-context'],
-    'idumb-high-governance': ['todoread', 'idumb-state'],
-    'idumb-low-validator': ['todoread', 'idumb-validate'],
+    'idumb-supreme-coordinator': ['idumb-todo', 'idumb-state', 'idumb-context'],
+    'idumb-high-governance': ['idumb-todo', 'idumb-state'],
+    'idumb-low-validator': ['idumb-todo', 'idumb-validate'],
     'idumb-builder': ['read']  // Builder should read before writing
   }
-  return firstTools[agentRole || ''] || ['todoread']
+  return firstTools[agentRole || ''] || ['idumb-todo']
 }
 ```
 
@@ -212,7 +212,7 @@ YOU ARE: Supreme Coordinator (TOP OF HIERARCHY)
 YOU → @idumb-high-governance → @idumb-low-validator/@idumb-builder
 
 ✅ REQUIRED FIRST ACTION:
-Use 'todoread' tool to check current TODO list
+Use 'idumb-todo' tool to check current TODO list
 
 ✅ DELEGATION PATTERN:
 - Validation work → @idumb-low-validator
@@ -237,7 +237,7 @@ YOU ARE: High Governance (MID-LEVEL COORDINATION)
 @idumb-supreme-coordinator → YOU → @idumb-low-validator/@idumb-builder
 
 ✅ REQUIRED FIRST ACTION:
-Use 'todoread' tool to check current TODO list
+Use 'idumb-todo' tool to check current TODO list
 
 Current Phase: ${state?.phase || 'init'}
 
@@ -256,10 +256,10 @@ YOU ARE: Low Validator (VALIDATION WORKER)
 ✅ YOUR TOOLS:
 - grep, glob, read (investigation)
 - idumb-validate (validation)
-- todoread (check tasks)
+- idumb-todo (check tasks)
 
 ✅ REQUIRED FIRST ACTION:
-Use 'todoread' tool to see what needs validation
+Use 'idumb-todo' tool to see what needs validation
 
 ---
 `,
@@ -318,7 +318,7 @@ Phase: ${state?.phase || 'init'}
 - Validator: Validate only
 - Builder: Execute only
 
-Use 'todoread' first to resume workflow.
+Use 'idumb-todo' first to resume workflow.
 `
   
   return reminder
@@ -487,7 +487,7 @@ You are: ${childRole}
 1. You are in a delegation chain
 2. Report back to your parent when done
 3. Follow the governance hierarchy
-4. Use todoread first to understand context
+4. Use idumb-todo first to understand context
 
 ---
 
@@ -627,7 +627,7 @@ Hierarchy Reminder:
 └─ Builder ──────────────┘
    Execute, modify files
 
-Next step: Use 'todoread' to check workflow, then delegate appropriately.
+Next step: Use 'idumb-todo' to check workflow, then delegate appropriately.
 `
 }
 ```
@@ -749,7 +749,7 @@ async function runInterceptionTests(directory: string): Promise<void> {
   
   // Test 4: First tool requirements
   const coordFirst = getRequiredFirstTools('idumb-supreme-coordinator')
-  console.assert(coordFirst.includes('todoread'), 'Coordinator should start with todoread')
+  console.assert(coordFirst.includes('idumb-todo'), 'Coordinator should start with idumb-todo')
   
   log(directory, '=== INTERCEPTION TESTS COMPLETE ===')
 }

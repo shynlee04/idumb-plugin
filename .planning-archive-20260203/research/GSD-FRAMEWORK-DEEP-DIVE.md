@@ -531,9 +531,9 @@ VERIFICATION.md
 
 | Agent | Can Read | Can Write | Can Delegate | Must Start With |
 |-------|----------|-----------|--------------|-----------------|
-| Supreme Coordinator | ✅ | ❌ | ✅ | todoread |
-| High Governance | ✅ | ❌ | ✅ | todoread |
-| Low Validator | ✅ | ❌ | ❌ | todoread |
+| Supreme Coordinator | ✅ | ❌ | ✅ | idumb-todo |
+| High Governance | ✅ | ❌ | ✅ | idumb-todo |
+| Low Validator | ✅ | ❌ | ❌ | idumb-todo |
 | Builder | ✅ | ✅ | ❌ | read |
 
 ---

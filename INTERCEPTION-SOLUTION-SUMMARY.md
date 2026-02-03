@@ -70,7 +70,7 @@
 
 | Entry Point | Strategy 1 | Strategy 2 | Strategy 3 |
 |-------------|-----------|-----------|-----------|
-| **Session Start** | ✅ Prepend governance to first user message | ✅ Force `todoread` as first tool | - |
+| **Session Start** | ✅ Prepend governance to first user message | ✅ Force `idumb-todo` as first tool | - |
 | **Post-Compact** | ✅ Inject reminder after compaction summary | ✅ Force context re-verification | - |
 | **Delegation** | ✅ Modify task prompt with delegation context | ✅ Track delegation depth | ✅ Permission check |
 | **Tool Decision** | - | ✅ Block non-allowed tools | ✅ Transform errors |
@@ -139,7 +139,7 @@ LLM sees: "⚡ GOVERNANCE ⚡ YOU ARE Coordinator... User: Create a file"
 LLM decides to use write tool
     ↓
 hook.tool.execute.before checks: Is this first tool? YES
-Required first: [todoread, idumb-state]
+Required first: [idumb-todo, idumb-state]
 Attempted: write
     ↓
 ❌ BLOCKED: Args modified to { __BLOCKED__: true }
@@ -326,9 +326,9 @@ By implementing these interceptors in the OpenCode plugin architecture, iDumb tr
 
 | Agent | Can Read | Can Write | Can Delegate | Must Start With |
 |-------|----------|-----------|--------------|-----------------|
-| Supreme Coordinator | ✅ | ❌ | ✅ | todoread |
-| High Governance | ✅ | ❌ | ✅ | todoread |
-| Low Validator | ✅ | ❌ | ❌ | todoread |
+| Supreme Coordinator | ✅ | ❌ | ✅ | idumb-todo |
+| High Governance | ✅ | ❌ | ✅ | idumb-todo |
+| Low Validator | ✅ | ❌ | ❌ | idumb-todo |
 | Builder | ✅ | ✅ | ❌ | read |
 
 ---

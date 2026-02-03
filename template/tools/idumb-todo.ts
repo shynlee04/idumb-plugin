@@ -2,7 +2,7 @@
  * iDumb TODO Management Tool
  * 
  * Hierarchical TODO management for governance workflows
- * Works with OpenCode's built-in todoread/todowrite but adds:
+ * Works with iDumb's idumb-todo and idumb-todo_complete/update tools
  * - Hierarchical prefixes [P1][P2][V][B][GAP]
  * - Metadata extraction
  * - Status tracking
@@ -343,7 +343,7 @@ export const sync = tool({
     direction: tool.schema.string().optional().describe("Sync direction: 'import' from OpenCode or 'export' to OpenCode (default: import)"),
   },
   async execute(args, context) {
-    // This tool provides the data format that can be used with OpenCode's todoread/todowrite
+    // This tool provides the data format that can be used with OpenCode's idumb-todo
     // It doesn't directly call OpenCode APIs but formats data for compatibility
     
     const state = readTodoState(context.directory)
@@ -366,7 +366,7 @@ export const sync = tool({
     } else {
       return JSON.stringify({
         status: "import_instructions",
-        message: "To import from OpenCode, use todoread first, then pass results to idumb-todo_create for each item",
+        message: "To import from OpenCode, use idumb-todo first, then pass results to idumb-todo_create for each item",
         currentCount: state.todos.length,
       }, null, 2)
     }

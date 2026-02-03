@@ -1,0 +1,32 @@
+{
+  "installer": {
+    "banner": {
+      "title": "Hierarchical AI Governance Framework",
+      "subtitle": "Intelligent Delegation Using Managed Boundaries",
+      "version": "v0.2.0"
+    },
+    "steps": {
+      "language": {
+        "title": "Step 0/9: Select Language / Chọn Ngôn ngữ",
+        "prompt": "Choose / Chọn [1]:",
+        "options": { "1": "English", "2": "Tiếng Việt" }
+      },
+      "location": {
+        "title": "Step 1/9: Select Installation Location",
+        "global": "Global (~/.config/opencode/) - All projects",
+        "local": "Local (./.opencode/) - Current only",
+        "prompt": "Choose [g/l]:"
+      },
+      "governance": {
+        "title": "Step 2/9: Governance Configuration",
+        "level": {
+          "efficient": "[1] EFFICIENT",
+          "strict": "[2] STRICT",
+          "intelligent": "[3] INTELLIGENT"
+        }
+      }
+    },
+    "success": { "title": "INSTALLATION SUCCESSFUL" }
+  },
+  "common": { "yes": "yes", "no": "no", "choose": "Choose" }
+}

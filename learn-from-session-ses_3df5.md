@@ -443,7 +443,7 @@ Hierarchy Reminder:
 └─ Builder ──────────────┘
    Execute, modify files
 
-Next step: Use 'todoread' to check workflow, then delegate appropriately.
+Next step: Use 'idumb-todo' to check workflow, then delegate appropriately.
 
 
 <file>
@@ -509,7 +509,7 @@ Let me check the TODO list first as required by the governance protocol.
 I can see iDumb is already initialized! Let me check the current TODO list and then gather project context properly:
 
 ```
-Tool: todoread
+Tool: idumb-todo
 
 **Input:**
 ```json
@@ -1578,7 +1578,7 @@ evidence: |
   └─ Builder ──────────────┘
      Execute, modify files
   
-  Next step: Use 'todoread' to check workflow, then delegate appropriately.
+  Next step: Use 'idumb-todo' to check workflow, then delegate appropriately.
   
   
   History recorded: governance_reinit -> iDumb governance re-initialized for iDumb v2 meta-framework. Planning system detected (GSD framework). Governance structure verified. Initial checkpoint anchor created (anchor-1770074764243). Current phase: Phase 1 - Contracts-First Governance Core (0% complete).

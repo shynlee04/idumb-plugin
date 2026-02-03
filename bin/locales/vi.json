@@ -1,0 +1,32 @@
+{
+  "installer": {
+    "banner": {
+      "title": "Framework Quản trị AI Phân cấp",
+      "subtitle": "Ủy quyền Thông minh với Ranh giới Quản lý",
+      "version": "v0.2.0"
+    },
+    "steps": {
+      "language": {
+        "title": "Bước 0/9: Chọn Ngôn ngữ / Select Language",
+        "prompt": "Chọn / Choose [1]:",
+        "options": { "1": "English", "2": "Tiếng Việt" }
+      },
+      "location": {
+        "title": "Bước 1/9: Chọn Vị trí Cài đặt",
+        "global": "Toàn cục (~/.config/opencode/) - Tất cả dự án",
+        "local": "Cục bộ (./.opencode/) - Chỉ hiện tại",
+        "prompt": "Chọn [g/l]:"
+      },
+      "governance": {
+        "title": "Bước 2/9: Cấu hình Quản trị",
+        "level": {
+          "efficient": "[1] HIỆU QUẢ",
+          "strict": "[2] NGHIÊM NGẶT",
+          "intelligent": "[3] THÔNG MINH"
+        }
+      }
+    },
+    "success": { "title": "CÀI ĐẶT THÀNH CÔNG" }
+  },
+  "common": { "yes": "có", "no": "không", "choose": "Chọn" }
+}

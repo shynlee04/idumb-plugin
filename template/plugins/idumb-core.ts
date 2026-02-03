@@ -1123,7 +1123,7 @@ function extractToolName(tool: any): string {
 function getAllowedTools(agentRole: string | null): string[] {
   // TIER 1: Coordinators - can delegate (task tool) + read context
   const tier1Tools = [
-    'task', 'todoread', 'todowrite',
+    'task', 'idumb-todo', 'todowrite',
     'read', 'glob', 'grep',  // Context gathering - MUST ALLOW
     'idumb-state', 'idumb-state_read', 'idumb-state_anchor', 'idumb-state_getAnchors', 'idumb-state_history',
     'idumb-context', 'idumb-context_summary',
@@ -1134,7 +1134,7 @@ function getAllowedTools(agentRole: string | null): string[] {
   
   // TIER 2: Executors/Planners - can delegate to leaf nodes + read
   const tier2Tools = [
-    'task', 'todoread', 'todowrite',
+    'task', 'idumb-todo', 'todowrite',
     'read', 'glob', 'grep',
     'idumb-state', 'idumb-state_read', 'idumb-state_anchor', 'idumb-state_getAnchors',
     'idumb-context', 'idumb-config', 'idumb-config_read',
@@ -1144,7 +1144,7 @@ function getAllowedTools(agentRole: string | null): string[] {
   
   // TIER 3: Researchers/Validators - read-only + anchoring
   const tier3Tools = [
-    'todoread',
+    'idumb-todo',
     'read', 'glob', 'grep',
     'idumb-state', 'idumb-state_read', 'idumb-state_anchor',
     'idumb-context', 'idumb-config_read',
@@ -1154,7 +1154,7 @@ function getAllowedTools(agentRole: string | null): string[] {
   
   // LEAF: Builder - write permissions
   const builderTools = [
-    'todoread', 'todowrite',
+    'idumb-todo', 'todowrite',
     'read', 'write', 'edit', 'bash',
     'filesystem_write_file', 'filesystem_edit_file', 'filesystem_read_file',
     'filesystem_read_text_file', 'filesystem_read_multiple_files',
@@ -1165,7 +1165,7 @@ function getAllowedTools(agentRole: string | null): string[] {
   
   // LEAF: Validator - read-only validation
   const validatorTools = [
-    'todoread',
+    'idumb-todo',
     'read', 'glob', 'grep', 'bash',
     'filesystem_read_file', 'filesystem_read_text_file', 'filesystem_read_multiple_files',
     'filesystem_list_directory', 'filesystem_list_directory_with_sizes',
@@ -1215,27 +1215,27 @@ function getAllowedTools(agentRole: string | null): string[] {
 function getRequiredFirstTools(agentRole: string | null): string[] {
   const firstTools: Record<string, string[]> = {
     // TIER 1: Coordinators - state awareness first
-    'idumb-supreme-coordinator': ['todoread', 'idumb-state', 'idumb-context', 'read', 'glob'],
-    'idumb-high-governance': ['todoread', 'idumb-state', 'read', 'glob'],
+    'idumb-supreme-coordinator': ['idumb-todo', 'idumb-state', 'idumb-context', 'read', 'glob'],
+    'idumb-high-governance': ['idumb-todo', 'idumb-state', 'read', 'glob'],
     
     // TIER 2: Executors/Planners
-    'idumb-executor': ['todoread', 'idumb-state', 'read'],
-    'idumb-verifier': ['todoread', 'idumb-state', 'read'],
-    'idumb-debugger': ['todoread', 'idumb-state', 'read', 'grep'],
-    'idumb-planner': ['todoread', 'idumb-state', 'read'],
-    'idumb-plan-checker': ['todoread', 'idumb-validate', 'read'],
-    'idumb-roadmapper': ['todoread', 'idumb-state', 'read'],
+    'idumb-executor': ['idumb-todo', 'idumb-state', 'read'],
+    'idumb-verifier': ['idumb-todo', 'idumb-state', 'read'],
+    'idumb-debugger': ['idumb-todo', 'idumb-state', 'read', 'grep'],
+    'idumb-planner': ['idumb-todo', 'idumb-state', 'read'],
+    'idumb-plan-checker': ['idumb-todo', 'idumb-validate', 'read'],
+    'idumb-roadmapper': ['idumb-todo', 'idumb-state', 'read'],
     
     // TIER 3: Researchers/Validators
-    'idumb-integration-checker': ['todoread', 'idumb-validate', 'read', 'grep'],
-    'idumb-project-researcher': ['todoread', 'read', 'glob'],
-    'idumb-phase-researcher': ['todoread', 'read', 'glob'],
-    'idumb-research-synthesizer': ['todoread', 'read'],
-    'idumb-codebase-mapper': ['todoread', 'read', 'glob', 'grep'],
+    'idumb-integration-checker': ['idumb-todo', 'idumb-validate', 'read', 'grep'],
+    'idumb-project-researcher': ['idumb-todo', 'read', 'glob'],
+    'idumb-phase-researcher': ['idumb-todo', 'read', 'glob'],
+    'idumb-research-synthesizer': ['idumb-todo', 'read'],
+    'idumb-codebase-mapper': ['idumb-todo', 'read', 'glob', 'grep'],
     
     // LEAF NODES
-    'idumb-low-validator': ['todoread', 'idumb-validate', 'read', 'glob', 'grep'],
-    'idumb-builder': ['todoread', 'read']
+    'idumb-low-validator': ['idumb-todo', 'idumb-validate', 'read', 'glob', 'grep'],
+    'idumb-builder': ['idumb-todo', 'read']
   }
   // Default fallback - EMPTY = skip first-tool enforcement entirely
   if (!agentRole || !agentRole.startsWith('idumb-')) {
@@ -1285,19 +1285,19 @@ Recommend running: /idumb:validate
   const firstActionRequired: Record<string, string> = {
     'idumb-supreme-coordinator': `
 🎯 FIRST ACTION REQUIRED:
-1. Use 'todoread' to check current TODO list
+1. Use 'idumb-todo' to check current TODO list
 2. Review active anchors and phase status
 3. Delegate tasks to appropriate agents
 `,
     'idumb-high-governance': `
 🎯 FIRST ACTION REQUIRED:
-1. Use 'todoread' to check current TODO list
+1. Use 'idumb-todo' to check current TODO list
 2. Assess task requirements
 3. Delegate to @idumb-builder or @idumb-low-validator
 `,
     'idumb-low-validator': `
 🎯 FIRST ACTION REQUIRED:
-1. Use 'todoread' to see what needs validation
+1. Use 'idumb-todo' to see what needs validation
 2. Use 'idumb-validate' to run validation checks
 3. Report findings without modifying files
 `,
@@ -1361,7 +1361,7 @@ YOU ARE: Low Validator (VALIDATION WORKER)
 ✅ YOUR TOOLS:
 - grep, glob, read (investigation)
 - idumb-validate (validation)
-- todoread (check tasks)
+- idumb-todo (check tasks)
 
 ${firstActionRequired['idumb-low-validator']}
 ${todoInfo}${staleWarning}
@@ -1457,7 +1457,7 @@ Sub-delegate to: @idumb-builder
 Details: [your specific request]`,
       specificGuidance: 'As Supreme Coordinator, you are at the TOP of the hierarchy. Your role is to DELEGATE ALL WORK. Never execute, never validate, never modify files.',
       actionableSteps: [
-        "1. Use 'todoread' to check current TODO list",
+        "1. Use 'idumb-todo' to check current TODO list",
         "2. Review active anchors and phase status with 'idumb-state'",
         "3. Delegate tasks to @idumb-high-governance for coordination",
         "4. Follow up on delegated work without doing it yourself"
@@ -1476,7 +1476,7 @@ Content: [what to change]
 Verify: Read file first, commit after`,
       specificGuidance: 'As High Governance, you are a MID-LEVEL COORDINATOR. You coordinate and delegate but NEVER execute directly. Your job is to break down tasks and assign them to builders or validators.',
       actionableSteps: [
-        "1. Use 'todoread' to understand current tasks",
+        "1. Use 'idumb-todo' to understand current tasks",
         "2. Assess requirements and break down into sub-tasks",
         "3. Delegate execution to @idumb-builder",
         "4. Delegate validation to @idumb-low-validator",
@@ -1496,7 +1496,7 @@ Issue: [what you found]
 Recommendation: Delegate to @idumb-builder for fix`,
       specificGuidance: 'As Low Validator, you are a VALIDATION WORKER. You investigate, validate, and report but NEVER modify files. Your findings should be reported to your parent agent.',
       actionableSteps: [
-        "1. Use 'todoread' to see what needs validation",
+        "1. Use 'idumb-todo' to see what needs validation",
         "2. Use 'read', 'glob', 'grep' to investigate",
         "3. Run 'idumb-validate' for automated checks",
         "4. Report findings to your parent agent",
@@ -1529,9 +1529,9 @@ Recommendation: Delegate to @idumb-builder for fix`,
   
   const info = delegationTargets[agent] || {
     target: 'Check hierarchy',
-    example: 'Use todoread to understand workflow',
+    example: 'Use idumb-todo to understand workflow',
     specificGuidance: 'Unknown agent role. Please check the hierarchy documentation.',
-    actionableSteps: ["1. Use 'todoread' to check current tasks", "2. Review AGENTS.md for hierarchy"],
+    actionableSteps: ["1. Use 'idumb-todo' to check current tasks", "2. Review AGENTS.md for hierarchy"],
     documentationLinks: ["- AGENTS.md (hierarchy overview)", "- template/router/chain-enforcement.md"]
   }
   
@@ -1542,7 +1542,7 @@ Role: ${info.specificGuidance}
 
 Delegate to: ${info.target}
 
-Next: Use todoread, then delegate to appropriate agent.`
+Next: Use idumb-todo, then delegate to appropriate agent.`
 }
 
 function buildPostCompactReminder(agentRole: string, directory: string): string {
@@ -1627,7 +1627,7 @@ State freshness: ${staleCheck.stale ? `⚠️ STALE (${staleCheck.hours}h old)` 
     reminder += `- ✅ State validated recently, check: /idumb:status\n`
   }
   
-  reminder += `- Check TODOs: Use todoread tool or /idumb:todo\n`
+  reminder += `- Check TODOs: Use idumb-todo tool or /idumb:todo\n`
   reminder += `- Review phase status: /idumb:status\n`
   
   // Add phase-specific recommendations
@@ -1647,7 +1647,7 @@ State freshness: ${staleCheck.stale ? `⚠️ STALE (${staleCheck.hours}h old)` 
 - Validator: Validate only
 - Builder: Execute only
 
-💡 TIP: Use 'todoread' first to resume workflow.
+💡 TIP: Use 'idumb-todo' first to resume workflow.
 `
   
   return reminder
@@ -2168,19 +2168,19 @@ function getInlineDefaultConfig(experience: ExperienceLevel = "guided"): InlineI
     pro: {
       mode: "autonomous",
       expertSkeptic: { enabled: true, requireEvidence: false, doubleCheckDelegation: false },
-      contextFirst: { enforced: true, requiredFirstTools: ["todoread"], blockWithoutContext: false },
+      contextFirst: { enforced: true, requiredFirstTools: ["idumb-todo"], blockWithoutContext: false },
       workflow: { research: true, planCheck: false, verifyAfterExecution: false, commitOnComplete: true }
     },
     guided: {
       mode: "confirmRequired",
       expertSkeptic: { enabled: true, requireEvidence: true, doubleCheckDelegation: true },
-      contextFirst: { enforced: true, requiredFirstTools: ["todoread", "idumb-state"], blockWithoutContext: true },
+      contextFirst: { enforced: true, requiredFirstTools: ["idumb-todo", "idumb-state"], blockWithoutContext: true },
       workflow: { research: true, planCheck: true, verifyAfterExecution: true, commitOnComplete: true }
     },
     strict: {
       mode: "manualOnly",
       expertSkeptic: { enabled: true, requireEvidence: true, doubleCheckDelegation: true },
-      contextFirst: { enforced: true, requiredFirstTools: ["todoread", "idumb-state", "idumb-config"], blockWithoutContext: true },
+      contextFirst: { enforced: true, requiredFirstTools: ["idumb-todo", "idumb-state", "idumb-config"], blockWithoutContext: true },
       workflow: { research: true, planCheck: true, verifyAfterExecution: true, commitOnComplete: true }
     }
   }
@@ -3356,7 +3356,7 @@ export const IdumbCorePlugin: Plugin = async ({ directory, client }) => {
     // The event handler above (line 472) triggers idle detection
     // Agent system prompts enforce TODO completion before stopping
     //
-    // For active enforcement, agents should use todoread/todowrite tools
+    // For active enforcement, agents should use idumb-todo/todowrite tools
     // and the STOP PREVENTION protocol in their system prompts.
   }
 }

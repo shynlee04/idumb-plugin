@@ -125,7 +125,7 @@ interface IdumbConfig {
     // Context-first enforcement
     contextFirst: {
       enforced: boolean              // Must read context before acting
-      requiredFirstTools: string[]   // ["todoread", "idumb-state"]
+      requiredFirstTools: string[]   // ["idumb-todo", "idumb-state"]
       blockWithoutContext: boolean   // Block if context not gathered
     }
     
@@ -254,7 +254,7 @@ function getAutomationByExperience(experience: ExperienceLevel): IdumbConfig["au
       },
       contextFirst: {
         enforced: true,
-        requiredFirstTools: ["todoread"],
+        requiredFirstTools: ["idumb-todo"],
         blockWithoutContext: false
       },
       workflow: {
@@ -273,7 +273,7 @@ function getAutomationByExperience(experience: ExperienceLevel): IdumbConfig["au
       },
       contextFirst: {
         enforced: true,
-        requiredFirstTools: ["todoread", "idumb-state"],
+        requiredFirstTools: ["idumb-todo", "idumb-state"],
         blockWithoutContext: true
       },
       workflow: {
@@ -292,7 +292,7 @@ function getAutomationByExperience(experience: ExperienceLevel): IdumbConfig["au
       },
       contextFirst: {
         enforced: true,
-        requiredFirstTools: ["todoread", "idumb-state", "idumb-config"],
+        requiredFirstTools: ["idumb-todo", "idumb-state", "idumb-config"],
         blockWithoutContext: true
       },
       workflow: {

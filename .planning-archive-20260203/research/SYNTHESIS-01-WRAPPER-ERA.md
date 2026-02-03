@@ -24,7 +24,7 @@ iDumb as a **GSD Wrapper** — a governance layer that sits between the user and
 
 1. **Hierarchical Agent Delegation**: Supreme Coordinator → High Governance → Low Validator/Builder
 2. **Role-Based Tool Permissions**: Each agent type has a whitelist of allowed tools
-3. **Context-First Enforcement**: First tool use must be context-gathering (todoread)
+3. **Context-First Enforcement**: First tool use must be context-gathering (idumb-todo)
 4. **Post-Compaction Recovery**: Governance survives context window limits
 5. **Delegation Chain Preservation**: Subagents know their place in the hierarchy
 
@@ -139,7 +139,7 @@ Despite the wrapper approach's failures, several core concepts remain valid and 
 
 **Why It Survived:** This is a best practice, not an enforcement mechanism. The problem wasn't the concept—it was trying to **force** it through interception instead of **teaching** it through clear instructions.
 
-**Evidence:** Supreme Coordinator agent definition lines 91-97: "Use 'todoread' first to understand context."
+**Evidence:** Supreme Coordinator agent definition lines 91-97: "Use 'idumb-todo' first to understand context."
 
 ### ✅ Surviving Concept 3: Post-Compaction Anchoring
 

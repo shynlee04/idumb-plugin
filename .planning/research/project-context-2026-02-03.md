@@ -130,9 +130,9 @@ before_any_action:
 ```
 
 **First-Tool Enforcement:**
-- Supreme Coordinator: Must start with `todoread` or `idumb-state`
-- High Governance: Must start with `todoread` or `idumb-state`
-- Validator: Must start with `idumb-validate` or `todoread`
+- Supreme Coordinator: Must start with `idumb-todo` or `idumb-state`
+- High Governance: Must start with `idumb-todo` or `idumb-state`
+- Validator: Must start with `idumb-validate` or `idumb-todo`
 - Builder: Must start with `read` (verify before modify)
 
 **Failure Mode:**
@@ -512,7 +512,7 @@ graph LR
       "mode": "confirmRequired",  // auto | confirmRequired | manual
       "contextFirst": {
         "enforced": true,
-        "requiredFirstTools": ["todoread", "idumb-state"],
+        "requiredFirstTools": ["idumb-todo", "idumb-state"],
         "blockWithoutContext": false
       }
     },

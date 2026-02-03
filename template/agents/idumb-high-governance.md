@@ -31,7 +31,7 @@ permission:
   write: deny
 tools:
   task: true
-  todoread: true
+  idumb-todo: true
   todowrite: true
   read: true
   glob: true
