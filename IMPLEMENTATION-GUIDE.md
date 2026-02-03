@@ -581,11 +581,12 @@ Add permission.ask hook and post-tool violation injection:
       )
     }
     
-    // Sync with GSD after file operations
+    // Track file operations
     if (toolName === 'edit' || toolName === 'write') {
       const outputText = output.output || output.title || ''
       if (outputText.includes('.planning/')) {
-        syncWithGSD(directory)
+        // File in planning directory modified - log it
+        log(directory, `Planning file modified: ${outputText}`)
       }
     }
     
@@ -641,15 +642,12 @@ Add session lifecycle tracking and cleanup:
 event: async ({ event }: { event: any }) => {
   try {
     // Session created - initialize tracking
-    if (event.type === "session.created") {
+    if (event.type === \"session.created\") {
       const sessionId = event.properties?.info?.id || 'unknown'
       log(directory, `Session created: ${sessionId}`)
       
       // Initialize tracker
       getSessionTracker(sessionId)
-      
-      // Sync with GSD
-      syncWithGSD(directory)
       
       // Store metadata
       storeSessionMetadata(directory, sessionId)
@@ -682,7 +680,7 @@ event: async ({ event }: { event: any }) => {
     }
     
     // Session compacted
-    if (event.type === "session.compacted") {
+    if (event.type === \"session.compacted\") {
       const sessionId = event.properties?.sessionID
       log(directory, `Session compacted: ${sessionId}`)
       
@@ -693,19 +691,21 @@ event: async ({ event }: { event: any }) => {
           tracker.governanceInjected = false
         }
       }
+    }
+      }
       
       syncWithGSD(directory)
     }
     
-    // GSD command executed
-    if (event.type === "command.executed") {
-      const command = event.properties?.command || ""
+    // iDumb command executed
+    if (event.type === \"command.executed\") {
+      const command = event.properties?.command || \"\"
       
-      if (command.startsWith("gsd:") || command.startsWith("gsd-")) {
-        log(directory, `[CMD] GSD command: ${command}`)
-        syncWithGSD(directory)
-        addHistoryEntry(directory, `gsd_command:${command}`, "plugin", "pass")
+      if (command.startsWith(\"idumb:\") || command.startsWith(\"idumb-\")) {
+        log(directory, `[CMD] iDumb command: ${command}`)
+        addHistoryEntry(directory, `idumb_command:${command}`, \"plugin\", \"pass\")
       }
+    }
     }
     
   } catch (error) {

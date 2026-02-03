@@ -86,7 +86,7 @@ The cumulative effect of these strategies counteracts natural context saturation
 
 ## System Context
 
-You are developing the idumb framework, an intelligent software development automation system designed to integrate seamlessly with OpenCode as a client-side platform. OpenCode is NOT a server-side codebase that can be forked or modified—any integration must work within its existing API and extension mechanisms without altering its source code. The idumb framework must enhance the GSD (Get Stuff Done) methodology through self-intelligent-governance, expert-agent-first architecture, and strict context-first principles.
+You are developing the idumb framework, an intelligent software development automation system designed to integrate seamlessly with OpenCode as a client-side platform. OpenCode is NOT a server-side codebase that can be forked or modified—any integration must work within its existing API and extension mechanisms without altering its source code. The idumb framework operates as an INDEPENDENT meta-framework with self-intelligent-governance, expert-agent-first architecture, and strict context-first principles.
 
 ## Core Architectural Principles
 
@@ -124,11 +124,11 @@ Every idumb concept must pass validation against these core principles to be con
 
 Edge case analysis must address user journey validation comprehensively. For any user action or scenario, the system must anticipate and handle deviations from the happy path, providing graceful degradation and clear guidance when unexpected conditions arise. Issue assessment must span both strategic high-level considerations and tactical mid-to-low-level implementations, ensuring that architectural decisions hold up under practical scrutiny.
 
-## GSD Framework Enhancement Protocol
+## iDumb Framework Protocol
 
-The existing GSD framework provides the foundation for idumb's enhancement, but idumb represents a substantial evolution beyond template fine-tuning. The enhancement protocol involves replacing GSD components with idumb equivalents that incorporate commands, prompts, agents, and subagents with improved controlled accuracy. New concepts including SKILL definitions, customized tools, and hooks manipulation extend the framework's capabilities beyond GSD's original scope.
+iDumb is an INDEPENDENT meta-framework that provides governance, automation, and context intelligence. It can optionally integrate with external planning systems (like BMAD or custom workflows) but operates fully independently without requiring any external dependencies. The framework provides commands, prompts, agents, and subagents with controlled accuracy. New concepts including SKILL definitions, customized tools, and hooks manipulation extend the framework's capabilities.
 
-The interpretation of self-intelligent-governance, expert-agent-first principles, and context-first delivery must include absolute validation and guardrails at every layer. The key optimization metric is reducing LLM reading burden—achieving less for AI requires doing more at the human level through granular control structures, hierarchical arrangement, and thoughtful interpretation of requirements. The validation checklist applies exclusively when replacing GSD components with idumb equivalents, ensuring that every enhancement meets the framework's heightened standards.
+The interpretation of self-intelligent-governance, expert-agent-first principles, and context-first delivery must include absolute validation and guardrails at every layer. The key optimization metric is reducing LLM reading burden—achieving less for AI requires doing more at the human level through granular control structures, hierarchical arrangement, and thoughtful interpretation of requirements.
 
 ## Cross-Validation Against User Concerns
 

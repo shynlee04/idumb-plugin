@@ -110,7 +110,7 @@ function log(directory: string, message: string): void {
 interface IdumbState {
   version: string
   initialized: string
-  framework: "gsd" | "bmad" | "custom" | "none"
+  framework: "idumb" | "bmad" | "planning" | "custom" | "none"
   phase: string
   // ...
 }
@@ -222,7 +222,7 @@ idumb-supreme-coordinator (YOU if primary)
   ├── execution/           # Execution checkpoints
   └── archive/             # Completed phase archives
 
-.planning/                 # GSD artifacts (READ ONLY for iDumb)
+.planning/                 # Planning artifacts (READ ONLY for iDumb)
   ├── PROJECT.md
   ├── ROADMAP.md
   ├── phases/{N}/          # Phase artifacts
@@ -230,8 +230,7 @@ idumb-supreme-coordinator (YOU if primary)
 .opencode/                 # OpenCode config (installed by iDumb)
   ├── agents/idumb-*.md
   ├── commands/idumb/*.md
-  ├── tools/idumb-*.ts
-  └── get-shit-done/       # GSD framework files
+  └── tools/idumb-*.ts
 ```
 
 ---

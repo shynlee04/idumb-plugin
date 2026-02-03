@@ -112,6 +112,7 @@ const pendingDenials = new Map<string, {
   agent: string
   tool: string
   timestamp: string
+  shouldBlock: boolean  // When true, tool.execute.after will REPLACE output entirely
 }>()
 
 function getSessionTracker(sessionId: string): SessionTracker {
@@ -305,38 +306,70 @@ function detectSessionId(messages: any[]): string | null {
 // ============================================================================
 
 function buildViolationGuidance(agent: string, tool: string): string {
-  const alternatives: Record<string, string> = {
-    'idumb-supreme-coordinator': 'Delegate to @idumb-builder for file operations',
-    'idumb-high-governance': 'Delegate to @idumb-builder for file operations',
-    'idumb-low-validator': 'Report findings to parent agent, do not modify',
-    'idumb-builder': 'Verify with read tool before modifying'
+  const delegationTargets: Record<string, { target: string; example: string }> = {
+    'idumb-supreme-coordinator': {
+      target: '@idumb-high-governance → @idumb-builder',
+      example: `@idumb-high-governance
+Task: Coordinate file modification
+Sub-delegate to: @idumb-builder
+Details: [your specific request]`
+    },
+    'idumb-high-governance': {
+      target: '@idumb-builder',
+      example: `@idumb-builder
+Task: Modify file [path]
+Content: [what to change]
+Verify: Read file first, commit after`
+    },
+    'idumb-low-validator': {
+      target: 'Report to parent, DO NOT modify',
+      example: `VALIDATION REPORT:
+File: [path]
+Issue: [what you found]
+Recommendation: Delegate to @idumb-builder for fix`
+    },
+    'idumb-builder': {
+      target: 'You ARE the executor - verify first',
+      example: `Use 'read' tool first to verify target file, then proceed.`
+    }
+  }
+  
+  const info = delegationTargets[agent] || {
+    target: 'Check hierarchy',
+    example: 'Use todoread to understand workflow'
   }
   
   return `
-🚫 GOVERNANCE VIOLATION 🚫
+🚫 GOVERNANCE VIOLATION - TOOL BLOCKED 🚫
 
 Agent: ${agent}
-Attempted tool: ${tool}
-Status: BLOCKED
+Tool Attempted: ${tool}
+Status: OUTPUT REPLACED (tool ran but output discarded)
 
-Why this was blocked:
-- Your role does not have permission to use this tool
-- Following iDumb hierarchical governance
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+YOU CANNOT USE THIS TOOL. DELEGATE INSTEAD:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-What you should do instead:
-${alternatives[agent] || 'Check your role permissions and delegate appropriately'}
+Delegate to: ${info.target}
 
-Hierarchy Reminder:
+Example delegation format:
+\`\`\`
+${info.example}
+\`\`\`
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+HIERARCHY REMINDER:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┌─ Supreme Coordinator ──┐
-│  Delegate only         │
+│  DELEGATE ONLY         │  ❌ edit/write/bash
 ├─ High Governance ──────┤
-│  Coordinate, delegate  │
+│  Coordinate, delegate  │  ❌ edit/write
 ├─ Low Validator ────────┤
-│  Validate, investigate │
+│  Validate, investigate │  ❌ edit/write
 └─ Builder ──────────────┘
-   Execute, modify files
+   Execute, modify files  │  ✅ edit/write/bash
 
-Next step: Use 'todoread' to check workflow, then delegate appropriately.
+NEXT STEP: Use 'todoread' first, then delegate appropriately.
 `
 }
 
@@ -1051,7 +1084,8 @@ export const IdumbCorePlugin: Plugin = async ({ directory, client }) => {
           pendingDenials.set(sessionId, {
             agent: agentRole || 'unknown',
             tool: tool,
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
+            shouldBlock: true  // CRITICAL: Signal to tool.execute.after to REPLACE output
           })
           
           addHistoryEntry(
@@ -1100,7 +1134,8 @@ export const IdumbCorePlugin: Plugin = async ({ directory, client }) => {
             pendingDenials.set(sessionId, {
               agent: agentRole || 'unknown',
               tool: toolName,
-              timestamp: new Date().toISOString()
+              timestamp: new Date().toISOString(),
+              shouldBlock: true  // CRITICAL: Signal to tool.execute.after to REPLACE output
             })
             
             addHistoryEntry(
@@ -1120,6 +1155,14 @@ export const IdumbCorePlugin: Plugin = async ({ directory, client }) => {
         
         if ((toolName === 'edit' || toolName === 'write') && agentRole !== 'idumb-builder') {
           log(directory, `[BLOCKED] ${agentRole} attempted file modification`)
+          
+          // CRITICAL: Add to pendingDenials so tool.execute.after REPLACES output
+          pendingDenials.set(sessionId, {
+            agent: agentRole || 'unknown',
+            tool: toolName,
+            timestamp: new Date().toISOString(),
+            shouldBlock: true  // Signal to tool.execute.after to REPLACE output
+          })
           
           output.args = {
             __BLOCKED_BY_GOVERNANCE__: true,
@@ -1146,11 +1189,26 @@ export const IdumbCorePlugin: Plugin = async ({ directory, client }) => {
         if (agentRole && allowedTools.length > 0 && !allowedTools.includes(toolName)) {
           log(directory, `[DENIED] ${agentRole} attempted unauthorized tool: ${toolName}`)
           
+          // CRITICAL: Add to pendingDenials so tool.execute.after REPLACES output
+          pendingDenials.set(sessionId, {
+            agent: agentRole || 'unknown',
+            tool: toolName,
+            timestamp: new Date().toISOString(),
+            shouldBlock: true  // Signal to tool.execute.after to REPLACE output
+          })
+          
           output.args = {
             __BLOCKED_BY_GOVERNANCE__: true,
             __VIOLATION__: `${agentRole} cannot use ${toolName}`,
             __ALLOWED_TOOLS__: allowedTools
           }
+          
+          addHistoryEntry(
+            directory,
+            `violation:general:${agentRole}:${toolName}`,
+            'interceptor',
+            'fail'
+          )
           
           return
         }
@@ -1192,21 +1250,32 @@ export const IdumbCorePlugin: Plugin = async ({ directory, client }) => {
         const sessionId = input.sessionID || 'unknown'
         
         // ==========================================
-        // VIOLATION GUIDANCE INJECTION (P1-3.6)
+        // CRITICAL: BLOCKED TOOL OUTPUT REPLACEMENT
         // ==========================================
+        // This is the REAL enforcement - tool.execute.before cannot stop execution,
+        // but we CAN replace the output here to hide the actual result
         
-        // Check for pending violation
         const violation = pendingDenials.get(sessionId)
-        if (violation && toolName === violation.tool) {
+        if (violation && violation.shouldBlock && toolName === violation.tool) {
+          // BUILD REPLACEMENT OUTPUT - COMPLETELY REPLACES TOOL OUTPUT
           const guidance = buildViolationGuidance(violation.agent, violation.tool)
           
-          output.output = guidance + '\n\n' + (output.output || '')
-          output.title = `🚫 GOVERNANCE ENFORCEMENT: ${violation.agent}`
+          // COMPLETELY REPLACE output - DO NOT append original output
+          output.output = guidance
+          output.title = `🚫 BLOCKED: ${violation.agent} cannot use ${toolName}`
           
+          // Clear the pending denial
           pendingDenials.delete(sessionId)
           
-          log(directory, `[GUIDANCE INJECTED] For ${violation.agent} violation`)
+          log(directory, `[BLOCKED OUTPUT REPLACED] ${violation.agent} tried ${toolName} - output discarded`)
+          
+          // STOP PROCESSING - don't track this as a successful operation
+          return
         }
+        
+        // ==========================================
+        // NORMAL PROCESSING (non-blocked tools)
+        // ==========================================
         
         // Record completed task delegations
         // NOTE: Cannot access original args here per OpenCode API
