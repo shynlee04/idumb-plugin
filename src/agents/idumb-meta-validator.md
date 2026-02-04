@@ -43,7 +43,7 @@ tools:
   idumb-security_scan: true
   idumb-quality: true
   idumb-quality_checkDocs: true
-  idumb-quality_checkErrorHandling: true
+  idumb-quality_checkErrors: true
   idumb-performance: true
   idumb-performance_monitor: true
   idumb-performance_checkIterationLimits: true

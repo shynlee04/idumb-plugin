@@ -167,7 +167,7 @@ const RACE_CONDITION_PATTERNS = [
 
 function detectPattern(
   content: string,
-  patterns: typeof INJECTION_PATTERNS
+  patterns: readonly { pattern: RegExp; type: SecurityIssue['type']; severity: SecurityIssue['severity']; description: string; suggestion: string }[]
 ): SecurityIssue[] {
   const issues: SecurityIssue[] = []
   const lines = content.split('\n')
@@ -296,7 +296,7 @@ export const validate = tool({
     // Determine overall status
     const status: "pass" | "fail" | "partial" =
       summary.critical > 0 || (mode === "strict" && summary.high > 0) ? "fail" :
-      summary.high > 0 || summary.medium > 0 ? "partial" : "pass"
+        summary.high > 0 || summary.medium > 0 ? "partial" : "pass"
 
     const result: SecurityValidationResult = {
       status,

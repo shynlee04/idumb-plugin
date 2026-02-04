@@ -13,7 +13,7 @@
  */
 
 import type { Plugin } from "@opencode-ai/plugin"
-import { existsSync, mkdirSync } from "fs"
+import { existsSync, mkdirSync, writeFileSync } from "fs"
 import { join } from "path"
 
 // Import all utilities from lib modules
@@ -87,6 +87,7 @@ import {
   storeSessionMetadata,
   loadSessionMetadata,
   isStateStale,
+  getPendingTodoCount,
   checkIfResumedSession,
   buildResumeContext,
 
@@ -105,7 +106,7 @@ import {
 type Part = { type: string; text?: string }
 
 // Pending denials map (kept in core for event handling)
-const pendingDenials = new Map<string, { agent: string; tool: string }>()
+const pendingDenials = new Map<string, { agent: string; tool: string; timestamp?: string; shouldBlock?: boolean }>()
 
 // In-memory session trackers (per plugin instance)
 const sessionTrackers = new Map<string, {
@@ -113,6 +114,7 @@ const sessionTrackers = new Map<string, {
   startTime: Date
   violationCount: number
   lastActivity: Date
+  governanceInjected: boolean
 }>()
 
 export const IdumbCorePlugin: Plugin = async ({ directory, client }) => {
@@ -138,7 +140,7 @@ export const IdumbCorePlugin: Plugin = async ({ directory, client }) => {
           log(directory, `Config loaded: experience=${config.user.experience}, version=${config.version}`)
 
           // Store metadata with config info
-          storeSessionMetadata(directory, sessionId as string)
+          storeSessionMetadata(directory, sessionId as string, config)
 
           // P3-T2: Initialize execution metrics tracking
           initializeExecutionMetrics(sessionId as string, directory)
@@ -316,8 +318,8 @@ export const IdumbCorePlugin: Plugin = async ({ directory, client }) => {
       try {
         log(directory, "Compaction triggered - injecting context")
 
-        // Build context from state and anchors
-        const context = buildCompactionContext(directory)
+        const config = ensureIdumbConfig(directory)
+        const context = buildCompactionContext(directory, config)
 
         // Append to compaction context (don't replace)
         output.context.push(context)
@@ -356,7 +358,8 @@ export const IdumbCorePlugin: Plugin = async ({ directory, client }) => {
           log(directory, `Session start detected for ${agentRole} (injecting governance)`)
 
           // Build governance prefix with resumption awareness
-          let governancePrefix = buildGovernancePrefix(agentRole, directory, isResumedSession)
+          const config = ensureIdumbConfig(directory)
+          let governancePrefix = buildGovernancePrefix(agentRole, directory, config, getPendingTodoCount, isStateStale, isResumedSession)
 
           // P1-T1: If resumed session, prepend resume context
           if (isResumedSession) {
@@ -509,7 +512,8 @@ export const IdumbCorePlugin: Plugin = async ({ directory, client }) => {
           const lastMsg = output.messages[output.messages.length - 1]
 
           if (lastMsg) {
-            const reminder = buildPostCompactReminder(agentRole, directory)
+            const config = ensureIdumbConfig(directory)
+            const reminder = buildPostCompactReminder(agentRole, directory, config, isStateStale)
             lastMsg.parts.push({
               type: 'text',
               text: reminder
@@ -573,7 +577,7 @@ export const IdumbCorePlugin: Plugin = async ({ directory, client }) => {
           })
 
           // Add to pending violations for tracking (P1-T3) - LOG ONLY
-          pendingViolations.set(sessionId, {
+          addPendingViolation(sessionId, {
             agent: agentRole || 'unknown',
             tool: toolName,
             timestamp: new Date().toISOString(),
@@ -634,7 +638,7 @@ export const IdumbCorePlugin: Plugin = async ({ directory, client }) => {
               directory,
               `warn:first_tool:${agentRole}:${toolName}`,
               'interceptor',
-              'warn'
+              'partial'
             )
           } else {
             log(directory, `[OK] ${agentRole} used ${toolName} as first tool`)
@@ -652,7 +656,7 @@ export const IdumbCorePlugin: Plugin = async ({ directory, client }) => {
             directory,
             `warn:file_mod:${agentRole}:${toolName}`,
             'interceptor',
-            'warn'
+            'partial'
           )
           // DO NOT return - let tool proceed
         }
@@ -671,7 +675,7 @@ export const IdumbCorePlugin: Plugin = async ({ directory, client }) => {
             directory,
             `warn:general:${agentRole}:${toolName}`,
             'interceptor',
-            'warn'
+            'partial'
           )
           // DO NOT return - let tool proceed
         }
@@ -700,10 +704,12 @@ export const IdumbCorePlugin: Plugin = async ({ directory, client }) => {
           const filePath = output.args?.path || output.args?.filePath || ''
           log(directory, `[FILE] ${toolName}: ${filePath}`)
 
-          if (shouldTrackTimestamp(filePath)) {
-            recordTimestamp(directory, filePath)
-            log(directory, `[FILE] Timestamp recorded: ${filePath}`)
-          }
+          // TODO: Implement timestamp tracking
+          // if (shouldTrackTimestamp(filePath)) {
+          //   recordTimestamp(directory, filePath)
+          //   log(directory, `[FILE] Timestamp recorded: ${filePath}`)
+          // }
+          log(directory, `[FILE] Timestamp tracking skipped (not implemented): ${filePath}`)
         }
 
       } catch (error) {

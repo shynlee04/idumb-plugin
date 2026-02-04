@@ -80,7 +80,7 @@ const ERROR_HANDLING_PATTERNS = [
   }
 ]
 
-function checkErrorHandling(content: string, fileType: string): QualityIssue[] {
+function _checkErrorHandling(content: string, fileType: string): QualityIssue[] {
   const issues: QualityIssue[] = []
 
   if (fileType === "sh" || fileType === "bash") {
@@ -373,7 +373,7 @@ function validateQuality(
 
     switch (check) {
       case "error-handling":
-        checkIssues = checkErrorHandling(content, fileType)
+        checkIssues = _checkErrorHandling(content, fileType)
         errorHandlingScore = checkIssues.length === 0 ? 100 : Math.max(0, 100 - checkIssues.length * 20)
         break
       case "cross-platform":
@@ -398,7 +398,7 @@ function validateQuality(
 
   const status: "pass" | "fail" | "partial" =
     summary.high > 0 ? "fail" :
-    summary.medium > 0 ? "partial" : "pass"
+      summary.medium > 0 ? "partial" : "pass"
 
   return {
     status,
@@ -469,7 +469,7 @@ export const validate = tool({
 
     const status: "pass" | "fail" | "partial" =
       summary.high > 0 ? "fail" :
-      summary.medium > 0 ? "partial" : "pass"
+        summary.medium > 0 ? "partial" : "pass"
 
     return JSON.stringify({
       status,
@@ -495,7 +495,7 @@ export const checkDocs = tool({
   }
 })
 
-export const checkErrorHandling = tool({
+export const checkErrors = tool({
   description: "Check error handling patterns in code",
   args: {
     target: tool.schema.string().describe("File to check")

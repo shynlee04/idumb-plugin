@@ -1,85 +1,364 @@
 ---
 name: opencode-conflict-prevention
-description: [TODO: Complete and informative explanation of what the skill does and when to use it. Include WHEN to use this skill - specific scenarios, file types, or tasks that trigger it.]
+description: OpenCode plugin conflict prevention - loading order, deduplication rules, naming conventions, and troubleshooting. Use when publishing plugins or diagnosing plugin conflicts.
+license: MIT
+compatibility: opencode
+metadata:
+  audience: ai-agents
+  workflow: plugin-development
 ---
 
-# Opencode Conflict Prevention
+# OpenCode Conflict Prevention
 
-## Overview
+Guidelines for avoiding plugin conflicts when developing and publishing OpenCode plugins.
 
-[TODO: 1-2 sentences explaining what this skill enables]
+## Plugin Loading Priority
 
-## Structuring This Skill
+### Load Order (Lowest to Highest Priority)
 
-[TODO: Choose the structure that best fits this skill's purpose. Common patterns:
+OpenCode loads plugins in this order. **Later sources override earlier ones**:
 
-**1. Workflow-Based** (best for sequential processes)
-- Works well when there are clear step-by-step procedures
-- Example: DOCX skill with "Workflow Decision Tree" → "Reading" → "Creating" → "Editing"
-- Structure: ## Overview → ## Workflow Decision Tree → ## Step 1 → ## Step 2...
+| Priority | Source | Location |
+|----------|--------|----------|
+| 1 (lowest) | Internal plugins | Built-in to OpenCode |
+| 2 | Built-in npm plugins | `opencode-anthropic-auth`, `@gitlab/opencode-gitlab-auth` |
+| 3 | Global config | `~/.config/opencode/opencode.json` |
+| 4 | Project config | `<project>/opencode.json` |
+| 5 | Global plugin directory | `~/.config/opencode/plugins/` |
+| 6 (highest) | Project plugin directory | `<project>/.opencode/plugins/` |
 
-**2. Task-Based** (best for tool collections)
-- Works well when the skill offers different operations/capabilities
-- Example: PDF skill with "Quick Start" → "Merge PDFs" → "Split PDFs" → "Extract Text"
-- Structure: ## Overview → ## Quick Start → ## Task Category 1 → ## Task Category 2...
+### Key Implications
 
-**3. Reference/Guidelines** (best for standards or specifications)
-- Works well for brand guidelines, coding standards, or requirements
-- Example: Brand styling with "Brand Guidelines" → "Colors" → "Typography" → "Features"
-- Structure: ## Overview → ## Guidelines → ## Specifications → ## Usage...
+```typescript
+// If you have the same plugin in multiple locations:
+// ~/.config/opencode/plugins/my-plugin.ts
+// .opencode/plugins/my-plugin.ts
 
-**4. Capabilities-Based** (best for integrated systems)
-- Works well when the skill provides multiple interrelated features
-- Example: Product Management with "Core Capabilities" → numbered capability list
-- Structure: ## Overview → ## Core Capabilities → ### 1. Feature → ### 2. Feature...
+// The .opencode/plugins/ version WINS (higher priority)
+```
 
-Patterns can be mixed and matched as needed. Most skills combine patterns (e.g., start with task-based, add workflow for complex operations).
+```
+Priority Rule: Local > Project > Global > npm > Internal
+```
 
-Delete this entire "Structuring This Skill" section when done - it's just guidance.]
+---
 
-## [TODO: Replace with the first main section based on chosen structure]
+## Deduplication Mechanism
 
-[TODO: Add content here. See examples in existing skills:
-- Code samples for technical skills
-- Decision trees for complex workflows
-- Concrete examples with realistic user requests
-- References to scripts/templates/references as needed]
+### How Deduplication Works
+
+OpenCode implements a deduplication system where plugins with the **same name** from different sources are deduplicated. **Higher priority sources win**.
+
+```typescript
+// Deduplication algorithm (for reference)
+export function deduplicatePlugins(plugins: string[]): string[] {
+  const seenNames = new Set<string>()
+  const uniqueSpecifiers = new Set<string>()
+
+  // Process in reverse (high to low priority)
+  for (const plugin of plugins.toReversed()) {
+    const name = extractPluginName(plugin)
+
+    if (!seenNames.has(name)) {
+      seenNames.add(name)
+      uniqueSpecifiers.add(plugin)
+    }
+    // Skip if already seen (lower priority duplicate)
+  }
+
+  return Array.from(uniqueSpecifiers).toReversed()
+}
+```
+
+### What Gets Deduplicated
+
+Plugins are considered the same if they have the **same package name**:
+
+```typescript
+// These are treated as duplicates - SAME NAME
+"my-plugin"                    // npm package
+"@scope/my-plugin"             // scoped npm package
+"file:///path/to/my-plugin"    // local file
+
+// The one with HIGHEST PRIORITY wins
+```
+
+### Priority Hierarchy
+
+```
+.opencode/plugins/       (highest - overrides everything)
+  ↓
+opencode.json (project)  (overrides global)
+  ↓
+~/.config/opencode/opencode.json (global)
+  ↓
+~/.config/opencode/plugins/ (global directory)
+  ↓
+npm packages             (lowest - gets overridden)
+```
+
+---
+
+## Naming Conventions
+
+### Avoiding Name Conflicts
+
+When publishing a plugin to npm, use a **scoped package name** to minimize conflicts:
+
+```bash
+# GOOD - Scoped, unique
+@yourcompany/opencode-plugin-name
+@yourusername/opencode-feature
+
+# RISKY - Common names, likely to conflict
+opencode-utils
+opencode-helper
+opencode-enhancer
+
+# GOOD - Specific, descriptive
+opencode-typecheck-integration
+opencode-docker-command-runner
+```
+
+### Plugin Naming Best Practices
+
+1. **Use a scope** - `@username/plugin-name` or `@company/plugin-name`
+2. **Be descriptive** - `opencode-my-feature` not `my-plugin`
+3. **Avoid common prefixes** - Don't use `utils`, `helpers`, `core`
+4. **Include "opencode"** - Helps users identify the plugin
+
+### Tool Naming
+
+Custom tools within plugins should also follow naming conventions:
+
+```typescript
+// GOOD - plugin-prefixed tools
+myplugin: tool({
+  myplugin_analyze: tool({ /* ... */ }),
+  myplugin_transform: tool({ /* ... */ }),
+})
+
+// BAD - generic tool names (may conflict)
+analyze: tool({ /* ... */ }),
+helper: tool({ /* ... */ }),
+```
+
+---
+
+## Common Conflict Scenarios
+
+### Scenario 1: Local vs npm Plugin
+
+**Problem**: User installs your npm plugin, but also has a local version.
+
+```typescript
+// npm package: @company/opencode-feature
+// Local file: .opencode/plugins/opencode-feature.ts
+
+// Result: Local file WINS, npm package is ignored
+```
+
+**Solution**: Document this behavior and advise users to uninstall the local version.
+
+### Scenario 2: Duplicate Plugin Names
+
+**Problem**: Two plugins have the same name.
+
+```json
+// ~/.config/opencode/opencode.json
+{
+  "plugin": ["opencode-enhancer", "my-plugin"]
+}
+
+// opencode.json (project)
+{
+  "plugin": ["opencode-enhancer-v2", "my-plugin"]
+}
+```
+
+**Result**: The project config's `opencode-enhancer-v2` loads, but if there's a naming conflict, only one wins.
+
+**Solution**: Use unique, descriptive names with scopes.
+
+### Scenario 3: Hook Conflicts
+
+**Problem**: Multiple plugins implement the same hook with conflicting behavior.
+
+```typescript
+// Plugin A
+"tool.execute.before": async (input, output) => {
+  // Allows operation
+}
+
+// Plugin B
+"tool.execute.before": async (input, output) => {
+  // Blocks operation
+}
+```
+
+**Result**: Both hooks run. Order is undefined. If one throws, execution stops.
+
+**Solution**: Document hook behavior and use graceful degradation.
+
+---
+
+## Troubleshooting Conflicts
+
+### Checklist for Diagnosing Issues
+
+```bash
+# 1. Check which plugins are loaded
+opencode status
+
+# 2. View plugin status in TUI
+/status_view
+
+# 3. Check for duplicate plugin names
+ls -la ~/.config/opencode/plugins/
+ls -la .opencode/plugins/
+
+# 4. Review config files
+cat ~/.config/opencode/opencode.json
+cat opencode.json
+```
+
+### Disable Plugins Temporarily
+
+To isolate conflicts, disable plugins in your config:
+
+```json
+// ~/.config/opencode/opencode.json
+{
+  "plugin": []  // Empty array = no plugins
+}
+```
+
+Then add plugins back one by one to identify the culprit.
+
+### Clear Cache
+
+If plugins cause crashes or strange behavior:
+
+```bash
+# Clear OpenCode cache
+rm -rf ~/.cache/opencode
+
+# Restart OpenCode
+opencode
+```
+
+### Check Plugin Load Order
+
+```typescript
+// Add temporary logging to see load order
+export const MyPlugin: Plugin = async (ctx) => {
+  await ctx.client.app.log({
+    service: "my-plugin",
+    level: "info",
+    message: "Plugin loaded",
+    extra: { priority: "should be high" },
+  })
+  // ...
+}
+```
+
+---
+
+## Publishing Guidelines
+
+### Before Publishing
+
+1. **Check for name conflicts**
+   ```bash
+   npm search opencode-your-name
+   ```
+
+2. **Test in clean environment**
+   ```bash
+   # Test without other plugins
+   opencode --plugin ./your-plugin.ts
+   ```
+
+3. **Document compatibility**
+   ```markdown
+   ## Compatibility
+   - Conflicts with: (list known conflicts)
+   - Tested with: (list tested plugins)
+   ```
+
+### Package.json Recommendations
+
+```json
+{
+  "name": "@yourcompany/opencode-your-feature",
+  "version": "1.0.0",
+  "description": "OpenCode plugin for...",
+  "keywords": ["opencode", "opencode-plugin", "your-feature"],
+  "peerDependencies": {
+    "opencode": ">=1.0.0"
+  },
+  "opencode": {
+    "type": "plugin",
+    "hooks": ["event", "tool.execute.after"],
+    "tools": ["yourtool_*"]
+  }
+}
+```
+
+---
+
+## Best Practices
+
+### ✅ Do
+
+```typescript
+// Use scoped package names
+@company/opencode-feature
+
+// Prefix custom tools
+myfeature_analyze
+myfeature_transform
+
+// Document hook behavior
+"tool.execute.before": async (input, output) => {
+  try {
+    // Your logic
+  } catch (error) {
+    // Log but don't throw - let other plugins run
+  }
+}
+
+// Handle conflicts gracefully
+if (input.tool === "read" && alreadyProcessed(input)) {
+  return  // Skip if another plugin handled it
+}
+```
+
+### ❌ Don't
+
+```typescript
+// Don't use common names
+utils
+helpers
+core
+
+// Don't throw in shared hooks
+"tool.execute.before": async (input, output) => {
+  throw new Error("I don't like this tool")  // Blocks ALL plugins
+}
+
+// Don't assume load order
+// Don't assume your plugin is the only one running
+
+// Don't override built-in tools (you can't anyway)
+```
+
+---
 
 ## Resources
 
-This skill includes example resource directories that demonstrate how to organize different types of bundled resources:
+See [opencode-plugin-compliance](../opencode-plugin-compliance/) for hook system details.
 
-### scripts/
-Executable code (Python/Bash/etc.) that can be run directly to perform specific operations.
+See [opencode-tui-safety](../opencode-tui-safety/) for TUI-related guidelines.
 
-**Examples from other skills:**
-- PDF skill: `fill_fillable_fields.py`, `extract_form_field_info.py` - utilities for PDF manipulation
-- DOCX skill: `document.py`, `utilities.py` - Python modules for document processing
-
-**Appropriate for:** Python scripts, shell scripts, or any executable code that performs automation, data processing, or specific operations.
-
-**Note:** Scripts may be executed without loading into context, but can still be read by Claude for patching or environment adjustments.
-
-### references/
-Documentation and reference material intended to be loaded into context to inform Claude's process and thinking.
-
-**Examples from other skills:**
-- Product management: `communication.md`, `context_building.md` - detailed workflow guides
-- BigQuery: API reference documentation and query examples
-- Finance: Schema documentation, company policies
-
-**Appropriate for:** In-depth documentation, API references, database schemas, comprehensive guides, or any detailed information that Claude should reference while working.
-
-### assets/
-Files not intended to be loaded into context, but rather used within the output Claude produces.
-
-**Examples from other skills:**
-- Brand styling: PowerPoint template files (.pptx), logo files
-- Frontend builder: HTML/React boilerplate project directories
-- Typography: Font files (.ttf, .woff2)
-
-**Appropriate for:** Templates, boilerplate code, document templates, images, icons, fonts, or any files meant to be copied or used in the final output.
-
----
-
-**Any unneeded directories can be deleted.** Not every skill requires all three types of resources.
+See [opencode-tool-compliance](../opencode-tool-compliance/) for tool development patterns.

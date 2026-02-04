@@ -1,0 +1,34 @@
+{
+    "compilerOptions": {
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "bundler",
+        "esModuleInterop": true,
+        "strict": true,
+        "skipLibCheck": true,
+        "noEmit": true,
+        "declaration": true,
+        "declarationMap": true,
+        "outDir": "./dist",
+        "rootDir": "./src",
+        "baseUrl": ".",
+        "paths": {
+            "@opencode-ai/plugin": [
+                "./node_modules/@opencode-ai/plugin"
+            ]
+        },
+        "typeRoots": [
+            "./node_modules/@types",
+            "./src/types"
+        ]
+    },
+    "include": [
+        "src/**/*.ts",
+        "src/types/**/*.d.ts"
+    ],
+    "exclude": [
+        "node_modules",
+        "dist",
+        ".opencode"
+    ]
+}

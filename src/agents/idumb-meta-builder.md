@@ -76,7 +76,7 @@ tools:
   idumb-quality: true
   idumb-quality_validate: true
   idumb-quality_checkDocs: true
-  idumb-quality_checkErrorHandling: true
+  idumb-quality_checkErrors: true
   idumb-performance: true
   idumb-performance_validate: true
   idumb-performance_monitor: true
