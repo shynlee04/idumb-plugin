@@ -6,7 +6,7 @@ mode: all
 scope: meta
 temperature: 0.1
 permission:
-  task: deny
+  task: allow
   bash:
     "grep*": allow
     "find*": allow
@@ -17,8 +17,8 @@ permission:
     "git status": allow
     "git diff*": allow
     "git log*": allow
-  edit: deny
-  write: deny
+  edit: allow
+  write: allow
 tools:
   idumb-todo: true
   read: true

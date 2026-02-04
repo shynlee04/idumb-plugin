@@ -7,15 +7,21 @@ scope: project
 temperature: 0.2
 permission:
   task:
-    "general": allow
+    allow:
+      - "idumb-atomic-explorer"
+      - "general"
   bash:
-    "ls*": allow
-    "find*": allow
-    "tree": allow
-    "wc*": allow
-    # Unspecified = implicit deny
-  edit: deny
-  write: deny
+    allow:
+      - "ls*"
+      - "find*"
+      - "tree"
+      - "wc*"
+  edit:
+    allow:
+      - ".idumb/idumb-project-output/exploration/**/*.md"
+  write:
+    allow:
+      - ".idumb/idumb-project-output/exploration/**/*.md"
 tools:
   task: true
   todoread: true

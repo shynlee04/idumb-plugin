@@ -12,6 +12,39 @@ agent: idumb-supreme-coordinator
 @src/agents/idumb-plan-checker.md
 </execution_context>
 
+<skills>
+
+## Auto-Activated Skills
+
+When this command is executed, the following skills are automatically activated:
+
+| Skill | Purpose | Activated For |
+|-------|---------|--------------|
+| `idumb-plan-synthesizer` | Transform research into plans | planner |
+| `idumb-validation-reporter` | Standardize plan validation | plan-checker |
+| `idumb-research-writer` | Write research artifacts | phase-researcher (if research needed) |
+
+## Skill-Driven Flow Control
+
+The plan-phase command forces specific flows through skill activations:
+
+1. **Plan Synthesis** (`idumb-plan-synthesizer`)
+   - Activates after research completes
+   - Transforms research findings into executable PLAN.md structure
+   - Applies goal-backward must_haves derivation
+   - Creates dependency-aware wave structure
+
+2. **Research Artifact Writing** (`idumb-research-writer`)
+   - `--research` flag triggers research artifact generation
+   - Writes phase-specific research to `.planning/phases/{PHASE}-RESEARCH.md`
+   - Enables context handoff between research and planning
+
+3. **Validation Reporting** (`idumb-validation-reporter`)
+   - Standardizes plan-checker output format
+   - Generates validation reports in consistent structure
+
+</skills>
+
 <objective>
 Create executable phase plans (PLAN.md files) for a roadmap phase with integrated research and verification.
 

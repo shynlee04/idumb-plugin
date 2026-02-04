@@ -7,20 +7,27 @@ scope: project
 temperature: 0.3
 permission:
   task:
-    "general": allow
-    "idumb-low-validator": allow
+    allow:
+      - "general"
+      - "idumb-low-validator"
+      - "idumb-atomic-explorer"
   bash:
-    "git diff*": allow
-    "git log*": allow
-    "git show*": allow
-    "git status": allow
-    "git bisect*": allow
-    "pnpm test*": allow
-    "npm test*": allow
-    "npm run*": allow
-    "curl*": allow
-  edit: deny
-  write: deny
+    allow:
+      - "git diff*"
+      - "git log*"
+      - "git show*"
+      - "git status"
+      - "git bisect*"
+      - "pnpm test*"
+      - "npm test*"
+      - "npm run*"
+      - "curl*"
+  edit:
+    allow:
+      - ".idumb/idumb-project-output/debug/**/*.md"
+  write:
+    allow:
+      - ".idumb/idumb-project-output/debug/**/*.md"
 tools:
   task: true
   read: true

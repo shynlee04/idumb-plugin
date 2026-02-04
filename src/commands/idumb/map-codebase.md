@@ -46,6 +46,34 @@ Comprehensively map the existing codebase structure through parallel analysis ag
 
 </context>
 
+<skills>
+
+## Auto-Activated Skills
+
+When this command is executed, the following skills are automatically activated:
+
+| Skill | Purpose | Activated For |
+|-------|---------|--------------|
+| `idumb-codebase-chunker` | Split large codebases | codebase-mapper (when > 50 files) |
+| `idumb-research-writer` | Write codebase artifacts | codebase-mapper |
+
+## Skill-Driven Flow Control
+
+The map-codebase command forces specific flows through skill activations:
+
+1. **Codebase Chunking** (`idumb-codebase-chunker`)
+   - Triggered when codebase has > 50 source files
+   - Automatically organizes analysis by feature/domain
+   - Prevents context overflow from scanning entire codebase
+
+2. **Research Artifact Writing** (`idumb-research-writer`)
+   - Writes structured artifacts to `.idumb/idumb-project-output/codebase/`
+   - Enables persistent codebase analysis results
+
+</skills>
+
+<process>
+
 <process>
 
 ## Step 1: Validate Prerequisites

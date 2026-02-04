@@ -6,7 +6,7 @@ mode: all
 scope: meta
 temperature: 0.2
 permission:
-  task: deny
+  task: allow
   bash:
     # Git operations
     "git status": allow

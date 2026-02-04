@@ -6,7 +6,8 @@ mode: all
 scope: dev
 temperature: 0.2
 permission:
-  task: true                    # CRITICAL: Builder CANNOT delegate
+  task:
+    allow: []
   bash:
     # Git operations
     "git status": allow

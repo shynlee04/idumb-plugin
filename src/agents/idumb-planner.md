@@ -7,16 +7,22 @@ scope: bridge
 temperature: 0.1
 permission:
   task:
-    "general": allow
+    allow:
+      - "general"
   bash:
-    "git status": allow
-    "git log": allow
-    "git add": allow
-    "git commit": allow
-    "ls*": allow
-    "cat*": allow
-  edit: deny
-  write: deny
+    allow:
+      - "git status"
+      - "git log"
+      - "git add"
+      - "git commit"
+      - "ls*"
+      - "cat*"
+  edit:
+    allow:
+      - ".planning/phases/**/*-PLAN.md"
+  write:
+    allow:
+      - ".planning/phases/**/*-PLAN.md"
 tools:
   task: true
   read: true

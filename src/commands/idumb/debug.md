@@ -33,6 +33,37 @@ Apply scientific debugging methodology to systematically diagnose, isolate, and 
 
 </execution_context>
 
+<skills>
+
+## Auto-Activated Skills
+
+When this command is executed, the following skills are automatically activated:
+
+| Skill | Purpose | Activated For |
+|-------|---------|--------------|
+| `idumb-debug-strategy` | Strategic debugging patterns | debugger, verifier |
+| `idumb-validation-reporter` | Standardize debug reports | verifier, low-validator |
+| `idumb-codebase-chunker` | Isolate problematic domains | debugger (for code issues) |
+
+## Skill-Driven Flow Control
+
+The debug command forces specific flows through skill activations:
+
+1. **Architecture-Level Debugging** (`idumb-debug-strategy`)
+   - `--scope=code --depth=deep` triggers architectural strategy
+   - Maps layers, identifies boundaries, checks integration
+   - Delegates to idumb-atomic-explorer for domain isolation
+
+2. **Validation Reporting** (`idumb-validation-reporter`)
+   - All debug scopes use standardized report format
+   - Generates `.idumb/idumb-project-output/debug/REPORT-YYYY-MM-DD.md`
+
+3. **Domain Isolation** (`idumb-codebase-chunker`)
+   - When issue spans multiple domains, chunks codebase
+   - Each chunk analyzed separately to isolate problem
+
+</skills>
+
 <context>
 
 ## Usage

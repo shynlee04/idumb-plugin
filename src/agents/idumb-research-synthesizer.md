@@ -7,15 +7,22 @@ scope: project
 temperature: 0.1
 permission:
   task:
-    "general": allow
+    allow:
+      - "idumb-atomic-explorer"
+      - "general"
   bash:
-    "ls*": allow
-    "cat*": allow
-    "git add": allow
-    "git commit": allow
-    "git check-ignore": allow
-  edit: deny
-  write: deny
+    allow:
+      - "ls*"
+      - "cat*"
+      - "git add"
+      - "git commit"
+      - "git check-ignore"
+  edit:
+    allow:
+      - ".planning/research/**/*.md"
+  write:
+    allow:
+      - ".planning/research/**/*.md"
 tools:
   task: true
   read: true

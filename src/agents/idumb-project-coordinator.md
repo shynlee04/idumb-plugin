@@ -7,19 +7,26 @@ scope: project
 temperature: 0.2
 permission:
   task:
-    "idumb-project-executor": allow
-    "idumb-project-validator": allow
-    "idumb-project-explorer": allow
-    "general": allow
+    allow:
+      - "idumb-project-executor"
+      - "idumb-project-validator"
+      - "idumb-project-explorer"
+      - "idumb-atomic-explorer"
+      - "general"
   bash:
-    "ls*": allow
-    "cat*": allow
-    "head*": allow
-    "tail*": allow
-    "git status*": allow
-    "git log*": allow
-  edit: deny
-  write: deny
+    allow:
+      - "ls*"
+      - "cat*"
+      - "head*"
+      - "tail*"
+      - "git status*"
+      - "git log*"
+  edit:
+    allow:
+      - ".idumb/idumb-project-output/**/*.md"
+  write:
+    allow:
+      - ".idumb/idumb-project-output/**/*.md"
 tools:
   task: true
   idumb-state: true

@@ -7,31 +7,38 @@ scope: project
 temperature: 0.2
 permission:
   task:
-    "general": allow       # KEY: Project code is written by @general
-    "idumb-verifier": allow
-    "idumb-debugger": allow
+    allow:
+      - "general"       # KEY: Project code is written by @general
+      - "idumb-verifier"
+      - "idumb-debugger"
+      - "idumb-atomic-explorer"
   bash:
     # Read-only git operations
-    "git status": allow
-    "git diff*": allow
-    "git log*": allow
-    "git rev-parse*": allow
-    "git check-ignore*": allow
-    # Test commands
-    "npm test*": allow
-    "npm run test*": allow
-    "npm run build": allow
-    "pnpm test*": allow
-    "pnpm run test*": allow
-    "pnpm run build": allow
-    # Safe exploration
-    "ls *": allow
-    "cat *": allow
-    "head *": allow
-    "tail *": allow
-    "date*": allow
-  edit: deny   
-  write: deny  
+    allow:
+      - "git status"
+      - "git diff*"
+      - "git log*"
+      - "git rev-parse*"
+      - "git check-ignore*"
+      # Test commands
+      - "npm test*"
+      - "npm run test*"
+      - "npm run build"
+      - "pnpm test*"
+      - "pnpm run test*"
+      - "pnpm run build"
+      # Safe exploration
+      - "ls *"
+      - "cat *"
+      - "head *"
+      - "tail *"
+      - "date*"
+  edit:
+    allow:
+      - ".planning/phases/**/*-SUMMARY.md"
+  write:
+    allow:
+      - ".planning/phases/**/*-SUMMARY.md"  
 tools:
   task: true        # Primary tool - delegation
   idumb-state: true

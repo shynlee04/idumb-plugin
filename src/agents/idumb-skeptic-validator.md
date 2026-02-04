@@ -7,14 +7,20 @@ scope: bridge
 temperature: 0.2
 permission:
   task:
-    "general": allow
+    allow:
+      - "idumb-atomic-explorer"
+      - "general"
   bash:
-    "ls*": allow
-    "cat*": allow
-    "grep*": allow
-    # Unspecified = implicit deny
-  edit: deny
-  write: deny
+    allow:
+      - "ls*"
+      - "cat*"
+      - "grep*"
+  edit:
+    allow:
+      - ".idumb/idumb-project-output/challenges/**/*.md"
+  write:
+    allow:
+      - ".idumb/idumb-project-output/challenges/**/*.md"
 tools:
   task: true
   todoread: true

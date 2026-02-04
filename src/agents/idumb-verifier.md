@@ -7,22 +7,29 @@ scope: project
 temperature: 0.2
 permission:
   task:
-    "general": allow
-    "idumb-low-validator": allow
-    "idumb-integration-checker": allow
+    allow:
+      - "general"
+      - "idumb-low-validator"
+      - "idumb-integration-checker"
+      - "idumb-atomic-explorer"
   bash:
-    "pnpm test*": allow
-    "npm test*": allow
-    "git diff*": allow
-    "git log*": allow
-    "git status": allow
-    "ls*": allow
-    "cat*": allow
-    "grep*": allow
-    "wc*": allow
-    "curl*": allow
-  edit: deny
-  write: deny
+    allow:
+      - "pnpm test*"
+      - "npm test*"
+      - "git diff*"
+      - "git log*"
+      - "git status"
+      - "ls*"
+      - "cat*"
+      - "grep*"
+      - "wc*"
+      - "curl*"
+  edit:
+    allow:
+      - ".planning/phases/**/*-VERIFICATION.md"
+  write:
+    allow:
+      - ".planning/phases/**/*-VERIFICATION.md"
 tools:
   task: true
   read: true

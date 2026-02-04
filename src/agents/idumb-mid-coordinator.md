@@ -33,8 +33,12 @@ permission:
     "head *": allow
     "tail *": allow
     # Other commands implicitly denied - no wildcard ask
-  edit: deny   # Coordinator cannot edit files directly
-  write: deny  # Coordinator cannot write files directly
+  edit:
+    allow:
+      - ".idumb/idumb-project-output/**/*.md"    # Research/plan artifacts via skills
+  write:
+    allow:
+      - ".idumb/idumb-project-output/**/*.md"    # Research/plan artifacts via skills
 tools:
   task: true              # Primary tool - delegation
   todoread: true

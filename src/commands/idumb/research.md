@@ -33,6 +33,33 @@ Conduct thorough domain-specific or phase-specific research by orchestrating spe
 
 </execution_context>
 
+<skills>
+
+## Auto-Activated Skills
+
+When this command is executed, the following skills are automatically activated:
+
+| Skill | Purpose | Activated For |
+|-------|---------|--------------|
+| `idumb-research-writer` | Write research artifacts | project-researcher, phase-researcher |
+| `idumb-codebase-chunker` | Split large codebases | project-researcher (when analyzing existing code) |
+
+## Skill-Driven Flow Control
+
+The research command forces specific flows through skill activations:
+
+1. **Research Output Mode** (`idumb-research-writer`)
+   - When research produces findings > 10KB context
+   - Automatically writes to `.idumb/idumb-project-output/research/`
+   - Enables intermediate artifact saving for context management
+
+2. **Codebase Chunking** (`idumb-codebase-chunker`)
+   - When analyzing codebases > 50 files
+   - Automatically organizes by feature/domain chunks
+   - Each chunk analyzed separately, then synthesized
+
+</skills>
+
 <context>
 
 ## Usage

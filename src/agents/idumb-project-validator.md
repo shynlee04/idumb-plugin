@@ -7,33 +7,40 @@ scope: project
 temperature: 0.1
 permission:
   task:
-    "idumb-project-executor": allow
-    "general": allow
+    allow:
+      - "idumb-project-executor"
+      - "idumb-atomic-explorer"
+      - "general"
   bash:
-    # Test commands
-    "npm test*": allow
-    "npm run test*": allow
-    "pnpm test*": allow
-    "pnpm run test*": allow
-    "python -m pytest*": allow
-    "pytest*": allow
-    "go test*": allow
-    # Linting
-    "npm run lint*": allow
-    "eslint*": allow
-    "pylint*": allow
-    "ruff*": allow
-    # Type checking
-    "npm run typecheck*": allow
-    "tsc --noEmit*": allow
-    "mypy*": allow
-    # Safe exploration
-    "ls*": allow
-    "cat*": allow
-    "head*": allow
-    "tail*": allow
-  edit: deny
-  write: deny
+    allow:
+      # Test commands
+      - "npm test*"
+      - "npm run test*"
+      - "pnpm test*"
+      - "pnpm run test*"
+      - "python -m pytest*"
+      - "pytest*"
+      - "go test*"
+      # Linting
+      - "npm run lint*"
+      - "eslint*"
+      - "pylint*"
+      - "ruff*"
+      # Type checking
+      - "npm run typecheck*"
+      - "tsc --noEmit*"
+      - "mypy*"
+      # Safe exploration
+      - "ls*"
+      - "cat*"
+      - "head*"
+      - "tail*"
+  edit:
+    allow:
+      - ".idumb/idumb-project-output/validations/**/*.md"
+  write:
+    allow:
+      - ".idumb/idumb-project-output/validations/**/*.md"
 tools:
   task: true
   idumb-state: true
