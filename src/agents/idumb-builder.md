@@ -69,6 +69,15 @@ tools:
   idumb-chunker_parseHierarchy: true
   idumb-chunker_insert: true
   idumb-chunker_targetEdit: true
+  # Skill validation tools (OpenCode integration)
+  idumb-security: true
+  idumb-security_validate: true
+  idumb-quality: true
+  idumb-quality_validate: true
+  idumb-performance: true
+  idumb-performance_validate: true
+  idumb-orchestrator: true
+  idumb-orchestrator_preWrite: true
 ---
 
 # @idumb-builder

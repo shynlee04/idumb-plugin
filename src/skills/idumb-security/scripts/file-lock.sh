@@ -44,7 +44,7 @@ atomic_write() {
 }
 
 if [[ $# -ge 2 ]]; then
-    atomic_write "$1" "$2"
+    atomic_write "$2" "$1"
 else
     echo "Usage: $0 <target-file> <content>"
     exit 1

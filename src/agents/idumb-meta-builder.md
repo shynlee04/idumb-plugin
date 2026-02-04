@@ -69,6 +69,24 @@ tools:
   idumb-chunker_extract: true
   idumb-chunker_insert: true
   idumb-chunker_targetEdit: true
+  # Skill validation tools (OpenCode integration)
+  idumb-security: true
+  idumb-security_validate: true
+  idumb-security_scan: true
+  idumb-quality: true
+  idumb-quality_validate: true
+  idumb-quality_checkDocs: true
+  idumb-quality_checkErrorHandling: true
+  idumb-performance: true
+  idumb-performance_validate: true
+  idumb-performance_monitor: true
+  idumb-performance_checkIterationLimits: true
+  idumb-orchestrator: true
+  idumb-orchestrator_orchestrate: true
+  idumb-orchestrator_preWrite: true
+  idumb-orchestrator_preDelegate: true
+  idumb-orchestrator_phaseTransition: true
+  idumb-orchestrator_activateSkills: true
 ---
 
 # @idumb-meta-builder
@@ -644,6 +662,37 @@ agent_types:
 ## Pre-Write Validation for META
 
 Before writing ANY META file, run these gates:
+
+### Skill-Based Validation
+
+Before writing META files with bash scripts or TypeScript tools, run:
+
+```yaml
+skill_validation_before_write:
+  security_check:
+    tool: "idumb-security_validate"
+    when: "File contains bash script (.sh)"
+    checks: [injection, traversal, permissions]
+    block_on: "critical issues"
+
+  quality_check:
+    tool: "idumb-quality_validate"
+    when: "Any META file write"
+    checks: [error-handling, documentation]
+    warn_on: "missing docs or error handling"
+
+  performance_check:
+    tool: "idumb-performance_validate"
+    when: "Writing validation tools or scripts"
+    checks: [iteration-limits, cleanup]
+    warn_on: "unbounded loops"
+```
+
+**Integration via orchestrator:**
+```bash
+# Before any META write, run pre-validation
+idumb-orchestrator_preWrite file_path="src/agents/new-agent.md"
+```
 
 <gate name="path_safety_meta">
 **Check:** Path is within META scope

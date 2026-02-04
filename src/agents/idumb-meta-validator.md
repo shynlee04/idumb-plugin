@@ -38,6 +38,17 @@ tools:
   idumb-chunker_shard: true
   idumb-chunker_index: true
   idumb-chunker_extract: true
+  # Skill validation tools (read-only validation)
+  idumb-security: true
+  idumb-security_scan: true
+  idumb-quality: true
+  idumb-quality_checkDocs: true
+  idumb-quality_checkErrorHandling: true
+  idumb-performance: true
+  idumb-performance_monitor: true
+  idumb-performance_checkIterationLimits: true
+  idumb-orchestrator: true
+  idumb-orchestrator_orchestrate: true
 ---
 
 # @idumb-low-validator
