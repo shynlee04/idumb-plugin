@@ -1,31 +1,16 @@
-# CLAUDE.md
+# AGENTS.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+# NON-NEGOTIABLE RULES
+- All agents must work by gathering context first, knowing which workflow **MUST FIND SKILL** to adapt the best selection for Complex, multi-step, recurring, or, domain-specific tasks. There is **NO TOLERANCE** for agents that start execute tasks without proper context gathering, and planning.
+- Update this AGENTS.md iteratively, and be the single-source-of-truth, at all time for all agents.
 
 ## Project Overview
 
 iDumb (Intelligent Delegation Using Managed Boundaries) is a hierarchical AI governance framework for OpenCode that ensures safe, controlled code development through agent delegation and permission management. It is distributed as an installable plugin that creates a local "brain" under `.idumb/` for durable governance state.
 
-## Agents profiles MUST ALWAYS BE LOADED AND CHECK HERE
-/Users/apple/Documents/coding-projects/idumb/.opencode/agents
-/Users/apple/Documents/coding-projects/idumb/.opencode/agents/idumb-builder.md
-/Users/apple/Documents/coding-projects/idumb/.opencode/agents/idumb-codebase-mapper.md
-/Users/apple/Documents/coding-projects/idumb/.opencode/agents/idumb-debugger.md
-/Users/apple/Documents/coding-projects/idumb/.opencode/agents/idumb-executor.md
-/Users/apple/Documents/coding-projects/idumb/.opencode/agents/idumb-high-governance.md
-/Users/apple/Documents/coding-projects/idumb/.opencode/agents/idumb-integration-checker.md
-/Users/apple/Documents/coding-projects/idumb/.opencode/agents/idumb-low-validator.md
-/Users/apple/Documents/coding-projects/idumb/.opencode/agents/idumb-mid-coordinator.md
-/Users/apple/Documents/coding-projects/idumb/.opencode/agents/idumb-phase-researcher.md
-/Users/apple/Documents/coding-projects/idumb/.opencode/agents/idumb-plan-checker.md
-/Users/apple/Documents/coding-projects/idumb/.opencode/agents/idumb-planner.md
-/Users/apple/Documents/coding-projects/idumb/.opencode/agents/idumb-project-explorer.md
-/Users/apple/Documents/coding-projects/idumb/.opencode/agents/idumb-project-researcher.md
-/Users/apple/Documents/coding-projects/idumb/.opencode/agents/idumb-research-synthesizer.md
-/Users/apple/Documents/coding-projects/idumb/.opencode/agents/idumb-roadmapper.md
-/Users/apple/Documents/coding-projects/idumb/.opencode/agents/idumb-skeptic-validator.md
-/Users/apple/Documents/coding-projects/idumb/.opencode/agents/idumb-supreme-coordinator.md
-/Users/apple/Documents/coding-projects/idumb/.opencode/agents/idumb-verifier.md
+**Version:** 0.2.0 | **Last Updated:** 2026-02-04
+
 ## Commands
 
 ### Installation
@@ -55,12 +40,39 @@ ls -la .opencode/tools/idumb-*.ts
 ls -la .opencode/plugins/idumb-core.ts
 ```
 
-### No Automated Tests
+### Testing
 This is a meta-framework (markdown profiles + TypeScript tools). Testing is manual:
 1. Install the plugin
 2. Verify files are copied to correct locations
 3. Test command execution in OpenCode CLI
 4. Verify agent profiles load correctly
+
+## Slash Commands
+
+All commands are under `.opencode/commands/idumb/*.md`:
+
+| Command | Purpose |
+|---------|---------|
+| `/idumb:init` | Initialize governance state |
+| `/idumb:status` | Show governance status |
+| `/idumb:certify` | Certify phase completion |
+| `/idumb:validate` | Run validation checks |
+| `/idumb:health-check` | Check system health |
+| `/idumb:stress-test` | Run stress tests |
+| `/idumb:pre-flight` | Pre-flight checks before operations |
+| `/idumb:research` | Research phase |
+| `/id:plan-phase` | Planning phase |
+| `/idumb:execute-phase` | Execution phase |
+| `/idumb:verify-phase` | Verification phase |
+| `/idumb:discuss-phase` | Discussion phase |
+| `/idumb:map-codebase` | Map codebase structure |
+| `/idumb:roadmap` | Generate roadmap |
+| `/idumb:config` | Configure governance |
+| `/idumb:debug` | Debug governance state |
+| `/idumb:help` | Show help |
+| `/idumb:resume` | Resume from checkpoint |
+| `/idumb:new-project` | Create new project |
+| `/idumb:verify-work` | Verify work artifacts |
 
 ## Architecture
 
@@ -82,38 +94,66 @@ The installer copies files from `src/` to `.opencode/`:
 
 ```
 src/
-├── agents/*.md           # Agent profiles (19 agents)
-├── commands/idumb/*.md   # Slash commands (14 commands)
-├── tools/*.ts            # TypeScript tools (8 tools)
+├── agents/*.md           # Agent profiles (23 agents)
+├── commands/idumb/*.md   # Slash commands (19 commands)
+├── tools/*.ts            # TypeScript tools (11 tools)
 ├── plugins/*.ts          # Event hooks (idumb-core.ts)
-└── skills/**/*.md        # Reusable skill workflows
+├── lib/                  # Shared libraries
+│   ├── logging.ts
+│   ├── state.ts
+│   ├── checkpoint.ts
+│   ├── chain-rules.ts
+│   └── ...
+└── types/                # TypeScript definitions
 ```
 
 ### Agent Categories
 
+**Meta-Governance** (framework self-management):
+- `idumb-meta-builder` - Builds iDumb framework components
+- `idumb-meta-validator` - Validates iDumb framework integrity
+
 **Coordinators** (delegation only, no file ops):
 - `idumb-supreme-coordinator` - Top-level orchestration
 - `idumb-high-governance` - Mid-level coordination
-- `idumb-executor` - Phase execution management
+- `idumb-project-executor` - Phase execution management
 - `idumb-verifier` - Verification coordination
 - `idumb-debugger` - Debug coordination
+- `idumb-mid-coordinator` - Mid-level delegation
 
 **Planners/Researchers** (read-only analysis):
 - `idumb-planner`, `idumb-plan-checker`, `idumb-roadmapper`
 - `idumb-project-researcher`, `idumb-phase-researcher`, `idumb-codebase-mapper`
+- `idumb-research-synthesizer`, `idumb-project-explorer`
+- `idumb-integration-checker`
 
 **Workers** (leaf nodes):
 - `idumb-low-validator` - Read-only validation (grep, glob, tests)
+- `idumb-skeptic-validator` - Deep validation skepticism
 - `idumb-builder` - **ONLY** agent that can write/edit files
 
 ### Permission Matrix
 
 | Agent Category | edit | write | bash | task | delegate |
 |----------------|------|-------|------|------|----------|
+| Meta-Governance | ✅   | ✅    | ✅   | ✅   | ✅       |
 | Coordinators   | ❌   | ❌    | ❌   | ✅   | ✅       |
 | Researchers    | ❌   | ❌    | ❌   | ❌   | ❌       |
-| Validator      | ❌   | ❌    | read | ❌   | ❌       |
+| Validators     | ❌   | ❌    | read | ❌   | ❌       |
 | Builder        | ✅   | ✅    | ✅   | ❌   | ❌       |
+
+### OpenCode Integration Skills
+
+iDumb includes OpenCode-specific skills for plugin development:
+
+| Skill | Purpose |
+|-------|---------|
+| `opencode-conflict-prevention` | Plugin loading order, deduplication rules, naming conventions |
+| `opencode-plugin-compliance` | Plugin development compliance - hooks, events, validation |
+| `opencode-tool-compliance` | Custom tool development compliance |
+| `opencode-tui-safety` | TUI safety guidelines - avoid console pollution |
+
+See `.plugin-dev/` for comprehensive integration documentation.
 
 ## Key Files
 
@@ -126,13 +166,18 @@ Installer script that:
 5. Supports both local and global installation modes
 
 ### `src/plugins/idumb-core.ts`
-Main event hook system (~3000 lines). Key responsibilities:
+Main event hook system. Key responsibilities:
 - **Session tracking**: Tracks agent role, delegation depth, first tool used
 - **Checkpoint management**: Create/load/list/delete checkpoints for rollback
 - **State persistence**: Manages `.idumb/idumb-brain/state.json` with anchors and history
-- **Governance enforcement**: Intercepts tools to enforce permissions (LOG-ONLY mode currently)
+- **Governance enforcement**: Intercepts tools to enforce permissions
+- **Security**: Input validation, sanitization, and pre-write gates
 
-**Important**: The plugin is currently in "LOG-ONLY" mode after emergency fixes. It observes and logs violations but does NOT block tools. See `.idumb/idumb-brain/SESSION-HANDOFF-2026-02-03.md`.
+**Important**: The plugin includes security hardening as of 2026-02-04:
+- File path sanitization to prevent directory traversal
+- Input validation on all user-provided paths
+- Pre-write gates to validate operations before execution
+- See `SECURITY_FIXES_SUMMARY.md` for details
 
 ### `src/tools/idumb-state.ts`
 State management tool with exports:
@@ -143,6 +188,20 @@ State management tool with exports:
 - `getAnchors` - Get anchors for context injection
 - `createSession`, `modifySession`, `exportSession`, `listSessions` - Session management
 - `purgeOldSessions` - Garbage collection for old sessions and checkpoints
+
+### `src/tools/` Directory
+All iDumb tools:
+- `idumb-state.ts` - State management
+- `idumb-config.ts` - Configuration management
+- `idumb-validate.ts` - Validation operations
+- `idumb-context.ts` - Context management
+- `idumb-manifest.ts` - Project manifest
+- `idumb-todo.ts` - Todo list management
+- `idumb-chunker.ts` - Code chunking
+- `idumb-orchestrator.ts` - Orchestration
+- `idumb-performance.ts` - Performance monitoring
+- `idumb-quality.ts` - Quality metrics
+- `idumb-security.ts` - Security checks
 
 ### `.idumb/idumb-brain/state.json`
 Single source of truth for governance state:
@@ -190,17 +249,26 @@ User settings and governance configuration. Contains:
 │   └── validations/         # Validation outputs
 └── idumb-modules/           # Optional user-generated extensions
 
-.planning/                # Planning artifacts (READ ONLY for iDumb)
-├── PROJECT.md
-├── STATE.md
-├── ROADMAP.md
-└── phases/{N}/
+.opencode/                   # Installed by iDumb from src/
+├── agents/idumb-*.md        # 23 agent profiles
+├── commands/idumb/*.md      # 19 slash commands
+├── tools/idumb-*.ts         # 11 TypeScript tools
+├── plugins/idumb-core.ts    # Main event hook
+├── skills/                  # OpenCode integration skills
+│   ├── opencode-conflict-prevention/
+│   ├── opencode-plugin-compliance/
+│   ├── opencode-tool-compliance/
+│   └── opencode-tui-safety/
+└── workflows/               # GSD-quality workflows
 
-.opencode/                # Installed by iDumb from src/
-├── agents/idumb-*.md
-├── commands/idumb/*.md
-├── tools/idumb-*.ts
-└── plugins/idumb-core.ts
+.plugin-dev/                 # Development artifacts
+├── ROADMAP.md               # Project roadmap
+├── PROJECT.md               # Project documentation
+├── OPENCODE-INTEGRATION-PLAN.md
+├── SKILL-INTEGRATION-GUIDE.md
+├── SKILL-INVOCATION-PATTERNS.md
+├── opencode-plugins-and-tools-dev-best-practices.md
+└── plugins-and-tools-for-opencode-guidelines.md
 ```
 
 ## Code Style
@@ -218,11 +286,29 @@ User settings and governance configuration. Contains:
 - Builder: `write: true, edit: true, task: false`
 - Use `temperature: 0.1` for deterministic governance behavior
 
+### GSD Pattern Standards
+As of 2026-02-04, all agents, commands, and workflows follow GSD-quality executable program patterns:
+- **Agents**: role, philosophy, execution_flow, structured_returns, success_criteria
+- **Commands**: objective, execution_context, context, process, completion_format
+- **Workflows**: purpose, philosophy, entry_check, execution_flow, chain_rules
+
 ### JavaScript (install.js)
 - ESM imports only (package.json: `"type": "module"`)
 - Step-based functions (`step1_*`, `step2_*`) for clarity
 - Always use fallback patterns: `const result = operation() || fallback`
 - Use `existsSync()` before operations, create directories with `mkdirSync(path, { recursive: true })`
+
+## Security
+
+As of 2026-02-04, iDumb includes comprehensive security hardening:
+
+1. **Input Validation**: All user-provided paths are validated and sanitized
+2. **Pre-write Gates**: Operations are validated before file writes
+3. **Path Traversal Prevention**: `sanitize_path()` prevents directory traversal attacks
+4. **Session Boundaries**: Clear session isolation prevents cross-contamination
+5. **Skill Validation**: Pre-write gates validate skill integrity before execution
+
+See `SECURITY_FIXES_SUMMARY.md` for complete security documentation.
 
 ## Session Handoff
 
@@ -234,101 +320,23 @@ When resuming work on iDumb itself, check `.idumb/idumb-brain/SESSION-HANDOFF-*.
 
 ## Current Status (as of 2026-02-04)
 
-- **Phase 1** (Contracts-First Governance Core) is in progress
-- Plugin is in LOG-ONLY mode (no blocking) after emergency TUI fixes
-- Session handoff documents indicate remaining work on:
-  - Phase A: Session State System (stop hook, depth-aware injection)
-  - Phase B: Brain State System (session status hierarchy)
-  - Phase C: Agent Concept Fix (meta vs project agents naming)
-  - Phase D: Permission Refinement (re-enable selective blocking)
+### GSD Transformation Complete
+- **46 files transformed** (~28,000 lines total)
+  - 23 agents transformed (~15,500 lines)
+  - 19 commands transformed (~5,900 lines)
+  - 9 workflows transformed (~7,000 lines)
+- **Validation**: 14/14 checks passed, 0 warnings
+
+### Phase 1: Contracts-First Governance Core (In Progress)
+- Session State System (stop hook, depth-aware injection)
+- Brain State System (session status hierarchy)
+- Agent Concept Fix (meta vs project agents naming)
+- Permission Refinement (selective blocking)
+
+### Recent Additions
+- OpenCode integration skills (conflict prevention, compliance)
+- Security hardening and input validation
+- Skill validation tools and pre-write gates
+- Comprehensive plugin development documentation
 
 See `.plugin-dev/ROADMAP.md` for full roadmap and phase definitions.
-
-## Agent Transformation Summary (GSD-Quality)
-
-All 18 core agents have been transformed from abstract YAML schemas to GSD-quality executable LLM programs.
-
-### Transformation Metrics
-
-| Category | Before | After |
-|----------|--------|-------|
-| Total agent files | 18 | 22 |
-| Average lines per agent | ~300 | ~700 |
-| Total lines | ~5,500 | ~15,310 |
-| GSD patterns per agent | 0 | 5-11 |
-
-### GSD Patterns Applied to All Agents
-
-1. **`<role>`** - First-person voice establishing identity
-2. **`<philosophy>`** - Core principles and mindset
-3. **`<execution_flow>`** - Step-by-step workflow with bash commands
-4. **`<structured_returns>`** - Consistent output formats
-5. **`<success_criteria>`** - Measurable checkboxes
-
-### Agent Categories and Key Patterns
-
-#### Core Execution Agents
-| Agent | Lines | Key Patterns |
-|-------|-------|--------------|
-| idumb-project-executor | 1063 | deviation_rules, checkpoint_protocol, tdd_execution, task_commit_protocol |
-| idumb-verifier | 1070 | verification_levels (4), stub_detection, gap_diagnosis |
-| idumb-debugger | 608 | debug_state_machine, hypothesis_management, isolation_techniques |
-
-#### Planning Agents
-| Agent | Lines | Key Patterns |
-|-------|-------|--------------|
-| idumb-planner | 677 | discovery_levels (0-3), task_breakdown, goal_backward, dependency_graph |
-| idumb-plan-checker | 815 | must_haves_verification, context_budget_check, dependency_graph_check |
-| idumb-roadmapper | 522 | goal_backward_phases, phase_sizing, dependency_analysis |
-
-#### Research Agents
-| Agent | Lines | Key Patterns |
-|-------|-------|--------------|
-| idumb-project-researcher | 784 | research_dimensions (4), source_hierarchy, mcp_integration |
-| idumb-phase-researcher | 790 | discovery_levels, verification_protocol |
-| idumb-research-synthesizer | 722 | synthesis_methodology, conflict_resolution |
-
-#### Builder Agents
-| Agent | Lines | Key Patterns |
-|-------|-------|--------------|
-| idumb-builder | 955 | permission_model, file_operations, git_protocol, quality_gates |
-| idumb-meta-builder | 1378 | entity_patterns, BMAD protocols (52 patterns) |
-
-#### Validation Agents
-| Agent | Lines | Key Patterns |
-|-------|-------|--------------|
-| idumb-low-validator | 864 | validation_types (7), test_execution, strict read-only |
-| idumb-skeptic-validator | 1077 | challenge_categories (5), questioning_techniques (5), bias_detection (6) |
-| idumb-integration-checker | 896 | integration_points, e2e_flow_verification, contract_checking |
-
-#### Coordinator Agents
-| Agent | Lines | Key Patterns |
-|-------|-------|--------------|
-| idumb-supreme-coordinator | 667 | delegation_model, request_routing |
-| idumb-high-governance | 708 | meta_governance_operations, state_management |
-| idumb-mid-coordinator | 810 | project_coordination_patterns, task_delegation |
-
-### Quality Degradation Curve
-
-All planning/execution agents use this context budget awareness:
-
-| Context Usage | Quality | Claude's State |
-|---------------|---------|----------------|
-| 0-30% | PEAK | Thorough, comprehensive |
-| 30-50% | GOOD | Confident, solid work |
-| 50-70% | DEGRADING | Efficiency mode begins |
-| 70%+ | POOR | Rushed, minimal |
-
-**Rule:** Plans should complete within ~50% context.
-
-### Guardrails Model
-
-| Agent Category | task | write | edit | bash |
-|----------------|------|-------|------|------|
-| Coordinators | ✅ | ❌ | ❌ | ❌ |
-| Builders | ❌ | ✅ | ✅ | ✅ |
-| Validators (leaf) | ❌ | ❌ | ❌ | 📖 |
-| Researchers | ✅ | ❌ | ❌ | 📖 |
-| Executors | ✅ | ❌ | ❌ | 📖 |
-
-Legend: ✅ = allowed, ❌ = denied, 📖 = read-only
