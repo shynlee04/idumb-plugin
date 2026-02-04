@@ -477,13 +477,83 @@ async function step8_installSkills(targetDir) {
     print('    └── templates/ (3 files: agent-template, MODULE_INDEX, workflow-template)');
 }
 
-// step9_installWorkflows REMOVED - iDumb is standalone
+async function step8b_installWorkflows(targetDir) {
+    print('');
+    print('┌─────────────────────────────────────────────────────────────┐');
+    print('│  📋 Installing iDumb Workflows (9)                          │');
+    print('└─────────────────────────────────────────────────────────────┘');
 
-// step10_installTemplates REMOVED - iDumb is standalone
+    const workflowsDir = join(targetDir, 'workflows');
+    mkdirSync(workflowsDir, { recursive: true });
 
-// step11_installReferences REMOVED - iDumb is standalone
+    copyDir(join(SRC_DIR, 'workflows'), workflowsDir);
 
-// step12_installRouter REMOVED - iDumb is standalone
+    print('  ✓ discuss-phase.md, execute-phase.md, plan-phase.md');
+    print('  ✓ map-codebase.md, research.md, resume-project.md');
+    print('  ✓ roadmap.md, transition.md, verify-phase.md');
+}
+
+async function step8c_installTemplates(targetDir) {
+    print('');
+    print('┌─────────────────────────────────────────────────────────────┐');
+    print('│  📄 Installing iDumb Templates (12)                         │');
+    print('└─────────────────────────────────────────────────────────────┘');
+
+    const templatesDir = join(targetDir, 'templates');
+    mkdirSync(templatesDir, { recursive: true });
+
+    copyDir(join(SRC_DIR, 'templates'), templatesDir);
+
+    print('  ✓ codebase/ - architecture.md, conventions.md, stack.md, structure.md');
+    print('  ✓ Core: config.md, context.md, continue-here.md, plan.md');
+    print('  ✓ State: state.md, summary.md, verification.md, milestone-summary.md');
+}
+
+async function step8d_installRouter(targetDir) {
+    print('');
+    print('┌─────────────────────────────────────────────────────────────┐');
+    print('│  🔀 Installing iDumb Router Rules (3)                       │');
+    print('└─────────────────────────────────────────────────────────────┘');
+
+    const routerDir = join(targetDir, 'router');
+    mkdirSync(routerDir, { recursive: true });
+
+    copyDir(join(SRC_DIR, 'router'), routerDir);
+
+    print('  ✓ chain-enforcement.md - Chain validation rules');
+    print('  ✓ routing-rules.md - Agent routing logic');
+    print('  ✓ SESSION-STATES-GOVERNANCE.md - Session state machine');
+}
+
+async function step8e_installConfig(targetDir) {
+    print('');
+    print('┌─────────────────────────────────────────────────────────────┐');
+    print('│  ⚙️  Installing iDumb Config (2)                             │');
+    print('└─────────────────────────────────────────────────────────────┘');
+
+    const configDir = join(targetDir, 'config');
+    mkdirSync(configDir, { recursive: true });
+
+    copyDir(join(SRC_DIR, 'config'), configDir);
+
+    print('  ✓ completion-definitions.yaml - Completion criteria');
+    print('  ✓ deny-rules.yaml - Permission deny rules');
+}
+
+async function step8f_installSchemas(targetDir) {
+    print('');
+    print('┌─────────────────────────────────────────────────────────────┐');
+    print('│  📐 Installing iDumb Schemas (2)                            │');
+    print('└─────────────────────────────────────────────────────────────┘');
+
+    const schemasDir = join(targetDir, 'schemas');
+    mkdirSync(schemasDir, { recursive: true });
+
+    copyDir(join(SRC_DIR, 'schemas'), schemasDir);
+
+    print('  ✓ brain-state-schema.json - State validation');
+    print('  ✓ checkpoint-schema.json - Checkpoint validation');
+}
 
 async function step9_createIdumbDir(location, selectedLanguage = 'en') {
     const stepTitle = getLocale() === 'vi'
@@ -885,7 +955,11 @@ async function main() {
     await step6_installTools(location.path);
     await step7_installPlugin(location.path);
     await step8_installSkills(location.path);
-    // step9-12 REMOVED - standalone framework, no GSD dependency
+    await step8b_installWorkflows(location.path);
+    await step8c_installTemplates(location.path);
+    await step8d_installRouter(location.path);
+    await step8e_installConfig(location.path);
+    await step8f_installSchemas(location.path);
     await step9_createIdumbDir(location, selectedLanguage);
     await showComplete(location.path, location, selectedLanguage);
 }

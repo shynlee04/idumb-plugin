@@ -1,0 +1,140 @@
+# Integration Matrix Template
+#
+# Use this template to document and validate integration points for any iDumb component.
+# Integration points count toward the minimum threshold (30/15/10 based on tier).
+
+component:
+  name: ""  # Component name
+  type: ""  # agent | tool | command | workflow | schema | config
+  tier: ""  # highest | middle | lowest
+  path: ""  # File path relative to project root
+
+# =============================================================================
+# INTEGRATION POINTS
+# =============================================================================
+# Each connection counts as 1 integration point.
+# Tier thresholds: highest=30+, middle=15+, lowest=10+
+
+integration_points:
+  # -------------------------------------------------------------------------
+  # READS FROM: What this component consumes
+  # -------------------------------------------------------------------------
+  reads_from: []
+  # Example:
+  #   - source: ".idumb/brain/state.json"
+  #     fields: ["phase", "framework", "anchors"]
+  #     purpose: "Get current governance state"
+
+  # -------------------------------------------------------------------------
+  # WRITES TO: What this component produces
+  # -------------------------------------------------------------------------
+  writes_to: []
+  # Example:
+  #   - target: ".idumb/brain/state.json"
+  #     fields: ["history", "lastValidation"]
+  #     purpose: "Record validation action"
+
+  # -------------------------------------------------------------------------
+  # VALIDATES AGAINST: Rules and schemas this checks
+  # -------------------------------------------------------------------------
+  validates_against: []
+  # Example:
+  #   - schema: "brain-state-schema.json"
+  #     enforcement: "runtime_validation"
+  #   - rules: "deny-rules.yaml"
+  #     enforcement: "permission_check"
+
+  # -------------------------------------------------------------------------
+  # TRIGGERS: What actions this initiates
+  # -------------------------------------------------------------------------
+  triggers: []
+  # Example:
+  #   - action: "delegation_to_agent"
+  #     target: "idumb-low-validator"
+  #     condition: "when validation requested"
+
+  # -------------------------------------------------------------------------
+  # TRIGGERED BY: What invokes this component
+  # -------------------------------------------------------------------------
+  triggered_by: []
+  # Example:
+  #   - source: "idumb-supreme-coordinator"
+  #     event: "user runs /idumb:validate"
+  #   - source: "idumb-high-governance"
+  #     event: "phase completion check"
+
+  # -------------------------------------------------------------------------
+  # DEPENDS ON: Prerequisites before this can run
+  # -------------------------------------------------------------------------
+  depends_on: []
+  # Example:
+  #   - component: ".idumb/brain/state.json"
+  #     reason: "Need current state to validate"
+  #   - component: "idumb-state tool"
+  #     reason: "Read state.json"
+
+  # -------------------------------------------------------------------------
+  # BLOCKS: What waits for this to complete
+  # -------------------------------------------------------------------------
+  blocks: []
+  # Example:
+  #   - component: "phase execution"
+  #     reason: "Must pass validation before proceeding"
+
+  # -------------------------------------------------------------------------
+  # RELATES TO: Associated components (non-dependent)
+  # -------------------------------------------------------------------------
+  relates_to: []
+  # Example:
+  #   - component: "idumb-chunker tool"
+  #     relationship: "Both handle large document processing"
+
+  # -------------------------------------------------------------------------
+  # CONFLICTS WITH: Potential collisions
+  # -------------------------------------------------------------------------
+  conflicts_with: []
+  # Example:
+  #   - component: "GSD planning commands"
+  #     condition: "when both frameworks active"
+  #     mitigation: "Separate state tracking"
+
+# =============================================================================
+# INTEGRATION SUMMARY
+# =============================================================================
+summary:
+  total_points: 0  # Auto-calculate from above sections
+  threshold: 0     # 30 (highest), 15 (middle), 10 (lowest)
+  met: false       # total_points >= threshold
+  gaps: []         # List integration gaps if below threshold
+
+# =============================================================================
+# VALIDATION STATUS
+# =============================================================================
+validation:
+  structure_check:
+    file_exists: false
+    correct_format: false
+    required_sections: false
+
+  behavior_check:
+    works_as_intended: false
+    error_handling: false
+    structured_returns: false
+
+  integration_check:
+    threshold_met: false
+    all_connections_documented: false
+    no_unreferenced_components: false
+
+# =============================================================================
+# EVIDENCE
+# =============================================================================
+evidence:
+  # List files/paths that prove this component's integrations
+  files: []
+
+  # List test scenarios that validate behavior
+  tests: []
+
+  # List documentation that references this component
+  documentation_references: []

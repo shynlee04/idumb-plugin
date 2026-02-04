@@ -19,6 +19,18 @@ export {
     addHistoryEntry
 } from "./state"
 
+// Config management
+export {
+    readConfig,
+    writeConfig,
+    getConfigPath,
+    getIdumbDir,
+    getDefaultConfig,
+    ensureIdumbConfig,
+    validateEnforcementSettings
+} from "./config"
+
+
 // Checkpoint management
 export {
     createCheckpoint,
