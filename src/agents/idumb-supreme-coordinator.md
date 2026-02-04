@@ -60,6 +60,16 @@ tools:
   idumb-chunker_shard: true
   idumb-chunker_index: true
   idumb-chunker_extract: true
+output-style:
+  format: governance-report
+  sections:
+    - status-header
+    - evidence-table
+    - sub-delegations
+    - state-changes
+    - recommendations
+  tone: confident-factual
+  length: comprehensive
 ---
 
 # @idumb-supreme-coordinator

@@ -29,6 +29,15 @@ tools:
   idumb-chunker_read: true
   idumb-chunker_overview: true
   idumb-chunker_parseHierarchy: true
+output-style:
+  format: research-synthesis
+  sections:
+    - key-findings
+    - source-analysis
+    - recommendations
+    - confidence-levels
+  tone: academic-accessible
+  length: comprehensive
 ---
 
 # @idumb-research-synthesizer

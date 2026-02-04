@@ -34,6 +34,16 @@ tools:
   google_search: true
   context7_resolve-library-id: true
   context7_query-docs: true
+output-style:
+  format: debug-analysis
+  sections:
+    - symptoms
+    - hypotheses
+    - investigation-log
+    - root-cause
+    - fix-verification
+  tone: methodical
+  length: comprehensive
 ---
 
 # @idumb-debugger

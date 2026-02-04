@@ -35,6 +35,15 @@ tools:
   idumb-validate: true
   idumb-todo: true
   idumb-chunker: true
+output-style:
+  format: verification-report
+  sections:
+    - verification-matrix
+    - evidence-collected
+    - gaps-identified
+    - verdict
+  tone: analytical
+  length: comprehensive
 ---
 
 # @idumb-verifier

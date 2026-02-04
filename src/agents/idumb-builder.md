@@ -78,6 +78,14 @@ tools:
   idumb-performance_validate: true
   idumb-orchestrator: true
   idumb-orchestrator_preWrite: true
+output-style:
+  format: implementation-summary
+  sections:
+    - files-changed
+    - code-highlights
+    - verification-status
+  tone: technical-precise
+  length: moderate
 ---
 
 # @idumb-builder

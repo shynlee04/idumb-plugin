@@ -29,6 +29,15 @@ tools:
   idumb-chunker: true
   context7_resolve-library-id: true
   context7_query-docs: true
+output-style:
+  format: plan-specification
+  sections:
+    - objective
+    - task-breakdown
+    - dependencies
+    - success-criteria
+  tone: structured-clear
+  length: comprehensive
 ---
 
 # @idumb-planner
