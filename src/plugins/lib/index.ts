@@ -113,3 +113,16 @@ export {
     formatValidationErrors
 } from "./schema-validator"
 
+// Style management
+export {
+  getStylesDir,
+  ensureStylesDir,
+  parseStyleFile,
+  listAvailableStyles,
+  loadStyle,
+  loadActiveStyle,
+  setActiveStyle,
+  type StyleConfig,
+  type StyleContent
+} from "./styles"
+
