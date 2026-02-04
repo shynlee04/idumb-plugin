@@ -41,6 +41,53 @@ const pendingDenials = new Map<string, PendingDenial>()
 const pendingViolations = new Map<string, PendingViolation>()
 
 // ============================================================================
+// SESSION CLEANUP (Phase 0 - Memory Management)
+// ============================================================================
+
+const SESSION_TTL_MS = 24 * 60 * 60 * 1000 // 24 hours
+const MAX_SESSIONS = 100
+
+/**
+ * Clean up stale sessions to prevent memory leaks
+ * Called on session.created and session.idle events
+ */
+export function cleanupStaleSessions(): number {
+    const now = Date.now()
+    const toDelete: string[] = []
+    
+    sessionTrackers.forEach((tracker, sessionId) => {
+        const lastActivity = tracker.lastActivity?.getTime() || 0
+        if (now - lastActivity > SESSION_TTL_MS) {
+            toDelete.push(sessionId)
+        }
+    })
+    
+    // LRU eviction if over max
+    if (sessionTrackers.size > MAX_SESSIONS) {
+        const sorted = [...sessionTrackers.entries()]
+            .sort((a, b) => {
+                const aTime = a[1].lastActivity?.getTime() || 0
+                const bTime = b[1].lastActivity?.getTime() || 0
+                return aTime - bTime
+            })
+        while (sorted.length > MAX_SESSIONS) {
+            const [id] = sorted.shift()!
+            if (!toDelete.includes(id)) {
+                toDelete.push(id)
+            }
+        }
+    }
+    
+    toDelete.forEach(id => {
+        sessionTrackers.delete(id)
+        pendingDenials.delete(id)
+        pendingViolations.delete(id)
+    })
+    
+    return toDelete.length
+}
+
+// ============================================================================
 // SESSION TRACKER CRUD
 // ============================================================================
 
@@ -54,10 +101,19 @@ export function getSessionTracker(sessionId: string): SessionTracker {
             firstToolName: null,
             agentRole: null,
             violationCount: 0,
-            governanceInjected: false
+            governanceInjected: false,
+            lastActivity: new Date(),
+            startTime: new Date(),
+            activeStyle: undefined,
+            styleCache: undefined
         })
     }
-    return sessionTrackers.get(sessionId)!
+    
+    // Update last activity on access
+    const tracker = sessionTrackers.get(sessionId)!
+    tracker.lastActivity = new Date()
+    
+    return tracker
 }
 
 /**

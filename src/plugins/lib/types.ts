@@ -26,12 +26,19 @@ export interface IdumbState {
     validationCount: number
     anchors: Anchor[]
     history: HistoryEntry[]
+    // Output style tracking (Phase 0 Memory Management)
+    activeStyle?: string
+    styleHistory?: Array<{
+        style: string
+        activatedAt: string
+        by: string
+    }>
 }
 
 export interface Anchor {
     id: string
     created: string
-    type: "decision" | "context" | "checkpoint"
+    type: "decision" | "context" | "checkpoint" | "output_style" | "session_flow"
     content: string
     priority: "critical" | "high" | "normal"
 }
@@ -209,6 +216,11 @@ export interface SessionTracker {
     agentRole: string | null
     violationCount: number
     governanceInjected: boolean
+    // Phase 0 Memory Management: cleanup TTL and style support
+    lastActivity?: Date
+    startTime?: Date
+    activeStyle?: string
+    styleCache?: any  // Will be StyleContent when styles.ts is created
 }
 
 // ============================================================================

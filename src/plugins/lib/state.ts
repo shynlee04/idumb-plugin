@@ -7,7 +7,7 @@
  * CRITICAL: NO console.log anywhere - causes TUI background text exposure
  */
 
-import { existsSync, readFileSync, writeFileSync, mkdirSync } from "fs"
+import { existsSync, readFileSync, writeFileSync, mkdirSync, renameSync, unlinkSync } from "fs"
 import { join } from "path"
 import type { IdumbState } from "./types"
 
@@ -46,7 +46,7 @@ export function readState(directory: string): IdumbState | null {
 
 /**
  * Write state to .idumb/idumb-brain/state.json
- * Creates brain directory if it doesn't exist
+ * Uses atomic write pattern (write temp, then rename) to prevent corruption
  */
 export function writeState(directory: string, state: IdumbState): void {
     const brainDir = getBrainDir(directory)
@@ -54,7 +54,22 @@ export function writeState(directory: string, state: IdumbState): void {
         mkdirSync(brainDir, { recursive: true })
     }
     const statePath = getStatePath(directory)
-    writeFileSync(statePath, JSON.stringify(state, null, 2))
+    const tempPath = statePath + ".tmp." + Date.now()
+    
+    try {
+        // Write to temp file first
+        writeFileSync(tempPath, JSON.stringify(state, null, 2))
+        // Atomic rename (safe on POSIX, mostly safe on Windows)
+        renameSync(tempPath, statePath)
+    } catch (error) {
+        // Clean up temp file on failure
+        try {
+            if (existsSync(tempPath)) {
+                unlinkSync(tempPath)
+            }
+        } catch {}
+        throw error
+    }
 }
 
 /**
@@ -91,13 +106,16 @@ export function addHistoryEntry(
 
 export function getDefaultState(): IdumbState {
     return {
-        version: "0.1.0",
+        version: "0.3.1",
         initialized: new Date().toISOString(),
         framework: "none",
         phase: "init",
         lastValidation: null,
         validationCount: 0,
         anchors: [],
-        history: []
+        history: [],
+        // NEW: Output style tracking
+        activeStyle: "default",
+        styleHistory: []
     }
 }

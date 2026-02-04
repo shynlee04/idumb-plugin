@@ -76,6 +76,7 @@ export {
 export {
     getSessionsDir,
     getSessionTracker,
+    cleanupStaleSessions,
     addPendingDenial,
     consumePendingDenial,
     addPendingViolation,
