@@ -119,6 +119,67 @@ const MAX_COMPACTION_CONTEXT_CHARS = 3000
 // In-memory session trackers (per plugin instance)
 const sessionTrackers = new Map<string, SessionTracker>()
 
+// ============================================================================
+// AUTO-STYLE SELECTION (inline, condition-based, no agent decision required)
+// ============================================================================
+
+/**
+ * Auto-select style based on agent role and phase.
+ * This runs automatically in hooks - agents don't need to call anything.
+ * 
+ * Priority: explicit style > agent-based > phase-based > 'default'
+ */
+function selectStyleForContext(
+  agentRole: string | null,
+  phase: string | null,
+  explicitStyle: string | undefined
+): string {
+  // 1. Explicit user selection always wins
+  if (explicitStyle && explicitStyle !== 'default') {
+    return explicitStyle
+  }
+  
+  // 2. Agent-based defaults (coordinators get governance, builders get terse)
+  const agentStyles: Record<string, string> = {
+    'idumb-supreme-coordinator': 'governance',
+    'idumb-high-governance': 'governance',
+    'idumb-mid-coordinator': 'governance',
+    'idumb-verifier': 'verbose',
+    'idumb-builder': 'terse',
+    'idumb-project-executor': 'terse',
+    'idumb-debugger': 'verbose',
+    'idumb-planner': 'verbose',
+    'idumb-project-researcher': 'verbose',
+    'idumb-phase-researcher': 'verbose',
+    'idumb-research-synthesizer': 'verbose'
+  }
+  
+  if (agentRole && agentStyles[agentRole]) {
+    return agentStyles[agentRole]
+  }
+  
+  // 3. Phase-based defaults
+  const phaseStyles: Record<string, string> = {
+    'research': 'verbose',
+    'planning': 'verbose',
+    'execution': 'terse',
+    'verification': 'governance',
+    'debugging': 'verbose'
+  }
+  
+  // Match phase prefix (e.g., "research-domain" matches "research")
+  if (phase) {
+    for (const [prefix, style] of Object.entries(phaseStyles)) {
+      if (phase.toLowerCase().includes(prefix)) {
+        return style
+      }
+    }
+  }
+  
+  // 4. Default fallback
+  return 'default'
+}
+
 export const IdumbCorePlugin: Plugin = async ({ directory, client }) => {
   log(directory, "iDumb plugin initialized")
 
@@ -381,19 +442,23 @@ export const IdumbCorePlugin: Plugin = async ({ directory, client }) => {
         const sessionId = input.sessionID || 'unknown'
         log(directory, `[STYLE] System transform for session ${sessionId}`)
 
-        // Get session-specific style (from tracker or state)
         const tracker = sessionTrackers.get(sessionId)
-        let activeStyle = tracker?.activeStyle
+        const state = readState(directory)
         
-        if (!activeStyle) {
-          // Fall back to state.json
-          const state = readState(directory)
-          activeStyle = state?.activeStyle || 'default'
-          
-          // Cache in tracker for future messages
-          if (tracker) {
-            tracker.activeStyle = activeStyle
-          }
+        // AUTO-SELECTION: Use detected agent role and phase to auto-select style
+        // No agent decision required - this happens automatically based on context
+        const explicitStyle = tracker?.activeStyle || state?.activeStyle
+        const agentRole = tracker?.agentRole || null
+        const currentPhase = state?.phase || null
+        
+        // Auto-select based on agent + phase (explicit always wins)
+        const activeStyle = selectStyleForContext(agentRole, currentPhase, explicitStyle)
+        
+        // Cache resolved style in tracker
+        if (tracker && tracker.activeStyle !== activeStyle) {
+          tracker.activeStyle = activeStyle
+          tracker.styleCache = undefined // Invalidate cache on style change
+          log(directory, `[STYLE] Auto-selected '${activeStyle}' for agent=${agentRole}, phase=${currentPhase}`)
         }
 
         // Skip injection for default style (no extra instructions)
