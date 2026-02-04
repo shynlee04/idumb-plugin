@@ -3,10 +3,10 @@ description: "Universal META builder - the ONLY agent with write permissions. Cr
 id: agent-idumb-builder
 parent: idumb-high-governance
 mode: all
-scope: meta
+scope: dev
 temperature: 0.2
 permission:
-  task: deny                    # CRITICAL: Builder CANNOT delegate
+  task: true                    # CRITICAL: Builder CANNOT delegate
   bash:
     # Git operations
     "git status": allow
@@ -164,21 +164,9 @@ Never write blind:
 ## What Builder CANNOT Do
 
 **Delegation:**
-- CANNOT spawn other agents via `@agent-name`
-- CANNOT use `task` tool to delegate work
-- CANNOT escalate - must complete or fail
-
+- CAN spawn other agents further down the hierarchy as long as they serve the refinement of the tasks
+-
 **Scope:**
-- CANNOT write outside META paths
-- CANNOT modify project source code (user's app)
-- CANNOT push to remote (local commits only)
-- CANNOT amend pushed commits
-
-**Destructive:**
-- CANNOT `git reset --hard` without explicit instruction
-- CANNOT force push
-- CANNOT delete without confirmation
-
 ## META Paths (Allowed Write Scope)
 
 ```
