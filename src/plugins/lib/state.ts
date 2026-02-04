@@ -9,7 +9,7 @@
 
 import { existsSync, readFileSync, writeFileSync, mkdirSync, renameSync, unlinkSync } from "fs"
 import { join } from "path"
-import type { IdumbState } from "./types"
+import type { IdumbState, Anchor } from "./types"
 
 // ============================================================================
 // STATE PATH HELPERS
@@ -98,6 +98,73 @@ export function addHistoryEntry(
     }
 
     writeState(directory, state)
+}
+
+// ============================================================================
+// STYLE ANCHOR MANAGEMENT
+// ============================================================================
+
+/**
+ * Create a style anchor for tracking agent output styles
+ * Uses JSON serialization for content (backward compatible)
+ */
+export function createStyleAnchor(
+  directory: string, 
+  agent: string, 
+  style: string
+): void {
+  const state = readState(directory)
+  if (!state) return
+  
+  // Serialize content as JSON string for compatibility
+  const anchorContent = JSON.stringify({ 
+    agent, 
+    style, 
+    timestamp: new Date().toISOString() 
+  })
+  
+  const anchor: Anchor = {
+    id: `style-${Date.now()}`,
+    created: new Date().toISOString(),
+    type: 'output_style',
+    content: anchorContent,
+    priority: 'high'
+  }
+  
+  state.anchors = state.anchors || []
+  
+  // Replace policy: one style anchor per agent
+  state.anchors = state.anchors.filter(a => {
+    if (a.type !== 'output_style') return true
+    try {
+      const parsed = JSON.parse(a.content)
+      return parsed.agent !== agent
+    } catch {
+      return true
+    }
+  })
+  
+  state.anchors.push(anchor)
+  writeState(directory, state)
+}
+
+/**
+ * Get all style anchors
+ */
+export function getStyleAnchors(directory: string): Array<{ agent: string; style: string }> {
+  const state = readState(directory)
+  if (!state?.anchors) return []
+  
+  return state.anchors
+    .filter(a => a.type === 'output_style')
+    .map(a => {
+      try {
+        return JSON.parse(a.content)
+      } catch {
+        return null
+      }
+    })
+    .filter(Boolean)
 }
 
 // ============================================================================

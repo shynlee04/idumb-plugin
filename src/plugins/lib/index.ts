@@ -16,7 +16,9 @@ export {
     writeState,
     getStatePath,
     getDefaultState,
-    addHistoryEntry
+    addHistoryEntry,
+    createStyleAnchor,
+    getStyleAnchors
 } from "./state"
 
 // Config management
