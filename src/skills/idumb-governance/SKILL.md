@@ -46,19 +46,25 @@ result:
 
 ---
 
-## Agent Hierarchy
+## Agent Categories
 
-### Level 1: Supreme Coordinator
+### META Agents
 
-**Agent:** `@idumb-supreme-coordinator`
-**Mode:** `primary`
-**Role:** Top-level orchestration
+**Purpose:** Manage iDumb framework itself
+
+**Scope:** Restricted to `.idumb/` and `.opencode/` directories
+
+**Agents:**
+- `@idumb-supreme-coordinator` - Entry-point coordinator (delegation only)
+- `@idumb-high-governance` - Mid-level coordinator (delegation only)
+- `@idumb-meta-builder` - ONLY META agent that can write/edit framework files
+- `@idumb-meta-validator` - Validates framework state (read-only)
 
 **Rules:**
-- NEVER execute code directly
-- NEVER write files directly
-- ALWAYS delegate to governance layer
-- ALWAYS track what was delegated
+- Coordinators: NEVER execute directly, ALWAYS delegate
+- `idumb-meta-builder`: ONLY agent that can write framework files
+- `idumb-meta-validator`: Read-only validation
+- Scope restricted to framework directories
 
 **Delegation pattern:**
 ```
@@ -69,40 +75,27 @@ Requirements: [constraints]
 Report: [expected format]
 ```
 
-### Level 2: High Governance
+### PROJECT Agents
 
-**Agent:** `@idumb-high-governance`
-**Mode:** `all`
-**Role:** Mid-level coordination
+**Purpose:** Work on user's actual project code
 
-**Rules:**
-- Receives delegation from coordinator
-- Further delegates to validators/builders
-- Synthesizes results from sub-agents
-- Reports back to coordinator
+**Scope:** User project directory (excluding `.idumb/`, `.opencode/`)
 
-**Delegation pattern:**
-```
-@idumb-low-validator
-Check: [what to validate]
-Method: [how to check]
-Return: [expected evidence]
-```
-
-### Level 3: Low Validator
-
-**Agent:** `@idumb-low-validator`
-**Mode:** `all`
-**Hidden:** `true`
-**Role:** Actual validation work
+**Agents:**
+- `@idumb-project-executor` - Executes project code tasks (can write user code)
+- `@idumb-project-coordinator` - Coordinates project workflows
+- `@idumb-project-validator` - Validates project code quality
+- `@idumb-project-explorer` - Explores project codebase
 
 **Capabilities:**
-- grep, glob, file reads
-- Test execution
-- Structure validation
-- Evidence gathering
+- Can read project files (grep, glob, read across entire codebase)
+- `@idumb-project-executor` can write/edit user code
+- Can further delegate via `task()` tool
+- NO depth restrictions on delegation
 
-**Return format:**
+**Key Principle:** The distinction is about **scope** (framework vs user code), not capability or depth. Any agent can delegate to any other agent.
+
+**Return format (for validation work):**
 ```yaml
 validation:
   check: [what was checked]
@@ -111,19 +104,7 @@ validation:
   details: [explanation]
 ```
 
-### Level 4: Builder
-
-**Agent:** `@idumb-builder`
-**Mode:** `all`
-**Hidden:** `true`
-**Role:** Actual execution work
-
-**Capabilities:**
-- File creation, editing, deletion
-- Tool execution
-- State updates
-
-**Return format:**
+**Return format (for execution work):**
 ```yaml
 execution:
   action: [what was done]
@@ -328,30 +309,34 @@ If `.idumb/` doesn't exist:
 
 ## Best Practices
 
-### For Coordinators
+### For Coordinators (META agents)
 
 1. Always check state before delegating
 2. Provide full context in delegation
 3. Synthesize results before reporting
 4. Anchor significant outcomes
+5. Stay within framework scope (.idumb/, .opencode/)
 
-### For Validators
+### For META Workers (meta-builder, meta-validator)
 
-1. Never assume - verify everything
-2. Return structured evidence
-3. Be specific about failures
-4. Include timestamps
+1. meta-builder: ONLY agent that writes framework files
+2. meta-validator: Read-only validation of framework state
+3. Never operate outside framework directories
+4. Report all framework changes
 
-### For Builders
+### For PROJECT Agents (project-executor, project-validator, etc.)
 
-1. Report all file changes
-2. Don't modify state directly
-3. Return to governance layer
-4. Log actions taken
+1. Work within user project scope
+2. project-executor: ONLY agent that can write user code
+3. project-validator: Validates user code quality
+4. Can read anywhere (grep, glob, read across codebase)
+5. Include timestamps in reports
 
 ### For All Agents
 
 1. Context first, action second
 2. Evidence-based conclusions only
 3. Anchor critical discoveries
-4. Respect the hierarchy
+4. Log actions taken
+
+**Remember:** The distinction is META (framework) vs PROJECT (user code), not "levels" or "subagents."

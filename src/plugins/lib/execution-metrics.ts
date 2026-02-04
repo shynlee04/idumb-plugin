@@ -1,9 +1,8 @@
 /**
  * iDumb Plugin Execution Metrics & Stall Detection
- * 
- * Tracks execution metrics, detects planner/validator stalls,
- * and manages delegation depth for infinite loop prevention.
- * 
+ *
+ * Tracks execution metrics, detects planner/validator stalls.
+ *
  * CRITICAL: NO console.log anywhere - causes TUI background text exposure
  */
 
@@ -49,7 +48,7 @@ export function initializeExecutionMetrics(sessionId: string, directory: string)
         limits: {
             // NOTE: No maxIterations - per user principle "NEVER define iteration with numbers"
             // Validation uses acceptance-criteria-based gates, not hardcoded counts
-            maxDelegationDepth: 3,
+            // NOTE: No maxDelegationDepth - agents in mode: all can do anything
             maxErrors: 20
         }
     }
@@ -186,10 +185,6 @@ export function getStallDetectionState(sessionId: string): StallDetection {
             validatorFix: {
                 errorHashHistory: [],
                 repeatCount: 0
-            },
-            delegation: {
-                depth: 0,
-                callStack: []
             }
         })
     }
@@ -296,27 +291,17 @@ export function trackDelegationDepth(
     sessionId: string,
     agentName: string
 ): { depth: number; maxReached: boolean } {
-    const state = getStallDetectionState(sessionId)
-    const del = state.delegation
-
-    del.callStack.push(agentName)
-    del.depth = del.callStack.length
-
-    // Max depth is 3
-    const maxReached = del.depth > 3
-
-    return { depth: del.depth, maxReached }
+    // REMOVED: Delegation depth tracking is no longer needed
+    // Agents in mode: all can do anything, including further delegation
+    return { depth: 0, maxReached: false }
 }
 
 /**
  * Pop delegation depth when returning from all
  */
 export function popDelegationDepth(sessionId: string): void {
-    const state = stallDetectionState.get(sessionId)
-    if (state) {
-        state.delegation.callStack.pop()
-        state.delegation.depth = state.delegation.callStack.length
-    }
+    // REMOVED: Delegation depth tracking is no longer needed
+    // This function exists for API compatibility but does nothing
 }
 
 /**

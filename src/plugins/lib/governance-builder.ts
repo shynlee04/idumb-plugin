@@ -90,29 +90,44 @@ export function getAllowedTools(agentRole: string | null): string[] {
         'idumb-chunker_index', 'idumb-chunker_extract'
     ]
 
+    // P1-T5: Updated agent permissions with META/PROJECT separation
     const toolPermissions: Record<string, string[]> = {
-        // TIER 1: Coordinators
+        // === META COORDINATORS (delegation only) ===
         'idumb-supreme-coordinator': tier1Tools,
         'idumb-high-governance': tier1Tools,
 
-        // TIER 2: Executors/Planners (can delegate)
-        'idumb-executor': tier2Tools,
-        'idumb-verifier': tier2Tools,
-        'idumb-debugger': tier2Tools,
-        'idumb-planner': tier3Tools,  // Planner doesn't delegate
-        'idumb-plan-checker': tier3Tools,
-        'idumb-roadmapper': tier3Tools,
+        // === META WORKERS ===
+        'idumb-meta-builder': builderTools,  // ONLY META agent that writes framework files
+        'idumb-meta-validator': validatorTools,  // Read-only framework validation
 
-        // TIER 3: Researchers/Validators (read-only)
+        // === PROJECT COORDINATORS ===
+        'idumb-project-coordinator': tier2Tools,  // Coordinates PROJECT work
+
+        // === PROJECT WORKERS ===
+        'idumb-project-executor': tier2Tools,  // Executes PROJECT tasks (was idumb-executor)
+        'idumb-project-validator': tier3Tools,  // Read-only PROJECT validation
+        'idumb-project-explorer': tier3Tools,  // Read-only PROJECT exploration
+
+        // === BRIDGE/OTHER AGENTS ===
+        'idumb-mid-coordinator': tier1Tools,  // Bridges META and PROJECT
+        'idumb-verifier': tier2Tools,  // General verifier
+        'idumb-debugger': tier2Tools,  // Debugging
+        'idumb-planner': tier3Tools,  // Planning (read-only)
+        'idumb-plan-checker': tier3Tools,  // Plan validation
+        'idumb-roadmapper': tier3Tools,  // Roadmapping
+        'idumb-skeptic-validator': tier3Tools,  // Challenge assumptions
+
+        // === RESEARCHERS ===
         'idumb-integration-checker': tier3Tools,
         'idumb-project-researcher': tier3Tools,
         'idumb-phase-researcher': tier3Tools,
         'idumb-research-synthesizer': tier3Tools,
         'idumb-codebase-mapper': tier3Tools,
 
-        // LEAF NODES
-        'idumb-low-validator': validatorTools,
-        'idumb-builder': builderTools
+        // === LEGACY NAMES (for backward compatibility) ===
+        'idumb-executor': tier2Tools,  // Use idumb-project-executor instead
+        'idumb-builder': builderTools,  // Use idumb-meta-builder instead
+        'idumb-low-validator': validatorTools  // Use idumb-meta-validator instead
     }
 
     // Return allowed tools - EMPTY ARRAY means ALLOW ALL (no enforcement)
@@ -128,29 +143,44 @@ export function getAllowedTools(agentRole: string | null): string[] {
  * Returns empty array for non-iDumb agents (means no enforcement)
  */
 export function getRequiredFirstTools(agentRole: string | null): string[] {
+    // P1-T5: Updated with META/PROJECT agents
     const firstTools: Record<string, string[]> = {
-        // TIER 1: Coordinators - state awareness first
+        // === META COORDINATORS ===
         'idumb-supreme-coordinator': ['idumb-todo', 'idumb-state', 'idumb-context', 'read', 'glob'],
         'idumb-high-governance': ['idumb-todo', 'idumb-state', 'read', 'glob'],
 
-        // TIER 2: Executors/Planners
-        'idumb-executor': ['idumb-todo', 'idumb-state', 'read'],
+        // === META WORKERS ===
+        'idumb-meta-builder': ['idumb-todo', 'read'],
+        'idumb-meta-validator': ['idumb-todo', 'idumb-validate', 'read', 'glob', 'grep'],
+
+        // === PROJECT COORDINATORS ===
+        'idumb-project-coordinator': ['idumb-todo', 'idumb-state', 'read', 'glob'],
+
+        // === PROJECT WORKERS ===
+        'idumb-project-executor': ['idumb-todo', 'idumb-state', 'read'],
+        'idumb-project-validator': ['idumb-todo', 'idumb-validate', 'read', 'glob', 'grep'],
+        'idumb-project-explorer': ['idumb-todo', 'read', 'glob', 'grep'],
+
+        // === BRIDGE/OTHER AGENTS ===
+        'idumb-mid-coordinator': ['idumb-todo', 'idumb-state', 'read', 'glob'],
         'idumb-verifier': ['idumb-todo', 'idumb-state', 'read'],
         'idumb-debugger': ['idumb-todo', 'idumb-state', 'read', 'grep'],
         'idumb-planner': ['idumb-todo', 'idumb-state', 'read'],
         'idumb-plan-checker': ['idumb-todo', 'idumb-validate', 'read'],
         'idumb-roadmapper': ['idumb-todo', 'idumb-state', 'read'],
+        'idumb-skeptic-validator': ['idumb-todo', 'idumb-validate', 'read', 'grep'],
 
-        // TIER 3: Researchers/Validators
+        // === RESEARCHERS ===
         'idumb-integration-checker': ['idumb-todo', 'idumb-validate', 'read', 'grep'],
         'idumb-project-researcher': ['idumb-todo', 'read', 'glob'],
         'idumb-phase-researcher': ['idumb-todo', 'read', 'glob'],
         'idumb-research-synthesizer': ['idumb-todo', 'read'],
         'idumb-codebase-mapper': ['idumb-todo', 'read', 'glob', 'grep'],
 
-        // LEAF NODES
-        'idumb-low-validator': ['idumb-todo', 'idumb-validate', 'read', 'glob', 'grep'],
-        'idumb-builder': ['idumb-todo', 'read']
+        // === LEGACY NAMES (backward compatibility) ===
+        'idumb-executor': ['idumb-todo', 'idumb-state', 'read'],
+        'idumb-builder': ['idumb-todo', 'read'],
+        'idumb-low-validator': ['idumb-todo', 'idumb-validate', 'read', 'glob', 'grep']
     }
     // Default fallback - EMPTY = skip first-tool enforcement entirely
     if (!agentRole || !agentRole.startsWith('idumb-')) {
@@ -338,72 +368,92 @@ export function buildValidationFailureMessage(
     tool: string,
     violations: string[]
 ): string {
-    const lines: string[] = [
-        "🚫 VALIDATION FAILURE - TOOL BLOCKED 🚫",
-        "",
-        `Agent: ${agent}`,
-        `Tool: ${tool}`,
-        "",
-        "Validation Violations:",
-        ...violations.map(v => `  ❌ ${v}`),
-        "",
-        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━",
-        "VALIDATION RULES NOT MET",
-        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━",
-        "",
-        "This tool execution failed validation checks.",
-        "Review the violations above and fix before retrying.",
-        "",
-        "Next Steps:",
-        "1. Review validation requirements",
-        "2. Fix the reported issues",
-        "3. Re-run the tool with corrected parameters",
-        ""
-    ]
+    // P1-T1: TUI-safe - no emojis, plain text, <10 lines
+    const violationList = violations.map(v => `  - ${v}`).join("\n")
+    return `VALIDATION FAILED: ${agent} cannot use ${tool}
 
-    return lines.join("\n")
+Violations:
+${violationList}
+
+Fix the issues above and retry.`
 }
 
 /**
  * Build violation guidance for blocked tools
+ * P1-T1: TUI-safe - no emojis, <10 lines, META/PROJECT scope aware
  */
 export function buildViolationGuidance(agent: string, tool: string): string {
-    // P3-T1: Enhanced guidance with specific text for each agent role
-    const delegationTargets: Record<string, {
-        target: string;
-        specificGuidance: string;
+    // Updated for META/PROJECT agent separation (Phase 1)
+    const agentInfo: Record<string, {
+        delegateTo: string;
+        guidance: string;
     }> = {
+        // META Coordinators
         'idumb-supreme-coordinator': {
-            target: '@idumb-high-governance → @idumb-builder',
-            specificGuidance: 'As Supreme Coordinator, you are at the TOP of the hierarchy. Your role is to DELEGATE ALL WORK. Never execute, never validate, never modify files.'
+            delegateTo: '@idumb-high-governance or @idumb-meta-builder',
+            guidance: 'You are the entry point coordinator. DELEGATE all work.'
         },
         'idumb-high-governance': {
-            target: '@idumb-builder',
-            specificGuidance: 'As High Governance, you are a MID-LEVEL COORDINATOR. You coordinate and delegate but NEVER execute directly.'
+            delegateTo: '@idumb-meta-builder (META) or @idumb-project-* (PROJECT)',
+            guidance: 'You coordinate META and PROJECT work. Delegate appropriately.'
         },
-        'idumb-low-validator': {
-            target: 'Report to parent, DO NOT modify',
-            specificGuidance: 'As Low Validator, you are a VALIDATION WORKER. You investigate, validate, and report but NEVER modify files.'
+
+        // META Workers
+        'idumb-meta-builder': {
+            delegateTo: 'You are the ONLY META agent that can write framework files',
+            guidance: 'META scope: .idumb/, .opencode/, src/agents/, etc.'
+        },
+        'idumb-meta-validator': {
+            delegateTo: 'Read-only validation. Report findings.',
+            guidance: 'META scope: Read-only framework validation.'
+        },
+
+        // PROJECT Coordinators
+        'idumb-project-coordinator': {
+            delegateTo: '@idumb-project-executor or @idumb-project-validator',
+            guidance: 'PROJECT scope: User application code only.'
+        },
+        'idumb-project-executor': {
+            delegateTo: '@general for file operations',
+            guidance: 'PROJECT scope: You coordinate, @general writes user code.'
+        },
+        'idumb-project-validator': {
+            delegateTo: '@idumb-project-executor for fixes',
+            guidance: 'PROJECT scope: Read-only validation. Delegate fixes.'
+        },
+        'idumb-project-explorer': {
+            delegateTo: '@general for file operations',
+            guidance: 'PROJECT scope: Read-only exploration. Delegate writes.'
+        },
+
+        // Legacy/Other agents (fallback)
+        'idumb-executor': {
+            delegateTo: '@general for file operations',
+            guidance: 'Note: Use @idumb-project-executor instead.'
         },
         'idumb-builder': {
-            target: 'You ARE the executor - verify first',
-            specificGuidance: 'As Builder, you are the EXECUTION WORKER. You are the ONLY agent allowed to modify files.'
+            delegateTo: 'Use @idumb-meta-builder for META files',
+            guidance: 'Note: META scope only. Delegate PROJECT work to @idumb-project-*'
+        },
+        'idumb-low-validator': {
+            delegateTo: 'Use @idumb-meta-validator or @idumb-project-validator',
+            guidance: 'Note: Specify META or PROJECT scope.'
         }
     }
 
-    const info = delegationTargets[agent] || {
-        target: 'Check hierarchy',
-        specificGuidance: 'Unknown agent role. Please check the hierarchy documentation.'
+    const info = agentInfo[agent] || {
+        delegateTo: 'Check META vs PROJECT scope',
+        guidance: 'Unknown agent. Verify your scope and permissions.'
     }
 
-    // SIMPLIFIED: No emojis, no box-drawing chars to prevent TUI breaking
+    // TUI-safe format: no emojis, <10 lines
     return `BLOCKED: ${agent} cannot use ${tool}
 
-Role: ${info.specificGuidance}
+${info.guidance}
 
-Delegate to: ${info.target}
+Delegate to: ${info.delegateTo}
 
-Next: Use idumb-todo, then delegate to appropriate agent.`
+Use idumb-todo to track, then delegate.`
 }
 
 // ============================================================================

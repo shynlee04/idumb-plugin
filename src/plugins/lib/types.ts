@@ -110,7 +110,7 @@ export interface ExecutionMetrics {
     limits: {
         // NOTE: maxIterations REMOVED per user principle "NEVER define iteration with numbers"
         // Replaced by acceptance-criteria-based validation gates
-        maxDelegationDepth: number
+        // NOTE: maxDelegationDepth REMOVED - agents in mode: all can do anything
         maxErrors: number
     }
 }
@@ -129,10 +129,6 @@ export interface StallDetection {
     validatorFix: {
         errorHashHistory: string[]
         repeatCount: number
-    }
-    delegation: {
-        depth: number
-        callStack: string[]
     }
 }
 
@@ -211,9 +207,6 @@ export interface SessionTracker {
     firstToolUsed: boolean
     firstToolName: string | null
     agentRole: string | null
-    delegationDepth: number
-    sessionLevel: number  // S5-R08: Track session hierarchy level (1=root, 2+=all)
-    parentSession: string | null
     violationCount: number
     governanceInjected: boolean
 }
@@ -228,8 +221,6 @@ export interface SessionMetadata {
     lastUpdated: string
     phase: string
     governanceLevel: string
-    delegationDepth: number
-    parentSession: string | null
     language: {
         communication: string
         documents: string

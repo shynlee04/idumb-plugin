@@ -64,9 +64,6 @@ import {
   detectPlannerCheckerStall,
   detectValidatorFixStall,
   getStallDetectionState,
-  trackDelegationDepth,
-  popDelegationDepth,
-  triggerEmergencyHalt,
 
   // Chain rules
   READONLY_COMMANDS,
@@ -86,7 +83,6 @@ import {
   addPendingViolation,
   consumeValidationResult,
   detectAgentFromMessages,
-  detectallSession,
   extractToolName,
   storeSessionMetadata,
   loadSessionMetadata,
@@ -116,7 +112,6 @@ const sessionTrackers = new Map<string, {
   sessionId: string
   startTime: Date
   violationCount: number
-  delegationDepth: number
   lastActivity: Date
 }>()
 
@@ -217,7 +212,7 @@ export const IdumbCorePlugin: Plugin = async ({ directory, client }) => {
               'pass'
             )
 
-            log(directory, `Session stats: violations=${tracker?.violationCount}, depth=${tracker?.delegationDepth}`)
+            log(directory, `Session stats: violations=${tracker?.violationCount}`)
 
             // Update metadata with idle timestamp
             const metadata = loadSessionMetadata(directory, sessionId)
@@ -347,18 +342,6 @@ export const IdumbCorePlugin: Plugin = async ({ directory, client }) => {
         const tracker = getSessionTracker(sessionId)
         tracker.agentRole = agentRole
 
-        // S5-R08: Detect if this is a all session (Level 2+)
-        // all sessions are created via task() calls from parent sessions
-        // They should NOT receive full governance injection to avoid context bloat
-        const isallSession = detectallSession(output.messages, tracker)
-        if (isallSession) {
-          tracker.sessionLevel = tracker.delegationDepth + 1 // Inherit from delegation chain
-          log(directory, `all session detected (Level ${tracker.sessionLevel}), skipping governance injection`)
-          // S5-R08: Skip full governance injection for Level 2+ sessions
-          // alls inherit governance constraints from parent via task delegation
-          return
-        }
-
         // Detect session start (no user messages yet processed)
         const userMessages = output.messages.filter((m: any) =>
           m.info?.role === 'user' ||
@@ -369,11 +352,8 @@ export const IdumbCorePlugin: Plugin = async ({ directory, client }) => {
         const isSessionStart = userMessages.length <= 1 && !tracker.governanceInjected
         const isResumedSession = isSessionStart && checkIfResumedSession(sessionId, directory)
 
-        // S5-R08: Only inject governance for Level 1 (root) sessions
-        const isLevel1Session = tracker.sessionLevel === 1
-
-        if ((isSessionStart || isResumedSession) && agentRole && isLevel1Session) {
-          log(directory, `Session start detected for ${agentRole} (Level 1 - injecting governance)`)
+        if ((isSessionStart || isResumedSession) && agentRole) {
+          log(directory, `Session start detected for ${agentRole} (injecting governance)`)
 
           // Build governance prefix with resumption awareness
           let governancePrefix = buildGovernancePrefix(agentRole, directory, isResumedSession)
@@ -697,45 +677,19 @@ export const IdumbCorePlugin: Plugin = async ({ directory, client }) => {
         }
 
         // ==========================================
-        // DELEGATION TRACKING (P3-T2, P3-T3)
+        // DELEGATION TRACKING (P3-T2)
         // ==========================================
 
         if (toolName === "task") {
           const desc = output.args?.description || "unknown"
           const agent = output.args?.all_type || "general"
           log(directory, `[TASK] Delegation: ${agent} - ${desc}`)
-          tracker.delegationDepth++
 
           // P3-T2: Track agent spawn in execution metrics
           trackAgentSpawn(directory, agent)
 
-          // P3-T3: Track delegation depth with stall detection
-          const delegationResult = trackDelegationDepth(sessionId, agent)
-
-          // P3-T3: Check for max delegation depth exceeded
-          if (delegationResult.maxReached) {
-            const haltMessage = triggerEmergencyHalt(
-              directory,
-              sessionId,
-              "MAX_DELEGATION_DEPTH_EXCEEDED",
-              {
-                depth: delegationResult.depth,
-                maxAllowed: 3,
-                agent: agent,
-                description: desc
-              }
-            )
-
-            // Block the delegation by modifying output args
-            output.args = {
-              __BLOCKED_BY_GOVERNANCE__: true,
-              __VIOLATION__: "Maximum delegation depth exceeded (max: 3)",
-              __HALT_MESSAGE__: haltMessage
-            }
-
-            log(directory, `[EMERGENCY HALT] Max delegation depth exceeded: ${delegationResult.depth}`)
-            return
-          }
+          // NOTE: No depth tracking or max depth enforcement
+          // Agents in mode: all can do anything, including further delegation
         }
 
         // ==========================================
@@ -776,7 +730,7 @@ export const IdumbCorePlugin: Plugin = async ({ directory, client }) => {
 
           // COMPLETELY REPLACE output - DO NOT append original output
           output.output = guidance
-          output.title = `🚫 BLOCKED: ${violation.agent} cannot use ${toolName}`
+          output.title = `BLOCKED: ${violation.agent} cannot use ${toolName}`
 
           // Clear the pending denial
           pendingDenials.delete(sessionId)
@@ -802,7 +756,7 @@ export const IdumbCorePlugin: Plugin = async ({ directory, client }) => {
 
           // COMPLETELY REPLACE output with validation failure message
           output.output = failureMessage
-          output.title = `🚫 VALIDATION FAILED: ${validationResult.tool}`
+          output.title = `VALIDATION FAILED: ${validationResult.tool}`
 
           log(directory, `[VALIDATION BLOCKED] ${validationResult.agent} using ${validationResult.tool} - ${validationResult.violations.length} violations`)
 
@@ -818,17 +772,12 @@ export const IdumbCorePlugin: Plugin = async ({ directory, client }) => {
         // NOTE: Cannot access original args here per OpenCode API
         // output contains: { title, output, metadata } - no error field
         if (toolName === "task") {
-          // P3-T3 BUG FIX: Pop delegation depth when task completes
-          // This was never called, causing delegation stack to grow indefinitely
-          // and triggering false MAX_DELEGATION_DEPTH_EXCEEDED errors
-          popDelegationDepth(sessionId)
-
           // Infer success from output.metadata or output.output content
           const hasError = output.output?.toLowerCase().includes('error') ||
             output.output?.toLowerCase().includes('failed')
           const result = hasError ? "fail" : "pass"
           addHistoryEntry(directory, `task:${output.title || "unknown"}`, "plugin", result as "pass" | "fail")
-          log(directory, `Task completed: ${result} (depth: ${stallDetectionState.get(sessionId)?.delegation.depth || 0})`)
+          log(directory, `Task completed: ${result}`)
         }
 
         // Track iDumb file operations
