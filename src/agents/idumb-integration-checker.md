@@ -7,24 +7,20 @@ scope: bridge
 temperature: 0.2
 permission:
   task:
-    allow:
-      - "idumb-atomic-explorer"
-      - "idumb-low-validator"
-      - "general"
+    idumb-atomic-explorer: allow
+    idumb-low-validator: allow
+    general: allow
   bash:
-    allow:
-      - "pnpm test*"
-      - "npm test*"
-      - "git diff*"
-      - "git status"
-      - "grep*"
-      - "curl*"
+    pnpm: allow
+    npm: allow
+    "git diff*": allow
+    "git status": allow
+    "grep*": allow
+    "curl*": allow
   edit:
-    allow:
-      - ".idumb/idumb-project-output/validations/**/*.md"
+    ".idumb/idumb-project-output/validations/**/*.md": allow
   write:
-    allow:
-      - ".idumb/idumb-project-output/validations/**/*.md"
+    ".idumb/idumb-project-output/validations/**/*.md": allow
 tools:
   task: true
   read: true

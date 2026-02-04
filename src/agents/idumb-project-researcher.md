@@ -7,20 +7,16 @@ scope: project
 temperature: 0.3
 permission:
   task:
-    allow:
-      - "idumb-atomic-explorer"
-      - "idumb-phase-researcher"
-      - "idumb-codebase-mapper"
-      - "general"
+    idumb-atomic-explorer: allow
+    idumb-phase-researcher: allow
+    idumb-codebase-mapper: allow
+    general: allow
   bash:
-    allow:
-      - "ls*"
+    "ls*": allow
   edit:
-    allow:
-      - ".idumb/idumb-project-output/research/**/*.md"
+    ".idumb/idumb-project-output/research/**/*.md": allow
   write:
-    allow:
-      - ".idumb/idumb-project-output/research/**/*.md"
+    ".idumb/idumb-project-output/research/**/*.md": allow
 tools:
   task: true
   read: true

@@ -7,24 +7,20 @@ scope: project
 temperature: 0.2
 permission:
   task:
-    allow:
-      - "idumb-project-researcher"
-      - "general"
+    idumb-project-researcher: allow
+    general: allow
   bash:
-    allow:
-      - "ls*"
-      - "cat*"
-      - "git log"
+    "ls*": allow
+    "cat*": allow
+    "git log": allow
   edit:
-    allow:
-      - ".planning/ROADMAP.md"
-      - ".planning/STATE.md"
-      - ".planning/REQUIREMENTS.md"
+    ".planning/ROADMAP.md": allow
+    ".planning/STATE.md": allow
+    ".planning/REQUIREMENTS.md": allow
   write:
-    allow:
-      - ".planning/ROADMAP.md"
-      - ".planning/STATE.md"
-      - ".planning/REQUIREMENTS.md"
+    ".planning/ROADMAP.md": allow
+    ".planning/STATE.md": allow
+    ".planning/REQUIREMENTS.md": allow
 tools:
   task: true
   read: true

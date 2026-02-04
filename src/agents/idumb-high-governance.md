@@ -1,5 +1,13 @@
 ---
-description: "High-level governance - coordinates validation and building, can delegate to all agents"
+# DEPRECATED 2026-02-05 - Replaced by idumb-governance-coordinator skill
+# This agent will be removed in version 0.3.0
+# Migration: Use .opencode/skills/idumb-governance-coordinator/SKILL.md
+# The skill provides the same functionality with:
+# - Embedded workflows for validate → build → verify cycles
+# - Better integration with modern skill-based architecture
+# - Modular, composable approach following BMAD patterns
+# This agent remains functional during transition period
+description: "DEPRECATED: Use idumb-governance-coordinator skill instead"
 id: agent-idumb-high-governance
 parent: idumb-supreme-coordinator
 mode: all

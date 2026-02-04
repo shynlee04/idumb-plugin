@@ -202,23 +202,30 @@ Then: @idumb-research-synthesizer → combine outputs
 
 When a request arrives, I classify and route:
 
-### Meta Work → @idumb-high-governance
+### Meta Work → idumb-governance-coordinator skill (PREFERRED)
 **Signals:** "framework", "config", "state", ".idumb/", "initialize", "checkpoint"
 ```
-Examples:
-- "Initialize iDumb" → @idumb-high-governance
-- "Update config settings" → @idumb-high-governance
-- "Create checkpoint" → @idumb-high-governance
-- "Restore from checkpoint" → @idumb-high-governance
+PREFERRED (new skill-based):
+- "Initialize iDumb" → [idumb-governance-coordinator] skill
+- "Update config settings" → [idumb-governance-coordinator] skill
+- "Create checkpoint" → [idumb-governance-coordinator] skill
+- "Restore from checkpoint" → [idumb-governance-coordinator] skill
+
+LEGACY (agent-based, transition period):
+- @idumb-high-governance (DEPRECATED - use skill instead)
 ```
 
-### Project Work → @idumb-mid-coordinator
+### Project Work → idumb-project-orchestrator skill (PREFERRED)
 **Signals:** "execute", "implement", "build", "phase", "feature"
 ```
-Examples:
-- "Execute phase 2" → @idumb-mid-coordinator
-- "Build the auth feature" → @idumb-mid-coordinator
-- "Run the current plan" → @idumb-mid-coordinator
+PREFERRED (new skill-based):
+- "Execute phase 2" → [idumb-project-orchestrator] skill
+- "Build the auth feature" → [idumb-project-orchestrator] skill
+- "Run the current plan" → [idumb-project-orchestrator] skill
+
+LEGACY (agent-based, transition period):
+- @idumb-mid-coordinator (DEPRECATED - use skill instead)
+- @idumb-project-coordinator (DEPRECATED - use skill instead)
 ```
 
 ### Research → Research Chain
@@ -645,8 +652,10 @@ Use structured format from `<structured_returns>` section.
 - **TODO System**: todoread/todowrite
 
 ### Delivers To
-- **@idumb-high-governance**: Meta-level work
-- **@idumb-mid-coordinator**: Project-level work
+- **[NEW] idumb-governance-coordinator skill**: Meta-level work (preferred)
+- **[DEPRECATED] @idumb-high-governance**: Meta-level work (transition period)
+- **[NEW] idumb-project-orchestrator skill**: Project-level work (preferred)
+- **[DEPRECATED] @idumb-mid-coordinator**: Project-level work (transition period)
 - **Research agents**: Research requests
 - **Validation agents**: Validation requests
 
@@ -655,23 +664,46 @@ Use structured format from `<structured_returns>` section.
 
 ## Available Agents (Complete Registry)
 
-| Agent | Mode | Scope | Can Delegate To | Purpose |
-|-------|------|-------|-----------------|---------|
-| idumb-supreme-coordinator | primary | bridge | ALL agents | Top-level orchestration |
-| idumb-high-governance | all | meta | ALL agents | Meta-level coordination |
-| idumb-mid-coordinator | all | bridge | project agents | Project coordination |
-| idumb-project-executor | all | project | general, verifier, debugger | Phase execution |
-| idumb-builder | all | meta | none (leaf) | File operations |
-| idumb-low-validator | all | meta | none (leaf) | Read-only validation |
-| idumb-verifier | all | project | general, low-validator | Work verification |
-| idumb-debugger | all | project | general, low-validator | Issue diagnosis |
-| idumb-planner | all | bridge | general | Plan creation |
-| idumb-plan-checker | all | bridge | general | Plan validation |
-| idumb-roadmapper | all | project | general | Roadmap creation |
-| idumb-project-researcher | all | project | general | Domain research |
-| idumb-phase-researcher | all | project | general | Phase research |
-| idumb-research-synthesizer | all | project | general | Synthesize research |
-| idumb-codebase-mapper | all | project | general | Codebase analysis |
-| idumb-integration-checker | all | bridge | general, low-validator | Integration validation |
-| idumb-skeptic-validator | all | bridge | general | Challenge assumptions |
-| idumb-project-explorer | all | project | general | Project exploration |
+| Agent/Skill | Type | Mode | Scope | Can Delegate To | Purpose |
+|-------------|------|------|-------|-----------------|---------|
+| idumb-supreme-coordinator | Agent | primary | bridge | ALL agents | Top-level orchestration |
+| **SKILLS (NEW)** | | | | | |
+| idumb-governance-coordinator | Skill | - | meta | ALL agents | Meta-level governance coordination |
+| idumb-project-orchestrator | Skill | - | project | project agents | Project-level coordination |
+| idumb-meta-creator | Skill | - | meta | meta-builder | On-demand entity creation |
+| **META AGENTS** | | | | | |
+| idumb-high-governance | Agent | all | meta | ALL agents | **DEPRECATED** - Use governance-coordinator skill |
+| idumb-meta-builder | Agent | all | meta | none (leaf) | META file operations |
+| idumb-meta-validator | Agent | all | meta | low-validator | Framework validation |
+| idumb-builder | Agent | all | meta | none (leaf) | File operations |
+| idumb-low-validator | Agent | all | meta | none (leaf) | Read-only validation |
+| **PROJECT COORDINATORS** | | | | | |
+| idumb-mid-coordinator | Agent | all | bridge | project agents | **DEPRECATED** - Use project-orchestrator skill |
+| idumb-project-coordinator | Agent | all | project | project agents | **DEPRECATED** - Use project-orchestrator skill |
+| **PROJECT AGENTS** | | | | | |
+| idumb-project-executor | Agent | all | project | general, verifier, debugger | Phase execution |
+| idumb-planner | Agent | all | bridge | general | Plan creation |
+| idumb-plan-checker | Agent | all | bridge | general | Plan validation |
+| idumb-roadmapper | Agent | all | project | general | Roadmap creation |
+| **RESEARCH AGENTS** | | | | | |
+| idumb-project-researcher | Agent | all | project | general | Domain research |
+| idumb-phase-researcher | Agent | all | project | general | Phase research |
+| idumb-research-synthesizer | Agent | all | project | general | Synthesize research |
+| idumb-codebase-mapper | Agent | all | project | general | Codebase analysis |
+| idumb-project-explorer | Agent | all | project | general | Project exploration |
+| **VALIDATION AGENTS** | | | | | |
+| idumb-verifier | Agent | all | project | general, low-validator | Work verification |
+| idumb-skeptic-validator | Agent | all | bridge | general | Challenge assumptions |
+| idumb-integration-checker | Agent | all | bridge | general, low-validator | Integration validation |
+| idumb-debugger | Agent | all | project | general, low-validator | Issue diagnosis |
+
+### Migration Notes
+
+**Skills vs Agents:**
+- Skills auto-activate based on context and provide modular workflows
+- Skills are preferred for new development (BMAD-inspired architecture)
+- Deprecated agents remain functional during transition period
+
+**Transition Status:**
+- Phase 2A (2026-02-05): Skills created, coordinators marked deprecated
+- Future v0.3.0: Deprecated agents may be removed after usage monitoring

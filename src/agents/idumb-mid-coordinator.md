@@ -1,5 +1,13 @@
 ---
-description: "PROJECT coordinator - bridges high-governance to project agents. READ-ONLY, coordinates via delegation."
+# DEPRECATED 2026-02-05 - Replaced by idumb-project-orchestrator skill
+# This agent will be removed in version 0.3.0
+# Migration: Use .opencode/skills/idumb-project-orchestrator/SKILL.md
+# The skill provides the same functionality with:
+# - Embedded workflows for research coordination, phase execution, blocker resolution
+# - Better integration with modern skill-based architecture
+# - Modular, composable approach following BMAD patterns
+# This agent remains functional during transition period
+description: "DEPRECATED: Use idumb-project-orchestrator skill instead"
 id: agent-idumb-mid-coordinator
 parent: idumb-supreme-coordinator
 mode: all
@@ -34,11 +42,9 @@ permission:
     "tail *": allow
     # Other commands implicitly denied - no wildcard ask
   edit:
-    allow:
-      - ".idumb/idumb-project-output/**/*.md"    # Research/plan artifacts via skills
+    ".idumb/idumb-project-output/**/*.md": allow
   write:
-    allow:
-      - ".idumb/idumb-project-output/**/*.md"    # Research/plan artifacts via skills
+    ".idumb/idumb-project-output/**/*.md": allow
 tools:
   task: true              # Primary tool - delegation
   todoread: true

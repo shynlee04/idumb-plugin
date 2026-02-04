@@ -7,29 +7,25 @@ scope: dev
 temperature: 0.2
 permission:
   task:
-    allow: []
+    "*": deny
   bash:
-    # Git operations
     "git status": allow
-    "git add *": allow
-    "git commit *": allow
-    "git log *": allow
-    "git diff *": allow
-    "git rev-parse *": allow
-    # Directory operations (META paths only)
+    "git add*": allow
+    "git commit*": allow
+    "git log*": allow
+    "git diff*": allow
+    "git rev-parse*": allow
     "mkdir -p .idumb/*": allow
     "mkdir -p .idumb/idumb-modules/*": allow
     "mkdir -p src/templates/*": allow
     "mkdir -p src/config/*": allow
     "mkdir -p src/schemas/*": allow
     "mkdir -p src/skills/*": allow
-    # Validation script execution
     "node *.js": allow
-    # Safe exploration
-    "ls *": allow
-    "cat *": allow
-    "head *": allow
-    "tail *": allow
+    "ls*": allow
+    "cat*": allow
+    "head*": allow
+    "tail*": allow
   edit:
     ".idumb/**": allow
     "src/templates/**": allow

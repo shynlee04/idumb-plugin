@@ -1,5 +1,13 @@
 ---
-description: "PROJECT coordinator - coordinates project-level workflows and delegates to project-executor, project-validator, or general. Scope: PROJECT code only."
+# DEPRECATED 2026-02-05 - Replaced by idumb-project-orchestrator skill
+# This agent will be removed in version 0.3.0
+# Migration: Use .opencode/skills/idumb-project-orchestrator/SKILL.md
+# The skill provides the same functionality with:
+# - Embedded workflows for research coordination, phase execution, blocker resolution
+# - Better integration with modern skill-based architecture
+# - Modular, composable approach following BMAD patterns
+# This agent remains functional during transition period
+description: "DEPRECATED: Use idumb-project-orchestrator skill instead"
 id: agent-idumb-project-coordinator
 parent: idumb-high-governance
 mode: all
@@ -7,26 +15,22 @@ scope: project
 temperature: 0.2
 permission:
   task:
-    allow:
-      - "idumb-project-executor"
-      - "idumb-project-validator"
-      - "idumb-project-explorer"
-      - "idumb-atomic-explorer"
-      - "general"
+    idumb-project-executor: allow
+    idumb-project-validator: allow
+    idumb-project-explorer: allow
+    idumb-atomic-explorer: allow
+    general: allow
   bash:
-    allow:
-      - "ls*"
-      - "cat*"
-      - "head*"
-      - "tail*"
-      - "git status*"
-      - "git log*"
+    "ls*": allow
+    "cat*": allow
+    "head*": allow
+    "tail*": allow
+    "git status*": allow
+    "git log*": allow
   edit:
-    allow:
-      - ".idumb/idumb-project-output/**/*.md"
+    ".idumb/idumb-project-output/**/*.md": allow
   write:
-    allow:
-      - ".idumb/idumb-project-output/**/*.md"
+    ".idumb/idumb-project-output/**/*.md": allow
 tools:
   task: true
   idumb-state: true

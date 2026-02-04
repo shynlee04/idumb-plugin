@@ -7,22 +7,18 @@ scope: bridge
 temperature: 0.1
 permission:
   task:
-    allow:
-      - "idumb-atomic-explorer"
-      - "general"
+    idumb-atomic-explorer: allow
+    general: allow
   bash:
-    allow:
-      - "git status"
-      - "git diff*"
-      - "ls*"
-      - "grep*"
-      - "cat*"
+    "git status": allow
+    "git diff*": allow
+    "ls*": allow
+    "grep*": allow
+    "cat*": allow
   edit:
-    allow:
-      - ".planning/phases/**/PLAN-*.md"
+    ".planning/phases/**/PLAN-*.md": allow
   write:
-    allow:
-      - ".idumb/idumb-project-output/phases/**/*.md"
+    ".idumb/idumb-project-output/phases/**/*.md": allow
 tools:
   task: true
   read: true
