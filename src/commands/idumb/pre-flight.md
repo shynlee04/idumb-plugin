@@ -56,6 +56,16 @@ Execute pre-flight validation checks before starting development work on a proje
 **Goal:** Determine if project is greenfield or brownfield
 
 ```bash
+# Security: Add error handling and input validation
+set -euo pipefail
+
+# Security: Validate and sanitize inputs
+QUICK="${QUICK:-false}"
+FULL="${FULL:-false}"
+FIX="${FIX:-false}"
+GREENFIELD="${GREENFIELD:-false}"
+BROWNFIELD="${BROWNFIELD:-false}"
+
 echo "Detecting project type..."
 
 # Count files (excluding node_modules, .git)
@@ -243,14 +253,20 @@ if [ "$FIX" == "true" ]; then
   if [ ! -d ".idumb/idumb-brain" ]; then
     echo "AUTO-FIX: Initializing iDumb..."
     mkdir -p .idumb/idumb-brain
-    echo '{"version":"0.3.0","initialized":"'$(date -u +"%Y-%m-%dT%H:%M:%SZ")'","framework":"idumb","phase":"init"}' > .idumb/idumb-brain/state.json
+    TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+    echo '{"version":"0.3.0","initialized":"'$TIMESTAMP'","framework":"idumb","phase":"init"}' > .idumb/idumb-brain/state.json
     echo '{"governance":{"level":"standard"}}' > .idumb/idumb-brain/config.json
   fi
   
-  # Fix 2: Create missing directories
+  # Fix 2: Create missing directories with security checks
   for dir in ".idumb/idumb-project-output" ".idumb/idumb-brain/governance" ".idumb/idumb-brain/history"; do
     if [ ! -d "$dir" ]; then
       echo "AUTO-FIX: Creating $dir"
+      # Security: Validate directory path
+      if [[ "$dir" == *".."* ]] || [[ "$dir" == *"//"* ]] || [[ "$dir" == *"&"* ]]; then
+        echo "ERROR: Unsafe directory path: $dir"
+        exit 1
+      fi
       mkdir -p "$dir"
     fi
   done

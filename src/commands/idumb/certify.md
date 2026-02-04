@@ -52,7 +52,14 @@ Run comprehensive certification process for the iDumb framework. Validates that 
 **Goal:** Determine certification rigor
 
 ```bash
+# Source security utilities
+source "$(dirname "$0")/../../security/security-utils.sh"
+source "$(dirname "$0")/../../security/integration-counter.sh"
+
+# Security: Validate and sanitize inputs
 LEVEL="${1:-standard}"
+
+validate_mode "$LEVEL" || exit 1
 
 case "$LEVEL" in
   basic)
@@ -71,7 +78,6 @@ case "$LEVEL" in
     THRESHOLD=95
     ;;
 esac
-```
 
 ## Step 2: Component Inventory
 
@@ -189,26 +195,32 @@ INTEGRATION_FAIL=0
 # Agent integration points (threshold: 30)
 echo "Agent integration points..."
 for agent in src/agents/idumb-*.md; do
-  POINTS=$(grep -c -E "(idumb-|/idumb:|\.json|\.md|read|write|state|config)" "$agent" 2>/dev/null || echo 0)
-  if [ "$POINTS" -ge 30 ]; then
-    echo "  ✓ $(basename $agent): $POINTS points"
-    ((INTEGRATION_PASS++))
-  else
-    echo "  ⚠ $(basename $agent): $POINTS points (< 30)"
-    ((INTEGRATION_FAIL++))
+  if [ -f "$agent" ]; then
+    POINTS=$(count_integration_points "$agent" "agent")
+    RESULT=$(validate_integration_threshold "$POINTS" "agent")
+    if [ "$RESULT" = "PASS" ]; then
+      echo "  ✓ $(basename $agent): $POINTS points"
+      ((INTEGRATION_PASS++))
+    else
+      echo "  ⚠ $(basename $agent): $POINTS points (< 30)"
+      ((INTEGRATION_FAIL++))
+    fi
   fi
 done
 
 # Command integration points (threshold: 15)
 echo "Command integration points..."
 for cmd in src/commands/idumb/*.md; do
-  POINTS=$(grep -c -E "(idumb-|/idumb:|\.json|\.md|state|config)" "$cmd" 2>/dev/null || echo 0)
-  if [ "$POINTS" -ge 15 ]; then
-    echo "  ✓ $(basename $cmd): $POINTS points"
-    ((INTEGRATION_PASS++))
-  else
-    echo "  ⚠ $(basename $cmd): $POINTS points (< 15)"
-    ((INTEGRATION_FAIL++))
+  if [ -f "$cmd" ]; then
+    POINTS=$(count_integration_points "$cmd" "command")
+    RESULT=$(validate_integration_threshold "$POINTS" "command")
+    if [ "$RESULT" = "PASS" ]; then
+      echo "  ✓ $(basename $cmd): $POINTS points"
+      ((INTEGRATION_PASS++))
+    else
+      echo "  ⚠ $(basename $cmd): $POINTS points (< 15)"
+      ((INTEGRATION_FAIL++))
+    fi
   fi
 done
 
@@ -301,9 +313,16 @@ echo "=========================================="
 ```bash
 if [ "$CERTIFIED" == "YES" ]; then
   TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-  CERT_FILE=".idumb/idumb-brain/governance/certificate-${TIMESTAMP}.json"
+  validate_timestamp "$TIMESTAMP"
   
-  cat > "$CERT_FILE" << EOF
+  # Security: Sanitize timestamp in filename
+  SAFE_TIMESTAMP=$(echo "$TIMESTAMP" | tr -d ':')
+  CERT_DIR=".idumb/idumb-brain/governance"
+  safe_mkdir "$CERT_DIR"
+  CERT_FILE="$CERT_DIR/certificate-${SAFE_TIMESTAMP}.json"
+  
+  # Security: Atomic write with validation
+  CERT_CONTENT=$(cat << EOF
 {
   "type": "iDumb Framework Certification",
   "version": "1.0.0",
@@ -334,8 +353,15 @@ if [ "$CERTIFIED" == "YES" ]; then
   ]
 }
 EOF
-
-  echo "Certificate saved: $CERT_FILE"
+)
+  
+  # Use atomic write function
+  if atomic_write "$CERT_CONTENT" "$CERT_FILE"; then
+    echo "Certificate saved: $CERT_FILE"
+  else
+    echo "ERROR: Failed to save certificate"
+    exit 1
+  fi
   
   # Update state
   idumb-state_anchor content="Certified: $CERT_SCORE% ($LEVEL level)" priority="critical" type="checkpoint"

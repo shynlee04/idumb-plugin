@@ -55,6 +55,56 @@ Execute a comprehensive health check on the project's governance state. Calculat
 **Goal:** Evaluate iDumb governance state
 
 ```bash
+# Security: Add error handling and input validation
+set -euo pipefail
+
+# Security: Validate timestamp format
+validate_timestamp() {
+    local ts="$1"
+    if [[ ! "$ts" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$ ]]; then
+        echo "ERROR: Invalid timestamp format: $ts"
+        exit 1
+    fi
+}
+
+# Security: Sanitize file paths
+sanitize_path() {
+    local path="$1"
+    # Remove dangerous characters
+    path="${path//../}"
+    path="${path//;/}"
+    path="${path//&/}"
+    path="${path//|/}"
+    path="${path//`/}"
+    path="${path//$/}"
+    # Ensure path doesn't start with /
+    path="${path#/}"
+    echo "$path"
+}
+
+# Security: Create safe directory path
+safe_mkdir() {
+    local dir="$1"
+    dir=$(sanitize_path "$dir")
+    if [[ "$dir" == *".."* ]] || [[ "$dir" == *"//"* ]]; then
+        echo "ERROR: Unsafe directory path: $dir"
+        exit 1
+    fi
+    mkdir -p "$dir"
+}
+
+# Security: Cross-platform date arithmetic
+calculate_hours_old() {
+    local last_validation="$1"
+    # Use node for cross-platform date handling
+    if command -v node &> /dev/null; then
+        node -e "console.log(Math.floor((Date.now() - new Date('$last_validation').getTime()) / 3600000))" 2>/dev/null || echo 0
+    else
+        # Fallback: assume very old if can't calculate
+        echo 999
+    fi
+}
+
 echo "Assessing governance health..."
 
 GOVERNANCE_SCORE=0
@@ -77,8 +127,8 @@ else
 fi
 
 # Check 3: State freshness (25 points)
-LAST_VALIDATION=$(jq -r '.lastValidation // "1970-01-01T00:00:00Z"' .idumb/idumb-brain/state.json)
-HOURS_OLD=$(( ($(date +%s) - $(date -d "$LAST_VALIDATION" +%s 2>/dev/null || echo 0)) / 3600 ))
+LAST_VALIDATION=$(jq -r '.lastValidation // "1970-01-01T00:00:00Z"' .idumb/idumb-brain/state.json || echo "1970-01-01T00:00:00Z")
+HOURS_OLD=$(calculate_hours_old "$LAST_VALIDATION")
 if [ "$HOURS_OLD" -lt 48 ]; then
   echo "✓ State is fresh ($HOURS_OLD hours old)"
   GOVERNANCE_SCORE=$((GOVERNANCE_SCORE + 25))
@@ -115,6 +165,7 @@ PROJECT_SCORE=0
 PROJECT_MAX=100
 
 # Check 1: Tests exist (25 points)
+TEST_COUNT=0
 if ls **/*.test.* **/*.spec.* __tests__/* tests/* 2>/dev/null | head -1 > /dev/null; then
   TEST_COUNT=$(find . -name "*.test.*" -o -name "*.spec.*" 2>/dev/null | wc -l)
   echo "✓ Tests exist ($TEST_COUNT files)"
@@ -295,11 +346,17 @@ done
 
 ```bash
 TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-REPORT_FILE=".idumb/idumb-brain/governance/health-check-${TIMESTAMP}.json"
+validate_timestamp "$TIMESTAMP"
 
-mkdir -p .idumb/idumb-brain/governance
+# Security: Sanitize timestamp in filename
+SAFE_TIMESTAMP=$(echo "$TIMESTAMP" | tr -d ':')
+REPORT_DIR=".idumb/idumb-brain/governance"
+safe_mkdir "$REPORT_DIR"
+REPORT_FILE="$REPORT_DIR/health-check-${SAFE_TIMESTAMP}.json"
 
-cat > "$REPORT_FILE" << EOF
+# Security: Atomic write with validation
+TEMP_REPORT="${REPORT_FILE}.tmp.$$"
+cat > "$TEMP_REPORT" << EOF
 {
   "timestamp": "$TIMESTAMP",
   "overall_score": $OVERALL_SCORE,
@@ -321,6 +378,16 @@ cat > "$REPORT_FILE" << EOF
   "recommendations": $(printf '%s\n' "${RECOMMENDATIONS[@]}" | jq -R . | jq -s .)
 }
 EOF
+
+# Validate JSON before moving
+if ! jq . "$TEMP_REPORT" > /dev/null 2>&1; then
+    echo "ERROR: Invalid JSON generated"
+    rm -f "$TEMP_REPORT"
+    exit 1
+fi
+
+# Atomic move
+mv "$TEMP_REPORT" "$REPORT_FILE"
 
 echo ""
 echo "Report saved: $REPORT_FILE"

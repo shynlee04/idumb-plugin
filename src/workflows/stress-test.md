@@ -370,6 +370,7 @@ echo "Report: $REPORT"
 ```yaml
 iteration_logic:
   mode: "until_pass_or_stall"
+  max_iterations: 10  # Prevent infinite loops
   
   progress_metric: |
     (AGENT_TESTS_PASSED + INTEGRATION_PASSED) / (TOTAL_TESTS)
@@ -377,6 +378,7 @@ iteration_logic:
   stall_detection:
     - same_score_3_iterations: "escalate"
     - no_fixes_applied: "exit with report"
+    - max_iterations_reached: "exit with report"
     
   exit_conditions:
     success:
@@ -392,6 +394,7 @@ iteration_logic:
     fail:
       - agent_tests_failed: "> 0"
       - conflicts: "> 0"
+      - max_iterations_reached: true
 ```
 </loop_controller>
 

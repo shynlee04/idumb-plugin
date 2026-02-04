@@ -383,6 +383,8 @@ continuous_loop:
   stall_prevention:
     max_frequency: "1 validation per 30 seconds"
     batch_cooldown: "5 minutes after batch"
+    max_iterations: 10  # Prevent infinite loops
+    progress_threshold: 0.1  # Require 10% progress to continue
 ```
 </loop_controller>
 

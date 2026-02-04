@@ -31,16 +31,14 @@ Make agentic development trustworthy: the right agent does the right work with t
 ## Context
 
 - Wrapper-era attempts (interception-heavy governance) were brittle and adversarial; iDumb v2 pivots to contracts-first governance using OpenCode primitives + durable local state.
-- Preserve GSD’s strengths (thin orchestrator, traceability, atomic commits) but remove trust-based failure modes by moving governance into explicit contracts and persisted validation.
+- upgrade powers of spec-drive devlopment and test-driven development using agents that are intelligently take decisions through iterative loop (thin orchestrator, traceability, atomic commits) but remove trust-based failure modes by moving governance into explicit contracts and persisted validation.
 
 ## Constraints
 
 - **Integration**: Plugin-only — no OpenCode forks, no OpenCode source patches
 - **Install Modes**: Must support global and local installs
 - **Compatibility**: Must not assume `.opencode/` exists or is editable in the target project
-- **Safety**: Do not write into user projects by default beyond `.idumb/` (unless explicitly requested)
 - **Performance**: Local operations must be fast (sub-second typical queries) and lightweight
-- **Offline**: Core capabilities must work without network access
 
 ## Key Decisions
 

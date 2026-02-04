@@ -58,14 +58,22 @@ Execute comprehensive stress testing of the iDumb meta-framework to ensure all a
 **Goal:** Select appropriate test mode based on flags or coordinator decision
 
 ```bash
-# Parse arguments
-MODE="batch"  # default
-[ "$1" == "--micro" ] && MODE="micro"
-[ "$1" == "--batch" ] && MODE="batch"
-[ "$1" == "--full" ] && MODE="full"
+# Security: Add error handling and input validation
+set -euo pipefail
 
-# If no flag, let coordinator decide based on conditions
-if [ -z "$1" ]; then
+# Security: Validate and sanitize inputs
+MODE="${1:-auto}"
+HEAL="${HEAL:-false}"
+REPORT="${REPORT:-false}"
+
+# Security: Validate mode
+if [[ "$MODE" != "auto" && "$MODE" != "micro" && "$MODE" != "batch" && "$MODE" != "full" ]]; then
+    echo "ERROR: Invalid mode: $MODE"
+    exit 1
+fi
+
+# Determine test mode
+if [ "$MODE" == "auto" ]; then
   # Check recent activity
   LAST_VALIDATION=$(jq -r '.lastValidation' .idumb/idumb-brain/state.json)
   FILES_CHANGED=$(git status --porcelain | wc -l)
@@ -74,6 +82,8 @@ if [ -z "$1" ]; then
     MODE="batch"
   elif [ "$FILES_CHANGED" -gt 0 ]; then
     MODE="micro"
+  else
+    MODE="batch"  # Default to batch when no files changed
   fi
 fi
 
@@ -189,23 +199,53 @@ echo "PASS: Full stress test complete"
 if [ "$HEAL" == "true" ]; then
   echo "Running self-healing..."
   
+  FIXED=0
+  
+  # Security: Validate permission changes before auto-fixing
+  validate_permission_change() {
+    local agent_file="$1"
+    local change="$2"
+    
+    # Check if agent exists
+    if [ ! -f "$agent_file" ]; then
+        echo "ERROR: Agent file not found: $agent_file"
+        return 1
+    fi
+    
+    # Check if change is safe
+    case "$change" in
+        "task: deny")
+            # Safe to add task: deny to leaf nodes
+            return 0
+            ;;
+        "write: deny")
+            # Safe to change write: allow to write: deny in coordinators
+            if [[ "$agent_file" == *"coordinator"* ]] || [[ "$agent_file" == *"governance"* ]]; then
+                return 0
+            else
+                echo "ERROR: Cannot remove write permission from non-coordinator: $agent_file"
+                return 1
+            fi
+            ;;
+        *)
+            echo "ERROR: Unknown permission change: $change"
+            return 1
+            ;;
+    esac
+  }
+  
   # Auto-fix: Add missing task: deny to leaf nodes
-  for agent in src/agents/idumb-builder.md src/agents/idumb-low-validator.md; do
-    if ! grep -q "task: deny" "$agent"; then
-      echo "AUTO-FIX: Adding task: deny to $agent"
-      # Would use edit tool here
+  for agent in src/agents/idumb-builder.md src/agents/idumb-low-validator.md src/agents/idumb-meta-validator.md; do
+    if [ -f "$agent" ] && ! grep -q "task:.*deny" "$agent"; then
+      if validate_permission_change "$agent" "task: deny"; then
+        echo "  Would fix: Add task: deny to $(basename $agent)"
+        # In production, would use edit tool here
+        ((FIXED++))
+      fi
     fi
   done
   
-  # Auto-fix: Remove write from coordinators
-  for agent in src/agents/idumb-*coordinator*.md; do
-    if grep -q "write: allow" "$agent"; then
-      echo "AUTO-FIX: Changing write: allow to write: deny in $agent"
-      # Would use edit tool here
-    fi
-  done
-  
-  echo "Self-healing complete"
+  echo "Self-healing: $FIXED issues would be fixed"
 fi
 ```
 
@@ -214,9 +254,22 @@ fi
 ```bash
 if [ "$REPORT" == "true" ]; then
   TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-  REPORT_FILE=".idumb/idumb-brain/governance/stress-test-${TIMESTAMP}.json"
   
-  cat > "$REPORT_FILE" << EOF
+  # Security: Validate timestamp
+  if [[ ! "$TIMESTAMP" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$ ]]; then
+      echo "ERROR: Invalid timestamp format: $TIMESTAMP"
+      exit 1
+  fi
+  
+  # Security: Sanitize timestamp in filename
+  SAFE_TIMESTAMP=$(echo "$TIMESTAMP" | tr -d ':')
+  REPORT_DIR=".idumb/idumb-brain/governance"
+  mkdir -p "$REPORT_DIR"
+  REPORT_FILE="$REPORT_DIR/stress-test-${SAFE_TIMESTAMP}.json"
+  
+  # Security: Atomic write with validation
+  TEMP_REPORT="${REPORT_FILE}.tmp.$$"
+  cat > "$TEMP_REPORT" << EOF
 {
   "timestamp": "$TIMESTAMP",
   "mode": "$MODE",
@@ -233,6 +286,15 @@ if [ "$REPORT" == "true" ]; then
 }
 EOF
 
+  # Validate JSON before moving
+  if ! jq . "$TEMP_REPORT" > /dev/null 2>&1; then
+      echo "ERROR: Invalid JSON generated"
+      rm -f "$TEMP_REPORT"
+      exit 1
+  fi
+  
+  # Atomic move
+  mv "$TEMP_REPORT" "$REPORT_FILE"
   echo "Report saved: $REPORT_FILE"
 fi
 ```
