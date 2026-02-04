@@ -30,8 +30,8 @@ permission:
     "head *": allow
     "tail *": allow
     "date*": allow
-  edit: allow   
-  write: allow  
+  edit: deny   
+  write: deny  
 tools:
   task: true        # Primary tool - delegation
   idumb-state: true

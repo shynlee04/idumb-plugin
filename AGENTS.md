@@ -243,3 +243,92 @@ When resuming work on iDumb itself, check `.idumb/idumb-brain/SESSION-HANDOFF-*.
   - Phase D: Permission Refinement (re-enable selective blocking)
 
 See `.plugin-dev/ROADMAP.md` for full roadmap and phase definitions.
+
+## Agent Transformation Summary (GSD-Quality)
+
+All 18 core agents have been transformed from abstract YAML schemas to GSD-quality executable LLM programs.
+
+### Transformation Metrics
+
+| Category | Before | After |
+|----------|--------|-------|
+| Total agent files | 18 | 22 |
+| Average lines per agent | ~300 | ~700 |
+| Total lines | ~5,500 | ~15,310 |
+| GSD patterns per agent | 0 | 5-11 |
+
+### GSD Patterns Applied to All Agents
+
+1. **`<role>`** - First-person voice establishing identity
+2. **`<philosophy>`** - Core principles and mindset
+3. **`<execution_flow>`** - Step-by-step workflow with bash commands
+4. **`<structured_returns>`** - Consistent output formats
+5. **`<success_criteria>`** - Measurable checkboxes
+
+### Agent Categories and Key Patterns
+
+#### Core Execution Agents
+| Agent | Lines | Key Patterns |
+|-------|-------|--------------|
+| idumb-project-executor | 1063 | deviation_rules, checkpoint_protocol, tdd_execution, task_commit_protocol |
+| idumb-verifier | 1070 | verification_levels (4), stub_detection, gap_diagnosis |
+| idumb-debugger | 608 | debug_state_machine, hypothesis_management, isolation_techniques |
+
+#### Planning Agents
+| Agent | Lines | Key Patterns |
+|-------|-------|--------------|
+| idumb-planner | 677 | discovery_levels (0-3), task_breakdown, goal_backward, dependency_graph |
+| idumb-plan-checker | 815 | must_haves_verification, context_budget_check, dependency_graph_check |
+| idumb-roadmapper | 522 | goal_backward_phases, phase_sizing, dependency_analysis |
+
+#### Research Agents
+| Agent | Lines | Key Patterns |
+|-------|-------|--------------|
+| idumb-project-researcher | 784 | research_dimensions (4), source_hierarchy, mcp_integration |
+| idumb-phase-researcher | 790 | discovery_levels, verification_protocol |
+| idumb-research-synthesizer | 722 | synthesis_methodology, conflict_resolution |
+
+#### Builder Agents
+| Agent | Lines | Key Patterns |
+|-------|-------|--------------|
+| idumb-builder | 955 | permission_model, file_operations, git_protocol, quality_gates |
+| idumb-meta-builder | 1378 | entity_patterns, BMAD protocols (52 patterns) |
+
+#### Validation Agents
+| Agent | Lines | Key Patterns |
+|-------|-------|--------------|
+| idumb-low-validator | 864 | validation_types (7), test_execution, strict read-only |
+| idumb-skeptic-validator | 1077 | challenge_categories (5), questioning_techniques (5), bias_detection (6) |
+| idumb-integration-checker | 896 | integration_points, e2e_flow_verification, contract_checking |
+
+#### Coordinator Agents
+| Agent | Lines | Key Patterns |
+|-------|-------|--------------|
+| idumb-supreme-coordinator | 667 | delegation_model, request_routing |
+| idumb-high-governance | 708 | meta_governance_operations, state_management |
+| idumb-mid-coordinator | 810 | project_coordination_patterns, task_delegation |
+
+### Quality Degradation Curve
+
+All planning/execution agents use this context budget awareness:
+
+| Context Usage | Quality | Claude's State |
+|---------------|---------|----------------|
+| 0-30% | PEAK | Thorough, comprehensive |
+| 30-50% | GOOD | Confident, solid work |
+| 50-70% | DEGRADING | Efficiency mode begins |
+| 70%+ | POOR | Rushed, minimal |
+
+**Rule:** Plans should complete within ~50% context.
+
+### Guardrails Model
+
+| Agent Category | task | write | edit | bash |
+|----------------|------|-------|------|------|
+| Coordinators | ✅ | ❌ | ❌ | ❌ |
+| Builders | ❌ | ✅ | ✅ | ✅ |
+| Validators (leaf) | ❌ | ❌ | ❌ | 📖 |
+| Researchers | ✅ | ❌ | ❌ | 📖 |
+| Executors | ✅ | ❌ | ❌ | 📖 |
+
+Legend: ✅ = allowed, ❌ = denied, 📖 = read-only

@@ -1,11 +1,12 @@
 ---
 description: "Low-level validator - runs grep, glob, tests, verifies state. Read-only operations."
-id: agent-idumb-low-validator
+id: agent-idumb-meta-validator
 parent: idumb-high-governance
 mode: all
 scope: meta
 temperature: 0.1
 permission:
+  task: deny
   bash:
     "grep*": allow
     "find*": allow
@@ -243,7 +244,7 @@ steps:
 | idumb-supreme-coordinator | primary | bridge | ALL agents | Top-level orchestration |
 | idumb-high-governance | all | meta | ALL agents | Meta-level coordination |
 | idumb-mid-coordinator | all | bridge | project agents | Project-level coordination |
-| idumb-executor | all | project | general, verifier, debugger | Phase execution |
+| idumb-project-executor | all | project | general, verifier, debugger | Phase execution |
 | idumb-builder | all | meta | none (leaf) | File operations |
 | idumb-low-validator | all | meta | none (leaf) | Read-only validation |
 | idumb-verifier | all | project | general, low-validator | Work verification |

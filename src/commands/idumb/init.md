@@ -5,375 +5,679 @@ parent: commands-idumb
 agent: idumb-supreme-coordinator
 ---
 
-# Initialize iDumb Governance
+# /idumb:init
 
-You are initializing iDumb governance for this project.
+Initialize iDumb governance for this project.
 
-**REMEMBER:** You (supreme-coordinator) have `write: false` and `edit: false`. You MUST delegate all file operations to @idumb-builder.
+<objective>
+Set up the iDumb governance framework by creating the `.idumb/` directory structure, initializing state and configuration, detecting project type (greenfield/brownfield), and integrating with existing planning frameworks if present. This command is the entry point for all iDumb-governed projects.
+</objective>
 
-## INITIALIZATION FLOW
+<execution_context>
 
-```
-Step 1 → Step 2 → Step 3 → Step 4 ──┬→ [PASS] → Step 5 → Step 6 → Step 7
-                                    │                                  ↓
-                                    │         Step 8 (Project Detection)
-                                    │                                  ↓
-                                    │    ┌────────────────┬────────────┴────────────┐
-                                    │    ↓                ↓                         ↓
-                                    │ [brownfield]    [greenfield]           [existing_planning]
-                                    │    ↓                ↓                         ↓
-                                    │ Step 9            Step 9               Skip to Step 10
-                                    │    ↓                ↓                         ↓
-                                    │    └────────→ Step 10 (Menu) ←────────────────┘
-                                    │                     ↓
-                                    └→ [FAIL] →    Step 11 → COMPLETE
-                                              ↓
-                                    Step 4b (guide user) → USER DECISION
-                                              │
-                                   ┌──────────┴───────────┐
-                                   ↓                      ↓
-                           [proceed anyway]     [create planning first]
-                                   ↓                      ↓
-                             Step 5...              Status: planning_incomplete
-```
+## Reference Files (Read Before Execution)
+- `.idumb/idumb-brain/state.json` - Check if already initialized
+- `.planning/` - Detect planning framework
+- `.planning/PROJECT.md` - Project definition
+- `.planning/STATE.md` - Current state
+- `.planning/ROADMAP.md` - Existing roadmap
+- `PROJECT.md` - BMAD indicator
+- `_bmad-output/` - BMAD output
 
-## YOUR TASK
+## Agents Involved
+| Agent | Role | Mode |
+|-------|------|------|
+| @idumb-supreme-coordinator | Command entry, orchestration | primary |
+| @idumb-low-validator | Structure validation | hidden |
+| @idumb-builder | File/directory creation | hidden |
 
-### Step 1: Check for existing setup
-- Read `.idumb/idumb-brain/state.json` if exists
-- Check if already initialized
-- If yes, report current state and ask if user wants to reinitialize
+</execution_context>
 
-### Step 2: Detect project context
-Delegate to @idumb-low-validator to gather project context:
-```
-@idumb-low-validator
-Task: Gather project context
-Checks:
-  - Check .planning/ exists (planning indicator)
-  - Check .planning/PROJECT.md exists (project definition)
-  - Check .planning/STATE.md exists (state file)
-  - Check .planning/ROADMAP.md exists (roadmap)
-  - Check .planning/config.json exists (planning config)
-  - Check PROJECT.md exists in root (BMAD indicator)
-  - Check _bmad-output/ exists (BMAD output)
-Return Format:
-  status: complete/partial/missing
-  planning:
-    detected: true/false
-    files_found: [list]
-    files_missing: [list]
-  bmad:
-    detected: true/false
-    files_found: [list]
-    files_missing: [list]
-```
+<context>
 
-### Step 3: Create iDumb governance structure
-**DELEGATE TO BUILDER** - You cannot create files directly!
+## Usage
 
-```
-@idumb-builder
-Task: Create iDumb governance structure
-Directories:
-  - .idumb/
-  - .idumb/idumb-brain/
-  - .idumb/idumb-brain/context/
-  - .idumb/idumb-brain/history/
-  - .idumb/idumb-brain/governance/
-  - .idumb/idumb-brain/governance/validations/
-  - .idumb/idumb-brain/anchors/
-  - .idumb/idumb-brain/sessions/
-Files:
-  - .idumb/idumb-brain/state.json (create with template below)
-  - .idumb/idumb-brain/config.json (create with template below)
-Template for state.json:
-  {
-    "version": "0.1.0",
-    "initialized": "[ISO timestamp]",
-    "framework": "[detected: planning/bmad/both/none]",
-    "phase": "[from STATE.md or 'init']",
-    "lastValidation": null,
-    "validationCount": 0,
-    "anchors": [],
-    "history": []
-  }
-Template for config.json:
-  {
-    "version": "0.1.0",
-    "user": {
-      "name": "Developer",
-      "language": {
-        "communication": "english",
-        "documents": "english"
-      }
-    },
-    "governance": {
-      "level": "moderate",
-      "expertSkeptic": true,
-      "autoValidation": true
-    },
-    "paths": {
-      "state": {
-        "brain": ".idumb/idumb-brain/state.json",
-        "history": ".idumb/idumb-brain/history/",
-        "anchors": ".idumb/idumb-brain/anchors/"
-      }
-    },
-    "planning": {
-      "detected": [true/false],
-      "configPath": ".planning/config.json",
-      "syncEnabled": true
-    }
-  }
-Return Format:
-  status: success/partial/failed
-  created: [list of created items]
-  failed: [list of failed items with reasons]
-```
-
-### Step 4: Validate structure AND planning completeness
-Delegate to @idumb-low-validator:
-```
-@idumb-low-validator
-Task: Verify governance structure AND planning integration
-Checks:
-  - .idumb/ directory exists
-  - .idumb/idumb-brain/state.json exists and is valid JSON
-  - .idumb/idumb-brain/governance/ directory exists
-  - .idumb/idumb-brain/config.json exists and is valid JSON
-  - IF planning detected: Check required planning files exist
-    - .planning/PROJECT.md (REQUIRED for planning)
-    - .planning/STATE.md (REQUIRED for workflow)
-    - .planning/ROADMAP.md (REQUIRED for phases)
-    - .planning/config.json (REQUIRED for settings)
-Return Format:
-  status: pass/fail
-  idumb_structure: pass/fail
-  planning_completeness: pass/fail/not_applicable
-  missing_planning_files: [list if any]
-  evidence: [specific checks performed]
-```
-
-## ⚡ PLANNING INTEGRATION LOGIC (CRITICAL)
-
-### Step 4b: IF planning detected but incomplete
-
-**DO NOT SCAFFOLD PLANNING FILES. Guide user instead.**
-
-When `planning_completeness: fail`:
-
-1. **Report the gap clearly:**
-```yaml
-planning_gap_detected:
-  status: incomplete
-  files_missing:
-    - .planning/PROJECT.md → "Run /idumb:new-project to create"
-    - .planning/STATE.md → "Created by /idumb:new-project"
-    - .planning/ROADMAP.md → "Created by roadmapping phase"
-    - .planning/config.json → "Created by /idumb:new-project"
-  guidance: |
-    iDumb detected .planning/ directory but planning setup is incomplete.
-    
-    OPTIONS:
-    1. Complete planning setup: Run `/idumb:new-project`
-    2. Use iDumb without planning: Proceed with `--no-planning` flag
-    3. Map existing codebase: Run `/idumb:map-codebase`
-  
-  recommended: "Run /idumb:new-project first, then /idumb:init"
-```
-
-2. **Ask user for decision:**
-   - "Would you like to proceed without planning integration?"
-   - If yes: Set `framework: "idumb-only"` and continue to Step 5
-   - If no: Halt and wait for planning setup
-
-3. **DO NOT create any files in .planning/**
-
-### Step 4c: Handle user decision
-```yaml
-user_decision:
-  proceed_without_planning:
-    - Update state.json with: framework: "idumb-only"
-    - Set planning_ready: false in config
-    - Continue to Step 5
-  wait_for_planning:
-    - Report: "Run /idumb:new-project then /idumb:init --force"
-    - Status: planning_incomplete
-    - Do NOT continue to Step 5
-```
-
-### Step 5: Set up initial anchor (only after Step 4 PASS)
-```
-@idumb-builder
-Task: Create initial anchor
-Use: idumb-state_anchor tool
-Anchor:
-  type: checkpoint
-  content: "iDumb initialized for [project name] - [framework] detected"
-  priority: high
-```
-
-### Step 6: Record in history
-```
-@idumb-builder
-Task: Record initialization in history
-Use: idumb-state_history tool
-Action: "governance_init"
-Result: "[summary of what was created/scaffolded]"
-```
-
-### Step 7: Final integrity check (MANDATORY)
-```
-@idumb-low-validator
-Task: Final initialization integrity check
-Checks:
-  - state.json exists AND valid JSON AND has required fields
-  - config.json exists AND valid JSON
-  - At least 1 anchor exists
-  - History has at least 1 entry
-  - IF planning: All 4 required files exist
-Return Format:
-  status: pass/fail
-  initialization_complete: true/false
-  summary: "[brief status]"
-```
-
-### Step 8: Project Type Detection (Brownfield Detection)
-
-**Check project type:**
 ```bash
-# Count source files (excluding node_modules, .git)
-SRC_FILES=$(find . -type f \( -name "*.ts" -o -name "*.tsx" -o -name "*.js" -o -name "*.jsx" -o -name "*.py" -o -name "*.go" -o -name "*.rs" \) -not -path "*/node_modules/*" -not -path "*/.git/*" 2>/dev/null | wc -l)
-PLANNING_EXISTS=$([ -d ".planning" ] && echo "true" || echo "false")
+/idumb:init [flags]
 ```
 
-**Determine project type:**
-```yaml
-project_type_detection:
-  if: SRC_FILES > 5 AND PLANNING_EXISTS == false
-    type: brownfield
-    action: Run /idumb:map-codebase first
-  elif: SRC_FILES <= 5 AND PLANNING_EXISTS == false
-    type: greenfield
-    action: Run /idumb:new-project
-  else:
-    type: existing_planning
-    action: Sync with existing .planning/ state
+## Flags
+
+| Flag | Description | Values | Default |
+|------|-------------|--------|---------|
+| `--greenfield` | Force greenfield mode (new project) | Boolean | Auto-detect |
+| `--brownfield` | Force brownfield mode (existing code) | Boolean | Auto-detect |
+| `--no-planning` | Skip planning integration | Boolean | `false` |
+| `--force` | Reinitialize even if exists | Boolean | `false` |
+| `--user` | Set user name | String | "Developer" |
+| `--language` | Set communication language | String | "english" |
+
+## Examples
+
+```bash
+# Standard initialization (auto-detect)
+/idumb:init
+
+# Greenfield project (new, no existing code)
+/idumb:init --greenfield
+
+# Brownfield project (existing codebase)
+/idumb:init --brownfield
+
+# Without planning framework integration
+/idumb:init --no-planning
+
+# Reinitialize existing setup
+/idumb:init --force
+
+# With user preferences
+/idumb:init --user="Alex" --language="english"
 ```
 
-### Step 9: Auto-Trigger iDumb Flow
+## Project Types
 
-**IF brownfield or greenfield:**
+| Type | Detection | Next Steps |
+|------|-----------|------------|
+| **Greenfield** | <5 source files, no .planning | `/idumb:new-project` |
+| **Brownfield** | >5 source files, no .planning | `/idumb:map-codebase`, then `/idumb:new-project` |
+| **Existing Planning** | .planning/ exists | Sync with planning state |
 
-Report to user:
+</context>
+
+<process>
+
+## Step 1: Check for Existing Setup
+
 ```yaml
-project_detected:
-  type: [brownfield | greenfield]
-  status: "Project type detected with ${SRC_FILES} source files"
-  next_steps:
-    brownfield:
-      1: "/idumb:map-codebase - Analyze existing code structure"
-      2: "/idumb:new-project - Create project context and roadmap"
-    greenfield:
-      1: "/idumb:new-project - Start project planning"
-  governance: "iDumb will track and manage your project progress"
+existing_check:
+  read: ".idumb/idumb-brain/state.json"
+  
+  if_exists:
+    check: Is already initialized?
+    if_yes:
+      report:
+        status: Already initialized
+        framework: {detected framework}
+        phase: {current phase}
+        prompt: "Would you like to reinitialize? Use --force flag."
+      unless: "--force flag provided"
+      
+  if_force:
+    action: Archive existing state
+    backup: ".idumb/idumb-brain/state.json.bak-{timestamp}"
+    continue: Fresh initialization
 ```
 
-### Step 10: Present Final Menu
+## Step 2: Detect Project Context
 
 ```yaml
-idumb_ready:
-  status: complete
-  project_status: [ready | brownfield_pending | greenfield_pending]
-  next_actions:
-    if_brownfield:
-      - "Run /idumb:map-codebase to analyze codebase"
-      - "Then /idumb:new-project to create roadmap"
-    if_greenfield:
-      - "Run /idumb:new-project to start project"
-    if_existing_planning:
-      - "Planning already initialized - iDumb synced"
-      - "Run /idumb:status to see current state"
-  commands_available:
-    - "/idumb:status - Check governance state"
-    - "/idumb:validate - Run validation checks"
-    - "/idumb:new-project - Start new project planning"
-    - "/idumb:roadmap - Create/view roadmap"
+context_detection:
+  delegate_to: "@idumb-low-validator"
+  prompt: |
+    ## Gather Project Context
+    
+    **Checks:**
+    - .planning/ directory exists
+    - .planning/PROJECT.md exists
+    - .planning/STATE.md exists
+    - .planning/ROADMAP.md exists
+    - .planning/config.json exists
+    - PROJECT.md in root (BMAD)
+    - _bmad-output/ exists (BMAD)
+    
+    **Return Format:**
+    \`\`\`yaml
+    status: complete | partial | missing
+    planning:
+      detected: true/false
+      files_found: [list]
+      files_missing: [list]
+    bmad:
+      detected: true/false
+      files_found: [list]
+    \`\`\`
 ```
 
-### Step 11: Report to user
-
-**ONLY report `status: complete` if Step 7 returns `pass`**
+## Step 3: Create iDumb Directory Structure
 
 ```yaml
-initialization:
-  status: [complete/partial/failed/planning_incomplete]
-  framework_detected: [planning/bmad/both/none/idumb-only]
-  planning_phase: [phase if planning detected and complete]
-  governance_mode: hierarchical
-  structure_created:
-    - .idumb/idumb-brain/state.json
+structure_creation:
+  delegate_to: "@idumb-builder"
+  prompt: |
+    ## Create iDumb Governance Structure
+    
+    **Directories to Create:**
+    - .idumb/
+    - .idumb/idumb-brain/
+    - .idumb/idumb-brain/context/
+    - .idumb/idumb-brain/history/
     - .idumb/idumb-brain/governance/
-    - .idumb/idumb-brain/anchors/
-  agents_available:
-    - idumb-supreme-coordinator (primary) - Switch with Tab
-    - idumb-high-governance (all) - Mid-level coordination
-    - idumb-low-validator (hidden) - Validation work
-    - idumb-builder (hidden) - File operations
-  next_steps:
-    - "Run /idumb:status to check state anytime"
-    - "iDumb commands manage your project planning"
-    - "Context anchors survive session compaction"
-  warnings: [list any issues that need user attention]
+    - .idumb/idumb-brain/governance/validations/
+    - .idumb/idumb-brain/sessions/
+    - .idumb/idumb-brain/execution/
+    - .idumb/idumb-project-output/
+    - .idumb/idumb-project-output/phases/
+    - .idumb/idumb-project-output/roadmaps/
+    - .idumb/idumb-project-output/research/
+    
+    **Files to Create:**
+    
+    1. `.idumb/idumb-brain/state.json`:
+    \`\`\`json
+    {
+      "version": "0.2.0",
+      "initialized": "{ISO-8601 timestamp}",
+      "framework": "{detected: planning | bmad | both | none}",
+      "phase": "{from STATE.md or 'init'}",
+      "lastValidation": null,
+      "validationCount": 0,
+      "anchors": [],
+      "history": []
+    }
+    \`\`\`
+    
+    2. `.idumb/idumb-brain/config.json`:
+    \`\`\`json
+    {
+      "version": "0.2.0",
+      "user": {
+        "name": "{from --user or 'Developer'}",
+        "language": {
+          "communication": "{from --language or 'english'}",
+          "documents": "english"
+        }
+      },
+      "governance": {
+        "level": "moderate",
+        "expertSkeptic": true,
+        "autoValidation": true
+      },
+      "paths": {
+        "state": {
+          "brain": ".idumb/idumb-brain/state.json",
+          "history": ".idumb/idumb-brain/history/",
+          "sessions": ".idumb/idumb-brain/sessions/"
+        },
+        "output": {
+          "phases": ".idumb/idumb-project-output/phases/",
+          "roadmaps": ".idumb/idumb-project-output/roadmaps/",
+          "research": ".idumb/idumb-project-output/research/"
+        }
+      },
+      "planning": {
+        "detected": {true/false},
+        "configPath": ".planning/config.json",
+        "syncEnabled": true
+      }
+    }
+    \`\`\`
+    
+    **Return:**
+    \`\`\`yaml
+    status: success | partial | failed
+    created: [list]
+    failed: [list with reasons]
+    \`\`\`
 ```
 
-**IF status is `partial` or `failed`:**
+## Step 4: Validate Structure AND Planning Completeness
+
 ```yaml
-initialization:
-  status: partial
-  completed_steps: [list]
-  failed_steps: [list with reasons]
-  manual_action_required:
-    - "[specific action needed]"
-    - "[specific file to complete]"
-  retry_command: "/idumb:init --force"
+structure_validation:
+  delegate_to: "@idumb-low-validator"
+  prompt: |
+    ## Verify Governance Structure
+    
+    **iDumb Structure Checks:**
+    - .idumb/ directory exists
+    - .idumb/idumb-brain/state.json exists and valid JSON
+    - .idumb/idumb-brain/config.json exists and valid JSON
+    - .idumb/idumb-brain/governance/ exists
+    
+    **Planning Integration Checks (if detected):**
+    - .planning/PROJECT.md exists (REQUIRED)
+    - .planning/STATE.md exists (REQUIRED)
+    - .planning/ROADMAP.md exists (REQUIRED)
+    - .planning/config.json exists (REQUIRED)
+    
+    **Return:**
+    \`\`\`yaml
+    status: pass | fail
+    idumb_structure: pass | fail
+    planning_completeness: pass | fail | not_applicable
+    missing_planning_files: [list]
+    evidence: [specific checks]
+    \`\`\`
 ```
 
-**IF status is `planning_incomplete` (planning detected but not fully set up):**
+## Step 4b: Handle Incomplete Planning (if applicable)
+
 ```yaml
-initialization:
-  status: planning_incomplete
-  framework_detected: planning (partial)
-  planning_files_found: [list]
-  planning_files_missing: [list]
-  idumb_ready: true
-  planning_ready: false
-  next_steps:
-    - "Run /idumb:new-project to complete planning setup"
-    - "Then run /idumb:init --force to re-sync"
-    - "Or run /idumb:init --no-planning to proceed without planning"
-  warning: "iDumb will operate in degraded mode without full planning"
+planning_gap:
+  condition: "planning detected but planning_completeness == fail"
+  
+  DO_NOT: Create planning files
+  DO: Guide user to complete planning
+  
+  report: |
+    ## Planning Gap Detected
+    
+    iDumb detected `.planning/` directory but planning setup is incomplete.
+    
+    **Files Found:** {list}
+    **Files Missing:** {list}
+    
+    **OPTIONS:**
+    1. **Complete planning:** Run `/idumb:new-project`
+    2. **Proceed without planning:** Use `--no-planning` flag
+    3. **Map existing codebase:** Run `/idumb:map-codebase`
+    
+    **Recommended:** Run `/idumb:new-project` first, then `/idumb:init`
+    
+  prompt_user: "Would you like to proceed without planning integration?"
+  
+  if_proceed:
+    update_state:
+      framework: "idumb-only"
+      planning_ready: false
+    continue_to: Step 5
+    
+  if_wait:
+    status: planning_incomplete
+    halt: true
 ```
 
-## CRITICAL RULES
+## Step 5: Set Up Initial Anchor
 
-1. **NEVER create files directly** - You have write: false, edit: false
+```yaml
+anchor_creation:
+  condition: Step 4 passed
+  delegate_to: "@idumb-builder"
+  
+  use_tool: idumb-state_anchor
+  params:
+    type: checkpoint
+    content: "iDumb initialized for {project name} - {framework} detected"
+    priority: high
+```
+
+## Step 6: Record in History
+
+```yaml
+history_record:
+  delegate_to: "@idumb-builder"
+  
+  use_tool: idumb-state_history
+  params:
+    action: governance_init
+    result: "Initialized with {framework} framework, {x} directories, {y} files"
+```
+
+## Step 7: Final Integrity Check
+
+```yaml
+integrity_check:
+  delegate_to: "@idumb-low-validator"
+  prompt: |
+    ## Final Initialization Integrity Check
+    
+    **Checks:**
+    - state.json exists AND valid JSON AND has required fields
+    - config.json exists AND valid JSON
+    - At least 1 anchor exists
+    - History has at least 1 entry
+    - IF planning: All 4 required files exist
+    
+    **Return:**
+    \`\`\`yaml
+    status: pass | fail
+    initialization_complete: true | false
+    summary: "{brief status}"
+    \`\`\`
+  
+  on_fail:
+    max_retries: 3
+    escalate_to_user: true
+```
+
+## Step 8: Project Type Detection
+
+```yaml
+project_type:
+  method: Count source files
+  command: |
+    find . -type f \( -name "*.ts" -o -name "*.tsx" -o -name "*.js" -o -name "*.jsx" -o -name "*.py" -o -name "*.go" -o -name "*.rs" \) \
+      -not -path "*/node_modules/*" -not -path "*/.git/*" 2>/dev/null | wc -l
+  
+  classification:
+    if: SRC_FILES > 5 AND !planning_exists
+      type: brownfield
+      message: "Existing codebase detected with {count} source files"
+      next: "/idumb:map-codebase"
+      
+    elif: SRC_FILES <= 5 AND !planning_exists
+      type: greenfield
+      message: "New project detected"
+      next: "/idumb:new-project"
+      
+    else:
+      type: existing_planning
+      message: "Planning framework detected"
+      next: "Synced with existing planning state"
+```
+
+## Step 9: Project-Type-Specific Guidance
+
+```yaml
+guidance:
+  brownfield:
+    report: |
+      **Brownfield Project Detected**
+      
+      Found {count} source files without planning setup.
+      
+      **Recommended Next Steps:**
+      1. `/idumb:map-codebase` - Analyze existing code structure
+      2. `/idumb:new-project` - Create project context and roadmap
+      
+  greenfield:
+    report: |
+      **Greenfield Project Detected**
+      
+      Fresh project with minimal code.
+      
+      **Recommended Next Step:**
+      1. `/idumb:new-project` - Start project planning
+      
+  existing_planning:
+    report: |
+      **Planning Framework Detected**
+      
+      iDumb has synced with existing planning state.
+      
+      **Current Phase:** {phase from STATE.md}
+      **Ready to:** Continue where you left off
+```
+
+## Step 10: Present Final Menu
+
+```yaml
+menu:
+  status: complete | brownfield_pending | greenfield_pending
+  
+  display: |
+    ## iDumb Governance Ready
+    
+    **Status:** {status}
+    **Framework:** {framework}
+    **Project Type:** {type}
+    
+    ### Available Commands
+    
+    | Command | Description |
+    |---------|-------------|
+    | `/idumb:status` | Check governance state |
+    | `/idumb:validate` | Run validation checks |
+    | `/idumb:new-project` | Start new project planning |
+    | `/idumb:roadmap` | Create/view roadmap |
+    | `/idumb:map-codebase` | Analyze existing code (brownfield) |
+    
+    ### Agents Available
+    
+    - **idumb-supreme-coordinator** - Primary orchestrator (Tab to switch)
+    - **idumb-high-governance** - Mid-level coordination
+    - **idumb-low-validator** - Validation work (hidden)
+    - **idumb-builder** - File operations (hidden)
+```
+
+## Step 11: Final Report
+
+```yaml
+report:
+  condition: Step 7 returns pass
+  
+  output: |
+    ## INITIALIZATION COMPLETE
+    
+    **Status:** {complete | partial | failed | planning_incomplete}
+    **Framework Detected:** {planning | bmad | both | none | idumb-only}
+    **Planning Phase:** {phase if applicable}
+    **Governance Mode:** hierarchical
+    
+    ### Structure Created
+    - .idumb/idumb-brain/state.json
+    - .idumb/idumb-brain/config.json
+    - .idumb/idumb-brain/governance/
+    - .idumb/idumb-project-output/
+    
+    ### Next Steps
+    {Based on project type detection}
+    
+    ### Warnings
+    {Any issues needing attention}
+```
+
+</process>
+
+<completion_format>
+
+## INITIALIZATION COMPLETE
+
+```markdown
+# iDumb Governance Initialized
+
+**Date:** {YYYY-MM-DD HH:MM:SS}
+**Status:** Complete
+**Framework:** {planning | bmad | both | none | idumb-only}
+**Project Type:** {greenfield | brownfield | existing_planning}
+
+## Structure Created
+
+```
+.idumb/
+├── idumb-brain/
+│   ├── state.json          ✓ Created
+│   ├── config.json         ✓ Created
+│   ├── context/            ✓ Created
+│   ├── history/            ✓ Created
+│   ├── governance/         ✓ Created
+│   │   └── validations/    ✓ Created
+│   ├── sessions/           ✓ Created
+│   └── execution/          ✓ Created
+└── idumb-project-output/
+    ├── phases/             ✓ Created
+    ├── roadmaps/           ✓ Created
+    └── research/           ✓ Created
+```
+
+## Framework Integration
+
+| Framework | Status |
+|-----------|--------|
+| Planning (.planning/) | {Detected / Not Found} |
+| BMAD (PROJECT.md) | {Detected / Not Found} |
+
+## Project Detection
+
+**Type:** {greenfield | brownfield | existing_planning}
+**Source Files:** {count}
+**Planning Ready:** {yes | no}
+
+## Agents Available
+
+| Agent | Mode | Description |
+|-------|------|-------------|
+| idumb-supreme-coordinator | primary | Top-level orchestration (Tab) |
+| idumb-high-governance | all | Mid-level coordination |
+| idumb-low-validator | hidden | Validation work |
+| idumb-builder | hidden | File operations |
+
+## Next Steps
+
+{Based on project type:}
+
+### For Greenfield Projects
+1. `/idumb:new-project` - Start project planning
+
+### For Brownfield Projects
+1. `/idumb:map-codebase` - Analyze existing code
+2. `/idumb:new-project` - Create project context
+
+### For Existing Planning
+1. `/idumb:status` - View current state
+2. Continue with current phase work
+
+## Context Anchors
+
+Anchors survive session compaction. Your initialization is recorded.
+
+---
+
+**iDumb Governance Active** | Version {version} | Run `/idumb:status` anytime
+```
+
+## INITIALIZATION PARTIAL/FAILED
+
+```markdown
+# iDumb Initialization: {PARTIAL | FAILED}
+
+**Date:** {YYYY-MM-DD HH:MM:SS}
+**Status:** {partial | failed}
+
+## Completed Steps
+
+- [x] {Step 1}
+- [x] {Step 2}
+- [ ] {Failed step}
+
+## Failed Steps
+
+| Step | Error | Resolution |
+|------|-------|------------|
+| {step} | {error} | {how to fix} |
+
+## Manual Action Required
+
+1. {Specific action needed}
+2. {Additional action}
+
+## Retry
+
+```bash
+/idumb:init --force
+```
+```
+
+## PLANNING INCOMPLETE
+
+```markdown
+# iDumb Initialization: Planning Incomplete
+
+**Date:** {YYYY-MM-DD HH:MM:SS}
+**Status:** planning_incomplete
+
+## Planning Detection
+
+**Directory:** .planning/ exists
+**Files Found:** {list}
+**Files Missing:** {list}
+
+## iDumb Status
+
+- [x] .idumb/ structure created
+- [x] state.json initialized
+- [x] config.json created
+- [ ] Planning integration incomplete
+
+## Options
+
+1. **Complete planning:** `/idumb:new-project`
+2. **Proceed without planning:** `/idumb:init --no-planning`
+3. **Map codebase first:** `/idumb:map-codebase`
+
+## Warning
+
+iDumb will operate in degraded mode without full planning integration.
+Some phase-tracking features will be unavailable.
+```
+
+</completion_format>
+
+<error_handling>
+
+| Error Code | Cause | Resolution |
+|------------|-------|------------|
+| `I001` | Already initialized | Use `--force` to reinitialize |
+| `I002` | Cannot create directories | Check file permissions |
+| `I003` | Invalid JSON created | Check for syntax errors, retry |
+| `I004` | Planning incomplete | Complete planning setup first |
+| `I005` | Integrity check failed | Review failed checks, retry |
+| `I006` | State write failed | Check disk space, permissions |
+
+</error_handling>
+
+<governance>
+
+## Delegation Chain
+
+```
+user → supreme-coordinator
+              ↓
+       low-validator (detect context)
+              ↓
+          builder (create structure)
+              ↓
+       low-validator (verify structure)
+              ↓
+          builder (create anchor, history)
+              ↓
+       low-validator (final integrity)
+              ↓
+      supreme-coordinator (report)
+```
+
+## Critical Rules
+
+1. **NEVER create files directly** - supreme-coordinator has `write: false`, `edit: false`
 2. **ALWAYS delegate file ops to @idumb-builder**
 3. **ALWAYS delegate validation to @idumb-low-validator**
 4. **NEVER stop when issues detected** - Guide user or fix iDumb files
 5. **NEVER report complete** unless final integrity check passes
 6. **Track retry counts** - Max 3 before escalating to user
-7. **NEVER scaffold planning files** - Guide user to /idumb:new-project instead
-8. **Planning files are READ-ONLY** - iDumb only reads .planning/, never writes
+7. **NEVER scaffold planning files** - Guide user to `/idumb:new-project`
+8. **Planning files are READ-ONLY** - iDumb only reads `.planning/`, never writes
 
-## PLANNING DETECTION
+## Validation Points
 
-Planning files are in `.planning/`, NOT project root:
-- `.planning/PROJECT.md` - Project definition (REQUIRED)
-- `.planning/STATE.md` - Current phase/plan
-- `.planning/ROADMAP.md` - Phase structure
-- `.planning/config.json` - Planning configuration
-- `.planning/phases/` - Phase directories
+| Point | Check | Agent |
+|-------|-------|-------|
+| Pre | Not already initialized (or --force) | supreme-coordinator |
+| During | Structure created correctly | low-validator |
+| During | Planning integration complete | low-validator |
+| Post | Final integrity check | low-validator |
+| Post | All required files exist and valid | low-validator |
 
-$ARGUMENTS
+## Permission Model
+
+| Agent | Can Delegate | Can Write | Can Read |
+|-------|--------------|-----------|----------|
+| supreme-coordinator | Yes | No | Yes |
+| low-validator | No | No | Yes |
+| builder | No | Yes | Yes |
+
+</governance>
+
+<metadata>
+```yaml
+category: setup
+priority: P0
+complexity: medium
+version: 0.2.0
+requires: nothing (entry point)
+outputs:
+  - .idumb/idumb-brain/state.json
+  - .idumb/idumb-brain/config.json
+  - .idumb/idumb-brain/governance/
+  - .idumb/idumb-project-output/
+```
+</metadata>

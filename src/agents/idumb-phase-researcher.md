@@ -32,6 +32,8 @@ tools:
   context7_query-docs: true
   exa_web_search_exa: true
   exa_get_code_context_exa: true
+  brave-search_brave_web_search: true
+  tavily_tavily_search: true
   webfetch: true
 ---
 
