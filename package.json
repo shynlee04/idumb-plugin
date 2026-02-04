@@ -7,10 +7,10 @@
     "idumb": "./bin/install.js",
     "create-idumb": "./bin/install.js"
   },
-  "main": "./template/plugins/idumb-core.ts",
+  "main": "./src/plugins/idumb-core.ts",
   "files": [
     "bin",
-    "template",
+    "src",
     "docs"
   ],
   "scripts": {

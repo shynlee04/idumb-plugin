@@ -1,75 +1,112 @@
-// ESM i18n loader for iDumb CLI
+/**
+ * iDumb i18n Module
+ * 
+ * Provides internationalization for the installer and CLI
+ */
+
 import { readFileSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-// Load locale files at module initialization
-const locales = {
-  en: JSON.parse(readFileSync(join(__dirname, 'locales/en.json'), 'utf8')),
-  vi: JSON.parse(readFileSync(join(__dirname, 'locales/vi.json'), 'utf8'))
-};
+// Available locales
+const LOCALES = ['en', 'vi'];
+const DEFAULT_LOCALE = 'en';
 
-let currentLocale = 'en';
+// Current locale
+let currentLocale = DEFAULT_LOCALE;
+let translations = {};
 
 /**
- * Set the current locale
- * @param {string} locale - 'en' or 'vi'
+ * Load locale file
  */
-export function setLocale(locale) {
-  if (locales[locale]) {
-    currentLocale = locale;
+function loadLocale(locale) {
+  const normalizedLocale = LOCALES.includes(locale) ? locale : DEFAULT_LOCALE;
+
+  try {
+    const localePath = join(__dirname, 'locales', `${normalizedLocale}.json`);
+    const content = readFileSync(localePath, 'utf8');
+    translations = JSON.parse(content);
+    currentLocale = normalizedLocale;
+  } catch (e) {
+    // Fallback to English if locale file not found
+    if (normalizedLocale !== 'en') {
+      console.warn(`Locale '${normalizedLocale}' not found, falling back to English`);
+      loadLocale('en');
+    } else {
+      // Create minimal translations if en.json also missing
+      translations = {
+        installer: {
+          welcome: { title: 'iDumb' },
+          steps: {}
+        }
+      };
+    }
   }
+
+  return translations;
 }
 
 /**
  * Get current locale
- * @returns {string}
  */
-export function getLocale() {
+function getLocale() {
   return currentLocale;
 }
 
 /**
- * Get available locales
- * @returns {string[]}
+ * Set locale and load translations
  */
-export function getAvailableLocales() {
-  return Object.keys(locales);
+function setLocale(locale) {
+  currentLocale = LOCALES.includes(locale) ? locale : DEFAULT_LOCALE;
+  loadLocale(currentLocale);
 }
 
 /**
- * Translate a key with optional interpolation
- * @param {string} key - Translation key (dot notation supported)
- * @param {object} values - Interpolation values
- * @returns {string}
+ * Get translation by key path (e.g., 'installer.welcome.title')
+ * Supports {{variable}} substitution
  */
-export function t(key, values = {}) {
-  const keys = key.split('.');
-  let result = locales[currentLocale];
-  
-  for (const k of keys) {
-    result = result?.[k];
-    if (result === undefined) {
-      // Fallback to English
-      result = locales.en;
-      for (const k2 of keys) {
-        result = result?.[k2];
-        if (result === undefined) break;
-      }
-      break;
+function t(keyPath, variables = {}) {
+  const keys = keyPath.split('.');
+  let value = translations;
+
+  for (const key of keys) {
+    if (value && typeof value === 'object' && key in value) {
+      value = value[key];
+    } else {
+      // Return key if translation not found
+      return keyPath;
     }
   }
-  
-  if (typeof result !== 'string') {
-    return key; // Return key if not found
+
+  // Handle string result with variable substitution
+  if (typeof value === 'string') {
+    return value.replace(/\{\{(\w+)\}\}/g, (_, varName) => {
+      return variables[varName] !== undefined ? variables[varName] : `{{${varName}}}`;
+    });
   }
-  
-  // Simple interpolation: {{name}} → values.name
-  return result.replace(/\{\{(\w+)\}\}/g, (_, name) => 
-    values[name] !== undefined ? values[name] : `{{${name}}}`
-  );
+
+  return value;
 }
 
-export default { t, setLocale, getLocale, getAvailableLocales };
+/**
+ * Get all available locales
+ */
+function getAvailableLocales() {
+  return [...LOCALES];
+}
+
+// Initialize with default locale
+loadLocale(DEFAULT_LOCALE);
+
+// Export as default object and named exports
+export { t, setLocale, getLocale, getAvailableLocales, loadLocale };
+
+export default {
+  t,
+  setLocale,
+  getLocale,
+  getAvailableLocales,
+  loadLocale
+};

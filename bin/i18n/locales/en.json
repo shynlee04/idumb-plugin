@@ -12,6 +12,40 @@
       "selectLanguage": "🌐 Select Language / Chọn Ngôn Ngữ",
       "languagePrompt": "Choose [1-2]:"
     },
+    "introduction": {
+      "title": "What is iDumb?",
+      "desc": "iDumb is a meta-framework that makes AI agents:",
+      "features": {
+        "hierarchical": {
+          "icon": "✦",
+          "name": "HIERARCHICAL",
+          "desc": "4-tier agent delegation (Supreme → High → Mid → Low)"
+        },
+        "governed": {
+          "icon": "✦",
+          "name": "GOVERNED",
+          "desc": "Chain enforcement, never silent failure, escalation"
+        },
+        "contextAware": {
+          "icon": "✦",
+          "name": "CONTEXT-AWARE",
+          "desc": "Purified working set, minimal tokens, maximum clarity"
+        },
+        "intelligent": {
+          "icon": "✦",
+          "name": "INTELLIGENT",
+          "desc": "Expert-level decisions for all users (pro or retard)"
+        }
+      },
+      "concepts": {
+        "title": "Core Concepts:",
+        "coordinator": "Supreme Coordinator → orchestrates all work",
+        "checkpoints": "Checkpoints → never lose progress",
+        "chainRules": "Chain Rules → prevent command overload",
+        "stallDetection": "Stall Detection → escalate, never loop forever"
+      },
+      "continuePrompt": "Press Enter to continue..."
+    },
     "steps": {
       "language": {
         "number": "0",

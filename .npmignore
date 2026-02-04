@@ -1,0 +1,50 @@
+# ==============================================================================
+# NPM IGNORE - Files NOT included in npm package
+# ==============================================================================
+
+# Development files
+.plugin-dev/
+.archive/
+.planning/
+
+# OpenCode client-side
+.opencode/
+.idumb/
+.agent/
+
+# Git
+.git/
+.gitignore
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Test coverage
+coverage/
+
+# Temporary
+tmp/
+temp/
+*.tmp
+
+# Documentation build artifacts
+docs/research/
+
+# Keep for package:
+# - src/           (plugin source)
+# - bin/           (CLI scripts)
+# - docs/          (main documentation)
+# - README.md
+# - README.vi.md
+# - LICENSE
+# - package.json

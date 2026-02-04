@@ -12,6 +12,40 @@
       "selectLanguage": "🌐 Select Language / Chọn Ngôn Ngữ",
       "languagePrompt": "Chọn [1-2]:"
     },
+    "introduction": {
+      "title": "iDumb là gì?",
+      "desc": "iDumb là meta-framework giúp AI agents:",
+      "features": {
+        "hierarchical": {
+          "icon": "✦",
+          "name": "PHÂN CẤP",
+          "desc": "Ủy quyền 4 tầng (Supreme → High → Mid → Low)"
+        },
+        "governed": {
+          "icon": "✦",
+          "name": "QUẢN TRỊ",
+          "desc": "Bảo đảm chuỗi, không lỗi thầm lặng, leo thang"
+        },
+        "contextAware": {
+          "icon": "✦",
+          "name": "NHẬN THỨC NGỮ CẢNH",
+          "desc": "Bộ làm việc tinh lọc, ít token, rõ ràng"
+        },
+        "intelligent": {
+          "icon": "✦",
+          "name": "THÔNG MINH",
+          "desc": "Quyết định cấp chuyên gia cho mọi user"
+        }
+      },
+      "concepts": {
+        "title": "Khái niệm cốt lõi:",
+        "coordinator": "Supreme Coordinator → điều phối toàn bộ",
+        "checkpoints": "Checkpoints → không bao giờ mất tiến độ",
+        "chainRules": "Chain Rules → ngăn quá tải lệnh",
+        "stallDetection": "Stall Detection → leo thang, không loop mãi"
+      },
+      "continuePrompt": "Nhấn Enter để tiếp tục..."
+    },
     "steps": {
       "language": {
         "number": "0",
