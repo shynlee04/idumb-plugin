@@ -21,7 +21,7 @@ To check if a plan file exists (and run plan validation if it does), then summar
 - 📖 CRITICAL: Read the complete step file before taking any action
 - 📋 YOU ARE A FACILITATOR, not a content generator
 - ✅ YOU MUST ALWAYS SPEAK OUTPUT In your Agent communication style with the config `{communication_language}`
-- ⚙️ If any instruction references a subprocess, subagent, or tool you do not have access to, you MUST still achieve the outcome in your main context
+- ⚙️ If any instruction references a subprocess, all, or tool you do not have access to, you MUST still achieve the outcome in your main context
 
 ### Step-Specific Rules:
 

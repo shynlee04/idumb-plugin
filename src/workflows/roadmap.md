@@ -1,5 +1,7 @@
 ---
 description: "Roadmap creation workflow for project planning and milestone definition"
+id: wf-roadmap
+parent: workflows
 created: "2026-02-03"
 version: "1.0.0"
 ---

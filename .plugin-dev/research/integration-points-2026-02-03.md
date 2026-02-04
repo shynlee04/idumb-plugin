@@ -69,7 +69,7 @@ npx github:shynlee04/idumb-plugin --global
 # .opencode/agents/idumb-{agent-name}.md
 ---
 description: "Brief description of agent purpose"
-mode: primary | subagent
+mode: primary | all
 scope: project | bridge | meta
 temperature: 0.1
 permission:
@@ -467,7 +467,7 @@ mcpServers: {
   'filesystem': {
     description: 'Access local project files',
     tools: ['read_file', 'write_file', 'list_directory'],
-    brainIntegration: '.idumb/brain/'
+    brainIntegration: '.idumb/idumb-brain/'
   },
   
   // Brain database queries
@@ -514,7 +514,7 @@ mcpServers: {
     }
   },
   handler: async ({ query, params }) => {
-    const db = openDatabase('.idumb/brain/idumb.db');
+    const db = openDatabase('.idumb/idumb-brain/idumb.db');
     const stmt = db.prepare(query);
     const result = stmt.all(...params);
     return { result, rowCount: result.length };
@@ -542,7 +542,7 @@ mcpServers: {
     }
   },
   handler: async ({ query, mode }) => {
-    const orama = await loadOrama('.idumb/brain/search/');
+    const orama = await loadOrama('.idumb/idumb-brain/search/');
     const results = await search(orama, { term: query, mode });
     return { results, count: results.length };
   }
@@ -564,11 +564,11 @@ mcpServers: {
     }
   },
   handler: async ({ includeHistory }) => {
-    const state = readState('.idumb/brain/state.json');
+    const state = readState('.idumb/idumb-brain/state.json');
     let response = { ...state };
     
     if (includeHistory) {
-      response.history = readHistory('.idumb/brain/history/');
+      response.history = readHistory('.idumb/idumb-brain/history/');
     }
     
     return response;
@@ -594,12 +594,12 @@ mcpServers: {
 
 **State Reading:**
 ```typescript
-// .idumb/brain/state.json
+// .idumb/idumb-brain/state.json
 const state = readState(directory);
 
 // OpenCode's read tool
 await read({
-  filePath: '.idumb/brain/state.json'
+  filePath: '.idumb/idumb-brain/state.json'
 });
 
 // Validation
@@ -628,7 +628,7 @@ await write({
 
 // Atomic writes (temp + rename)
 await edit({
-  filePath: '.idumb/brain/state.json',
+  filePath: '.idumb/idumb-brain/state.json',
   edits: [{
     oldText: '"phase": "init"',
     newText: '"phase": "planning"'
@@ -721,21 +721,21 @@ reportValidation(validation);
 ```typescript
 // Coordinator delegates to high-governance
 await task({
-  subagent_type: 'idumb-high-governance',
+  all_type: 'idumb-high-governance',
   description: 'Coordinate phase execution',
   prompt: delegationContext + '\n\n' + userRequest
 });
 
 // High-governance delegates to executor
 await task({
-  subagent_type: 'idumb-executor',
+  all_type: 'idumb-executor',
   description: 'Execute phase 1 tasks',
   prompt: `Execute tasks: ${taskList}\n\nGovernance context: ${loadContext()}`
 });
 
 // Executor delegates to builder
 await task({
-  subagent_type: 'idumb-builder',
+  all_type: 'idumb-builder',
   description: 'Implement file changes',
   prompt: `Modify files: ${filesToChange}\n\nUse read tool first, then edit/write.`
 });
@@ -806,7 +806,7 @@ brain.execute('INSERT INTO history (action, result) VALUES (?, ?)',
    ```typescript
    // Configurable opt-in
    if (config.backup.enabled) {
-     await uploadToCloud('.idumb/brain/', config.backup.provider);
+     await uploadToCloud('.idumb/idumb-brain/', config.backup.provider);
    }
    ```
 
@@ -1080,7 +1080,7 @@ interface AuditLog {
 
 // Log on every operation
 const logAudit = (entry: AuditLog) => {
-  const logPath = '.idumb/governance/audit.log';
+  const logPath = '.idumb/idumb-brain/governance/audit.log';
   const line = JSON.stringify(entry) + '\n';
   appendFileSync(logPath, line);
 };

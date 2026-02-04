@@ -32,7 +32,7 @@ export const structure = tool({
   async execute(args, context) {
     const results: ValidationResult[] = []
     const idumbDir = join(context.directory, ".idumb")
-    
+
     // Check .idumb/ exists
     if (!existsSync(idumbDir)) {
       results.push({
@@ -48,30 +48,30 @@ export const structure = tool({
       status: "pass",
       message: ".idumb/ directory exists"
     })
-    
+
     // Check brain/ subdirectory
-    const brainDir = join(idumbDir, "brain")
+    const brainDir = join(idumbDir, "idumb-brain")
     if (!existsSync(brainDir)) {
       results.push({
         check: "brain_dir",
         status: "fail",
-        message: ".idumb/brain/ directory missing"
+        message: ".idumb/idumb-brain/ directory missing"
       })
     } else {
       results.push({
         check: "brain_dir",
         status: "pass",
-        message: ".idumb/brain/ exists"
+        message: ".idumb/idumb-brain/ exists"
       })
     }
-    
+
     // Check state.json
     const stateFile = join(brainDir, "state.json")
     if (!existsSync(stateFile)) {
       results.push({
         check: "state_file",
         status: "fail",
-        message: ".idumb/brain/state.json missing"
+        message: ".idumb/idumb-brain/state.json missing"
       })
     } else {
       results.push({
@@ -80,26 +80,26 @@ export const structure = tool({
         message: "state.json exists"
       })
     }
-    
+
     // Check governance/ subdirectory
     const govDir = join(idumbDir, "governance")
     if (!existsSync(govDir)) {
       results.push({
         check: "governance_dir",
         status: "warning",
-        message: ".idumb/governance/ missing (optional)"
+        message: ".idumb/idumb-brain/governance/ missing (optional)"
       })
     } else {
       results.push({
         check: "governance_dir",
         status: "pass",
-        message: ".idumb/governance/ exists"
+        message: ".idumb/idumb-brain/governance/ exists"
       })
     }
-    
-    const overall = results.some(r => r.status === "fail") ? "fail" : 
-                    results.some(r => r.status === "warning") ? "warning" : "pass"
-    
+
+    const overall = results.some(r => r.status === "fail") ? "fail" :
+      results.some(r => r.status === "warning") ? "warning" : "pass"
+
     return JSON.stringify({ overall, checks: results }, null, 2)
   },
 })
@@ -111,7 +111,7 @@ export const schema = tool({
   async execute(args, context) {
     const results: ValidationResult[] = []
     const stateFile = join(context.directory, ".idumb", "brain", "state.json")
-    
+
     if (!existsSync(stateFile)) {
       return JSON.stringify({
         overall: "fail",
@@ -122,11 +122,11 @@ export const schema = tool({
         }]
       })
     }
-    
+
     try {
       const content = readFileSync(stateFile, "utf8")
       const state = JSON.parse(content)
-      
+
       // Required fields
       const required = ["version", "initialized", "framework", "phase"]
       for (const field of required) {
@@ -144,7 +144,7 @@ export const schema = tool({
           })
         }
       }
-      
+
       // Framework validation
       const validFrameworks = ["bmad", "planning", "idumb", "custom", "none"]
       if (state.framework && !validFrameworks.includes(state.framework)) {
@@ -155,7 +155,7 @@ export const schema = tool({
           evidence: `Valid: ${validFrameworks.join(", ")}`
         })
       }
-      
+
       // Anchors array
       if (!Array.isArray(state.anchors)) {
         results.push({
@@ -170,7 +170,7 @@ export const schema = tool({
           message: `${state.anchors.length} anchors stored`
         })
       }
-      
+
     } catch (e) {
       results.push({
         check: "json_parse",
@@ -178,10 +178,10 @@ export const schema = tool({
         message: `Invalid JSON: ${(e as Error).message}`
       })
     }
-    
-    const overall = results.some(r => r.status === "fail") ? "fail" : 
-                    results.some(r => r.status === "warning") ? "warning" : "pass"
-    
+
+    const overall = results.some(r => r.status === "fail") ? "fail" :
+      results.some(r => r.status === "warning") ? "warning" : "pass"
+
     return JSON.stringify({ overall, checks: results }, null, 2)
   },
 })
@@ -197,7 +197,7 @@ export const freshness = tool({
     const maxAge = (args.maxAgeHours || 48) * 60 * 60 * 1000 // Convert to ms
     const now = Date.now()
     const staleFiles: string[] = []
-    
+
     const idumbDir = join(context.directory, ".idumb")
     if (!existsSync(idumbDir)) {
       return JSON.stringify({
@@ -209,18 +209,18 @@ export const freshness = tool({
         }]
       })
     }
-    
+
     // Check key files
     const filesToCheck = [
       join(idumbDir, "brain", "state.json"),
     ]
-    
+
     for (const file of filesToCheck) {
       if (existsSync(file)) {
         const stat = statSync(file)
         const age = now - stat.mtimeMs
         const ageHours = Math.round(age / (60 * 60 * 1000))
-        
+
         if (age > maxAge) {
           staleFiles.push(file)
           results.push({
@@ -238,7 +238,7 @@ export const freshness = tool({
         }
       }
     }
-    
+
     // Check anchors freshness
     const stateFile = join(idumbDir, "brain", "state.json")
     if (existsSync(stateFile)) {
@@ -249,7 +249,7 @@ export const freshness = tool({
             const created = new Date(a.created).getTime()
             return (now - created) > maxAge
           })
-          
+
           if (staleAnchors.length > 0) {
             results.push({
               check: "stale_anchors",
@@ -268,13 +268,13 @@ export const freshness = tool({
         // Ignore parse errors here - schema check handles it
       }
     }
-    
+
     const overall = staleFiles.length > 0 ? "warning" : "pass"
-    
-    return JSON.stringify({ 
-      overall, 
+
+    return JSON.stringify({
+      overall,
       checks: results,
-      staleFiles 
+      staleFiles
     }, null, 2)
   },
 })
@@ -285,21 +285,21 @@ export const planningAlignment = tool({
   args: {},
   async execute(args, context) {
     const results: ValidationResult[] = []
-    
+
     // Check for planning presence
     // IMPORTANT: STATE.md lives in .planning/, NOT project root
     const planningDir = join(context.directory, ".planning")
     const projectMd = join(context.directory, "PROJECT.md")
     const roadmapMd = join(planningDir, "ROADMAP.md")  // In .planning/
     const stateMd = join(planningDir, "STATE.md")      // In .planning/
-    
+
     const hasPlanning = existsSync(planningDir)
     const hasProject = existsSync(projectMd)
     const hasRoadmap = existsSync(roadmapMd)
     const hasState = existsSync(stateMd)
-    
+
     const hasPlanningSystem = hasPlanning || hasProject || hasRoadmap || hasState
-    
+
     if (!hasPlanningSystem) {
       return JSON.stringify({
         overall: "pass",
@@ -311,13 +311,13 @@ export const planningAlignment = tool({
         planningPresent: false
       })
     }
-    
+
     results.push({
       check: "planning_detected",
       status: "pass",
       message: "Planning system detected"
     })
-    
+
     // Check individual planning files
     if (hasPlanning) {
       results.push({
@@ -326,7 +326,7 @@ export const planningAlignment = tool({
         message: ".planning/ directory exists"
       })
     }
-    
+
     if (hasProject) {
       results.push({
         check: "project_md",
@@ -334,7 +334,7 @@ export const planningAlignment = tool({
         message: "PROJECT.md exists"
       })
     }
-    
+
     if (hasRoadmap) {
       results.push({
         check: "roadmap_md",
@@ -342,7 +342,7 @@ export const planningAlignment = tool({
         message: "ROADMAP.md exists"
       })
     }
-    
+
     if (hasState) {
       results.push({
         check: "state_md",
@@ -350,13 +350,13 @@ export const planningAlignment = tool({
         message: "STATE.md exists"
       })
     }
-    
+
     // Check iDumb state framework setting
     const idumbStateFile = join(context.directory, ".idumb", "brain", "state.json")
     if (existsSync(idumbStateFile)) {
       try {
         const idumbState = JSON.parse(readFileSync(idumbStateFile, "utf8"))
-        
+
         if (idumbState.framework !== "planning" && idumbState.framework !== "bmad" && idumbState.framework !== "idumb") {
           results.push({
             check: "framework_mismatch",
@@ -386,12 +386,12 @@ export const planningAlignment = tool({
         evidence: "Run /idumb:init"
       })
     }
-    
-    const overall = results.some(r => r.status === "fail") ? "fail" : 
-                    results.some(r => r.status === "warning") ? "warning" : "pass"
-    
-    return JSON.stringify({ 
-      overall, 
+
+    const overall = results.some(r => r.status === "fail") ? "fail" :
+      results.some(r => r.status === "warning") ? "warning" : "pass"
+
+    return JSON.stringify({
+      overall,
       checks: results,
       planningPresent: true
     }, null, 2)
@@ -409,14 +409,14 @@ export default tool({
     const allResults: ValidationResult[] = []
     const critical: string[] = []
     const warnings: string[] = []
-    
+
     const runCheck = async (checkFn: any) => {
       const result = await checkFn.execute({}, context)
       const parsed = JSON.parse(result)
       allResults.push(...(parsed.checks || []))
       return parsed
     }
-    
+
     // Run checks based on scope
     if (scope === "all" || scope === "structure") {
       await runCheck(structure)
@@ -430,7 +430,7 @@ export default tool({
     if (scope === "all" || scope === "alignment") {
       await runCheck(planningAlignment)
     }
-    
+
     // Categorize issues
     for (const check of allResults) {
       if (check.status === "fail") {
@@ -439,10 +439,10 @@ export default tool({
         warnings.push(`${check.check}: ${check.message}`)
       }
     }
-    
-    const overall = critical.length > 0 ? "fail" : 
-                    warnings.length > 0 ? "warning" : "pass"
-    
+
+    const overall = critical.length > 0 ? "fail" :
+      warnings.length > 0 ? "warning" : "pass"
+
     const validation: FullValidation = {
       timestamp: new Date().toISOString(),
       overall,
@@ -450,7 +450,7 @@ export default tool({
       critical,
       warnings,
     }
-    
+
     return JSON.stringify(validation, null, 2)
   },
 })
@@ -487,20 +487,20 @@ interface IntegrationReport {
 function extractYamlFrontmatter(content: string): Record<string, any> | null {
   const match = content.match(/^---\s*\n([\s\S]*?)\n---/)
   if (!match) return null
-  
+
   const yaml = match[1]
   const result: Record<string, any> = {}
-  
+
   // Simple YAML parser for basic types
   const lines = yaml.split('\n')
   let currentKey = ''
   let currentObj: Record<string, any> = result
   const objStack: { key: string; obj: Record<string, any> }[] = []
-  
+
   for (const line of lines) {
     const trimmed = line.trim()
     if (!trimmed || trimmed.startsWith('#')) continue
-    
+
     // Check for nested object start
     if (trimmed.endsWith(':') && !trimmed.includes(': ')) {
       const key = trimmed.slice(0, -1)
@@ -510,29 +510,29 @@ function extractYamlFrontmatter(content: string): Record<string, any> | null {
       currentObj = currentObj[key]
       continue
     }
-    
+
     // Check for key-value pair
     const colonIndex = trimmed.indexOf(': ')
     if (colonIndex > 0) {
       const key = trimmed.slice(0, colonIndex)
       let value: any = trimmed.slice(colonIndex + 2).trim()
-      
+
       // Remove quotes
       if ((value.startsWith('"') && value.endsWith('"')) ||
-          (value.startsWith("'") && value.endsWith("'"))) {
+        (value.startsWith("'") && value.endsWith("'"))) {
         value = value.slice(1, -1)
       }
-      
+
       // Parse booleans
       if (value === 'true') value = true
       else if (value === 'false') value = false
       // Parse numbers
       else if (!isNaN(Number(value)) && value !== '') value = Number(value)
-      
+
       currentObj[key] = value
     }
   }
-  
+
   return result
 }
 
@@ -540,7 +540,7 @@ function extractYamlFrontmatter(content: string): Record<string, any> | null {
 async function validateAgentIntegrations(directory: string): Promise<IntegrationResult[]> {
   const results: IntegrationResult[] = []
   const agentsDir = join(directory, "template", "agents")
-  
+
   if (!existsSync(agentsDir)) {
     return [{
       tier: "agent",
@@ -549,18 +549,18 @@ async function validateAgentIntegrations(directory: string): Promise<Integration
       issues: ["src/agents/ directory does not exist"]
     }]
   }
-  
+
   const files = readdirSync(agentsDir).filter(f => f.startsWith("idumb-") && f.endsWith(".md"))
-  
+
   for (const file of files) {
     const filePath = join(agentsDir, file)
     const content = readFileSync(filePath, "utf8")
     const frontmatter = extractYamlFrontmatter(content)
-    
+
     const agentName = file.replace(".md", "")
     const issues: string[] = []
     const delegations: string[] = []
-    
+
     if (!frontmatter) {
       issues.push("Missing or invalid YAML frontmatter")
     } else {
@@ -573,12 +573,12 @@ async function validateAgentIntegrations(directory: string): Promise<Integration
           }
         }
       }
-      
+
       // Flag agents with no delegations
       if (delegations.length === 0) {
         issues.push("Agent has no task delegations defined")
       }
-      
+
       // Check for required fields
       if (!frontmatter.description) {
         issues.push("Missing required field: description")
@@ -587,10 +587,10 @@ async function validateAgentIntegrations(directory: string): Promise<Integration
         issues.push("Missing required field: mode")
       }
     }
-    
-    const status = issues.length === 0 ? "pass" : 
-                   issues.some(i => i.includes("required")) ? "fail" : "warning"
-    
+
+    const status = issues.length === 0 ? "pass" :
+      issues.some(i => i.includes("required")) ? "fail" : "warning"
+
     results.push({
       tier: "agent",
       name: agentName,
@@ -599,7 +599,7 @@ async function validateAgentIntegrations(directory: string): Promise<Integration
       delegations: delegations.length > 0 ? delegations : undefined
     })
   }
-  
+
   return results
 }
 
@@ -607,7 +607,7 @@ async function validateAgentIntegrations(directory: string): Promise<Integration
 async function validateCommandIntegrations(directory: string): Promise<IntegrationResult[]> {
   const results: IntegrationResult[] = []
   const commandsDir = join(directory, "template", "commands", "idumb")
-  
+
   if (!existsSync(commandsDir)) {
     return [{
       tier: "command",
@@ -616,18 +616,18 @@ async function validateCommandIntegrations(directory: string): Promise<Integrati
       issues: ["src/commands/idumb/ directory does not exist"]
     }]
   }
-  
+
   const files = readdirSync(commandsDir).filter(f => f.endsWith(".md"))
-  
+
   for (const file of files) {
     const filePath = join(commandsDir, file)
     const content = readFileSync(filePath, "utf8")
     const frontmatter = extractYamlFrontmatter(content)
-    
+
     const commandName = file.replace(".md", "")
     const issues: string[] = []
     let agentBinding: string | undefined
-    
+
     if (!frontmatter) {
       issues.push("Missing or invalid YAML frontmatter")
     } else {
@@ -637,16 +637,16 @@ async function validateCommandIntegrations(directory: string): Promise<Integrati
       } else {
         issues.push("Command has no agent binding defined")
       }
-      
+
       // Check for required fields
       if (!frontmatter.description) {
         issues.push("Missing required field: description")
       }
     }
-    
-    const status = issues.length === 0 ? "pass" : 
-                   issues.some(i => i.includes("required")) ? "fail" : "warning"
-    
+
+    const status = issues.length === 0 ? "pass" :
+      issues.some(i => i.includes("required")) ? "fail" : "warning"
+
     results.push({
       tier: "command",
       name: commandName,
@@ -655,7 +655,7 @@ async function validateCommandIntegrations(directory: string): Promise<Integrati
       bindings: agentBinding ? [agentBinding] : undefined
     })
   }
-  
+
   return results
 }
 
@@ -663,7 +663,7 @@ async function validateCommandIntegrations(directory: string): Promise<Integrati
 async function validateToolIntegrations(directory: string): Promise<IntegrationResult[]> {
   const results: IntegrationResult[] = []
   const toolsDir = join(directory, "template", "tools")
-  
+
   if (!existsSync(toolsDir)) {
     return [{
       tier: "tool",
@@ -672,17 +672,17 @@ async function validateToolIntegrations(directory: string): Promise<IntegrationR
       issues: ["src/tools/ directory does not exist"]
     }]
   }
-  
+
   const files = readdirSync(toolsDir).filter(f => f.startsWith("idumb-") && f.endsWith(".ts"))
-  
+
   for (const file of files) {
     const filePath = join(toolsDir, file)
     const content = readFileSync(filePath, "utf8")
-    
+
     const toolName = file.replace(".ts", "")
     const issues: string[] = []
     const exports: string[] = []
-    
+
     // Check for exported tools
     const exportMatches = content.match(/export\s+(?:const|function|default)\s+(\w+)/g)
     if (exportMatches) {
@@ -693,20 +693,20 @@ async function validateToolIntegrations(directory: string): Promise<IntegrationR
         }
       }
     }
-    
+
     // Flag tools with no exports
     if (exports.length === 0) {
       issues.push("Tool has no exports defined")
     }
-    
+
     // Check for tool() wrapper usage
     if (!content.includes("tool({")) {
       issues.push("Tool does not use @opencode-ai/plugin tool() wrapper")
     }
-    
-    const status = issues.length === 0 ? "pass" : 
-                   issues.some(i => i.includes("no exports")) ? "fail" : "warning"
-    
+
+    const status = issues.length === 0 ? "pass" :
+      issues.some(i => i.includes("no exports")) ? "fail" : "warning"
+
     results.push({
       tier: "tool",
       name: toolName,
@@ -715,7 +715,7 @@ async function validateToolIntegrations(directory: string): Promise<IntegrationR
       exports: exports.length > 0 ? exports : undefined
     })
   }
-  
+
   return results
 }
 
@@ -727,14 +727,14 @@ export const integrationPoints = tool({
     const agents = await validateAgentIntegrations(context.directory)
     const commands = await validateCommandIntegrations(context.directory)
     const tools = await validateToolIntegrations(context.directory)
-    
+
     const allResults = [...agents, ...commands, ...tools]
     const pass = allResults.filter(r => r.status === "pass").length
     const fail = allResults.filter(r => r.status === "fail").length
     const warning = allResults.filter(r => r.status === "warning").length
-    
+
     const overall = fail > 0 ? "fail" : warning > 0 ? "warning" : "pass"
-    
+
     const report: IntegrationReport = {
       timestamp: new Date().toISOString(),
       overall,
@@ -748,7 +748,7 @@ export const integrationPoints = tool({
         warning
       }
     }
-    
+
     return JSON.stringify(report, null, 2)
   }
 })
@@ -774,7 +774,7 @@ const AGENT_SCHEMA: ArtifactSchema = {
   name: "agent",
   fields: [
     { name: "description", type: "string", required: true },
-    { name: "mode", type: "string", required: true, allowedValues: ["primary", "subagent", "all"] },
+    { name: "mode", type: "string", required: true, allowedValues: ["primary", "all", "all"] },
     { name: "temperature", type: "number", required: false },
     { name: "permission", type: "object", required: true },
     { name: "tools", type: "object", required: false }
@@ -805,34 +805,34 @@ function validateFrontmatterAgainstSchema(
   schema: ArtifactSchema
 ): string[] {
   const errors: string[] = []
-  
+
   for (const field of schema.fields) {
     const value = frontmatter[field.name]
-    
+
     // Check required fields
     if (field.required && (value === undefined || value === null)) {
       errors.push(`Missing required field: ${field.name}`)
       continue
     }
-    
+
     // Skip type validation if field is missing and not required
     if (value === undefined || value === null) {
       continue
     }
-    
+
     // Validate type
     const actualType = Array.isArray(value) ? "array" : typeof value
     if (actualType !== field.type) {
       errors.push(`Field '${field.name}' should be ${field.type}, got ${actualType}`)
       continue
     }
-    
+
     // Validate allowed values
     if (field.allowedValues && !field.allowedValues.includes(String(value))) {
       errors.push(`Field '${field.name}' value '${value}' not in allowed values: ${field.allowedValues.join(", ")}`)
     }
   }
-  
+
   return errors
 }
 
@@ -846,7 +846,7 @@ export const frontmatter = tool({
   async execute(args, context) {
     const { path: filePath, type: schemaType } = args
     const fullPath = join(context.directory, filePath)
-    
+
     // Select schema
     let schema: ArtifactSchema
     switch (schemaType) {
@@ -865,7 +865,7 @@ export const frontmatter = tool({
           message: `Unknown schema type: ${schemaType}. Use: agent, command, or plan`
         })
     }
-    
+
     // Check file exists
     if (!existsSync(fullPath)) {
       return JSON.stringify({
@@ -873,21 +873,21 @@ export const frontmatter = tool({
         message: `File not found: ${filePath}`
       })
     }
-    
+
     // Read and parse
     const content = readFileSync(fullPath, "utf8")
     const frontmatterData = extractYamlFrontmatter(content)
-    
+
     if (!frontmatterData) {
       return JSON.stringify({
         error: true,
         message: "Could not extract YAML frontmatter from file"
       })
     }
-    
+
     // Validate
     const errors = validateFrontmatterAgainstSchema(frontmatterData, schema)
-    
+
     return JSON.stringify({
       file: filePath,
       schema: schemaType,
@@ -906,22 +906,22 @@ export const configSchema = tool({
   },
   async execute(args, context) {
     const { configType } = args
-    
+
     if (configType === "state") {
       const stateFile = join(context.directory, ".idumb", "brain", "state.json")
-      
+
       if (!existsSync(stateFile)) {
         return JSON.stringify({
           error: true,
           message: "state.json does not exist"
         })
       }
-      
+
       try {
         const content = readFileSync(stateFile, "utf8")
         const state = JSON.parse(content)
         const errors: string[] = []
-        
+
         // Required fields for state.json
         const requiredFields = ["version", "initialized", "framework", "phase"]
         for (const field of requiredFields) {
@@ -929,7 +929,7 @@ export const configSchema = tool({
             errors.push(`Missing required field: ${field}`)
           }
         }
-        
+
         // Type validations
         if (state.version !== undefined && typeof state.version !== "string") {
           errors.push("Field 'version' should be string")
@@ -943,21 +943,21 @@ export const configSchema = tool({
         if (state.phase !== undefined && typeof state.phase !== "string") {
           errors.push("Field 'phase' should be string")
         }
-        
+
         // Valid framework values
         const validFrameworks = ["bmad", "planning", "idumb", "custom", "none"]
         if (state.framework && !validFrameworks.includes(state.framework)) {
           errors.push(`Framework '${state.framework}' not in valid values: ${validFrameworks.join(", ")}`)
         }
-        
+
         // Anchors should be array
         if (state.anchors !== undefined && !Array.isArray(state.anchors)) {
           errors.push("Field 'anchors' should be an array")
         }
-        
+
         return JSON.stringify({
           configType: "state",
-          file: ".idumb/brain/state.json",
+          file: ".idumb/idumb-brain/state.json",
           valid: errors.length === 0,
           errors: errors.length > 0 ? errors : undefined,
           state: {
@@ -967,7 +967,7 @@ export const configSchema = tool({
             initialized: state.initialized
           }
         }, null, 2)
-        
+
       } catch (e) {
         return JSON.stringify({
           error: true,
@@ -975,22 +975,22 @@ export const configSchema = tool({
         })
       }
     }
-    
+
     if (configType === "config") {
       const configFile = join(context.directory, ".idumb", "config.json")
-      
+
       if (!existsSync(configFile)) {
         return JSON.stringify({
           error: true,
           message: "config.json does not exist"
         })
       }
-      
+
       try {
         const content = readFileSync(configFile, "utf8")
         const config = JSON.parse(content)
         const errors: string[] = []
-        
+
         // Required fields for config.json
         if (config.user === undefined) {
           errors.push("Missing required field: user")
@@ -998,7 +998,7 @@ export const configSchema = tool({
         if (config.governance === undefined) {
           errors.push("Missing required field: governance")
         }
-        
+
         // Type validations
         if (config.user !== undefined) {
           if (typeof config.user.name !== "string") {
@@ -1008,7 +1008,7 @@ export const configSchema = tool({
             errors.push("Field 'user.language' should be string")
           }
         }
-        
+
         if (config.governance !== undefined) {
           if (typeof config.governance.level !== "string") {
             errors.push("Field 'governance.level' should be string")
@@ -1018,14 +1018,14 @@ export const configSchema = tool({
             errors.push(`Governance level '${config.governance.level}' not in valid values: ${validLevels.join(", ")}`)
           }
         }
-        
+
         return JSON.stringify({
           configType: "config",
-          file: ".idumb/config.json",
+          file: ".idumb/idumb-brain/config.json",
           valid: errors.length === 0,
           errors: errors.length > 0 ? errors : undefined
         }, null, 2)
-        
+
       } catch (e) {
         return JSON.stringify({
           error: true,
@@ -1033,7 +1033,7 @@ export const configSchema = tool({
         })
       }
     }
-    
+
     return JSON.stringify({
       error: true,
       message: `Unknown config type: ${configType}. Use: state, config`

@@ -123,11 +123,11 @@ required_evidence:
 
 ```yaml
 init_evidence:
-  - ".idumb/brain/state.json exists and valid"
-  - ".idumb/config.json exists and valid"
+  - ".idumb/idumb-brain/state.json exists and valid"
+  - ".idumb/idumb-brain/config.json exists and valid"
 
 research_evidence:
-  - ".idumb/governance/research/*-*.md exists"
+  - ".idumb/idumb-brain/governance/research/*-*.md exists"
   - "synthesis section with recommendations"
 
 roadmap_evidence:
@@ -136,7 +136,7 @@ roadmap_evidence:
 
 execute_phase_evidence:
   - ".planning/phases/{N}/*SUMMARY.md"
-  - ".idumb/execution/{N}/progress.json"
+  - ".idumb/idumb-brain/execution/{N}/progress.json"
   - "all tasks resolved"
 ```
 
@@ -154,7 +154,7 @@ workflow:
 validation_commands:
   - "/idumb:validate"
   - "Use idumb-validate tool with scope parameter"
-  - "Read validation reports from .idumb/governance/"
+  - "Read validation reports from .idumb/idumb-brain/governance/"
 ```
 
 ### Exit Criteria Validation

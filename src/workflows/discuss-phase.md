@@ -1,5 +1,7 @@
 ---
 name: discuss-phase
+id: wf-discuss-phase
+parent: workflows
 description: "Interactive discussion to understand phase goals, scope, and constraints before planning"
 type: workflow
 version: 0.1.0
@@ -21,7 +23,7 @@ entry_conditions:
     - exists: ".planning/PROJECT.md"
     - exists: ".planning/REQUIREMENTS.md"
   blocked_when:
-    - condition: "!exists('.idumb/brain/state.json')"
+    - condition: "!exists('.idumb/idumb-brain/state.json')"
       redirect: "/idumb:init"
       message: "iDumb not initialized"
 ```
@@ -137,7 +139,7 @@ integration:
     - ".planning/REQUIREMENTS.md"
   writes_to:
     - ".planning/phases/{N}/*CONTEXT.md"
-    - ".idumb/brain/state.json"
+    - ".idumb/idumb-brain/state.json"
   never_modifies:
     - ".planning/ROADMAP.md"
     - ".planning/PROJECT.md"

@@ -40,10 +40,10 @@ command_workflows:
     
     exits_when:
       all_true:
-        - condition: file_exists(".idumb/brain/state.json")
-          verification: "fs.existsSync('.idumb/brain/state.json')"
-        - condition: file_exists(".idumb/config.json")
-          verification: "fs.existsSync('.idumb/config.json')"
+        - condition: file_exists(".idumb/idumb-brain/state.json")
+          verification: "fs.existsSync('.idumb/idumb-brain/state.json')"
+        - condition: file_exists(".idumb/idumb-brain/config.json")
+          verification: "fs.existsSync('.idumb/idumb-brain/config.json')"
         - condition: schema_valid(state.json)
           verification: "JSON.parse() succeeds AND has version, initialized, framework fields"
         - condition: schema_valid(config.json)
@@ -63,8 +63,8 @@ command_workflows:
       
     on_completion:
       evidence:
-        - ".idumb/brain/state.json"
-        - ".idumb/config.json"
+        - ".idumb/idumb-brain/state.json"
+        - ".idumb/idumb-brain/config.json"
       state_update: "history += 'init_complete'"
       next_action:
         brownfield: "/idumb:map-codebase"
@@ -110,8 +110,8 @@ command_workflows:
     
     exits_when:
       all_true:
-        - condition: file_exists(".idumb/codebase-map.json")
-          verification: "fs.existsSync('.idumb/codebase-map.json')"
+        - condition: file_exists(".idumb/idumb-project-output/codebase-map.json")
+          verification: "fs.existsSync('.idumb/idumb-project-output/codebase-map.json')"
         - condition: at_least_one_source_file_analyzed
           verification: "codebase_map.files.length >= 1"
         - condition: language_detection_complete
@@ -136,7 +136,7 @@ command_workflows:
         
     on_completion:
       evidence:
-        - ".idumb/codebase-map.json"
+        - ".idumb/idumb-project-output/codebase-map.json"
       state_update: "codebase_mapped = true"
       
   # -----------------------------------------------------------------------------
@@ -148,7 +148,7 @@ command_workflows:
     exits_when:
       all_true:
         - condition: research_artifact_exists
-          verification: "glob('.idumb/governance/research/*-*.md').length >= 1"
+          verification: "glob('.idumb/idumb-brain/governance/research/*-*.md').length >= 1"
         - condition: synthesis_section_populated
           verification: "research_doc contains ## Synthesis with content"
         - condition: at_least_two_domain_findings
@@ -194,7 +194,7 @@ command_workflows:
       
     on_completion:
       evidence:
-        - ".idumb/governance/research/{timestamp}-*.md"
+        - ".idumb/idumb-brain/governance/research/{timestamp}-*.md"
       confidence_rating: "HIGH|MEDIUM|LOW based on source quality"
       
   # -----------------------------------------------------------------------------
@@ -372,7 +372,7 @@ command_workflows:
     on_completion:
       evidence:
         - ".planning/phases/{N}/*SUMMARY.md"
-        - ".idumb/execution/{N}/progress.json"
+        - ".idumb/idumb-brain/execution/{N}/progress.json"
       state_update: "phaseStatus = 'executed'"
       
   # -----------------------------------------------------------------------------
@@ -909,15 +909,15 @@ evidence_requirements:
     
   per_workflow_evidence:
     init:
-      - ".idumb/brain/state.json exists and valid"
-      - ".idumb/config.json exists and valid"
+      - ".idumb/idumb-brain/state.json exists and valid"
+      - ".idumb/idumb-brain/config.json exists and valid"
       
     new_project:
       - ".planning/PROJECT.md with required sections"
       - ".planning/config.json"
       
     research:
-      - ".idumb/governance/research/*-*.md"
+      - ".idumb/idumb-brain/governance/research/*-*.md"
       - "synthesis section with recommendations"
       
     roadmap:
@@ -934,7 +934,7 @@ evidence_requirements:
       
     execute_phase:
       - ".planning/phases/{N}/*SUMMARY.md"
-      - ".idumb/execution/{N}/progress.json"
+      - ".idumb/idumb-brain/execution/{N}/progress.json"
       - "all tasks resolved"
       
     verify_work:

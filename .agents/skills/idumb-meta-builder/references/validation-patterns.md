@@ -111,7 +111,7 @@ agent_validation:
     check: "Agent mode compatible with delegation"
     valid_modes:
       coordinator: ["primary", "all"]
-      worker: ["subagent"]
+      worker: ["all"]
     pass_condition: "delegation matches mode hierarchy"
     fail_message: "Cannot delegate {parent} → {child}: mode mismatch"
 ```

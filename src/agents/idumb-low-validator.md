@@ -1,6 +1,8 @@
 ---
 description: "Low-level validator - runs grep, glob, tests, verifies state. Read-only operations."
-mode: subagent
+id: agent-idumb-low-validator
+parent: idumb-high-governance
+mode: all
 scope: meta
 temperature: 0.1
 permission:
@@ -26,6 +28,15 @@ tools:
   idumb-validate: true
   idumb-context: true
   idumb-todo: true
+  # Hierarchical data processing (read-only + validation)
+  idumb-chunker: true
+  idumb-chunker_read: true
+  idumb-chunker_overview: true
+  idumb-chunker_validate: true
+  idumb-chunker_parseHierarchy: true
+  idumb-chunker_shard: true
+  idumb-chunker_index: true
+  idumb-chunker_extract: true
 ---
 
 # @idumb-low-validator
@@ -232,21 +243,21 @@ steps:
 | idumb-supreme-coordinator | primary | bridge | ALL agents | Top-level orchestration |
 | idumb-high-governance | all | meta | ALL agents | Meta-level coordination |
 | idumb-mid-coordinator | all | bridge | project agents | Project-level coordination |
-| idumb-executor | subagent | project | general, verifier, debugger | Phase execution |
-| idumb-builder | subagent | meta | none (leaf) | File operations |
-| idumb-low-validator | subagent | meta | none (leaf) | Read-only validation |
-| idumb-verifier | subagent | project | general, low-validator | Work verification |
-| idumb-debugger | subagent | project | general, low-validator | Issue diagnosis |
-| idumb-planner | subagent | bridge | general | Plan creation |
-| idumb-plan-checker | subagent | bridge | general | Plan validation |
-| idumb-roadmapper | subagent | project | general | Roadmap creation |
-| idumb-project-researcher | subagent | project | general | Domain research |
-| idumb-phase-researcher | subagent | project | general | Phase research |
-| idumb-research-synthesizer | subagent | project | general | Synthesize research |
-| idumb-codebase-mapper | subagent | project | general | Codebase analysis |
-| idumb-integration-checker | subagent | bridge | general, low-validator | Integration validation |
-| idumb-skeptic-validator | subagent | bridge | general | Challenge assumptions |
-| idumb-project-explorer | subagent | project | general | Project exploration |
+| idumb-executor | all | project | general, verifier, debugger | Phase execution |
+| idumb-builder | all | meta | none (leaf) | File operations |
+| idumb-low-validator | all | meta | none (leaf) | Read-only validation |
+| idumb-verifier | all | project | general, low-validator | Work verification |
+| idumb-debugger | all | project | general, low-validator | Issue diagnosis |
+| idumb-planner | all | bridge | general | Plan creation |
+| idumb-plan-checker | all | bridge | general | Plan validation |
+| idumb-roadmapper | all | project | general | Roadmap creation |
+| idumb-project-researcher | all | project | general | Domain research |
+| idumb-phase-researcher | all | project | general | Phase research |
+| idumb-research-synthesizer | all | project | general | Synthesize research |
+| idumb-codebase-mapper | all | project | general | Codebase analysis |
+| idumb-integration-checker | all | bridge | general, low-validator | Integration validation |
+| idumb-skeptic-validator | all | bridge | general | Challenge assumptions |
+| idumb-project-explorer | all | project | general | Project exploration |
 
 ## Reporting Format
 

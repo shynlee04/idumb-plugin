@@ -101,7 +101,7 @@ Before delegating, verify:
 
 ```yaml
 checklist:
-  1: "Read .idumb/brain/state.json"
+  1: "Read .idumb/idumb-brain/state.json"
   2: "Identify current phase"
   3: "Check delegation depth"
   4: "Verify agent role matches permissions"
@@ -216,11 +216,11 @@ root_session:
   inject: "Full governance context + anchors"
   reason: "Primary orchestration layer"
 
-subagent_session:
+all_session:
   inject: "Minimal context + task scope"
   reason: "Prevent context bloat in delegation"
 
-resumed_subagent:
+resumed_all:
   inject: "Re-establish delegation chain"
   reason: "Mindfulness of parent session context"
 ```

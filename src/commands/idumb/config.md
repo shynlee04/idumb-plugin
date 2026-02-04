@@ -1,5 +1,7 @@
 ---
 description: "View and edit iDumb configuration settings"
+id: cmd-config
+parent: commands-idumb
 mode: all
 temperature: 0.1
 permission:

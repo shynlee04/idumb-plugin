@@ -27,7 +27,10 @@ export function getAllowedTools(agentRole: string | null): string[] {
         'idumb-context', 'idumb-context_summary',
         'idumb-config', 'idumb-config_read', 'idumb-config_status',
         'idumb-todo', 'idumb-todo_list', 'idumb-todo_hierarchy',
-        'idumb-validate', 'idumb-manifest', 'idumb-chunker'
+        'idumb-validate', 'idumb-manifest',
+        // Hierarchical chunker tools
+        'idumb-chunker', 'idumb-chunker_read', 'idumb-chunker_overview',
+        'idumb-chunker_parseHierarchy', 'idumb-chunker_shard', 'idumb-chunker_index', 'idumb-chunker_extract'
     ]
 
     // TIER 2: Executors/Planners - can delegate to leaf nodes + read
@@ -37,7 +40,9 @@ export function getAllowedTools(agentRole: string | null): string[] {
         'idumb-state', 'idumb-state_read', 'idumb-state_anchor', 'idumb-state_getAnchors',
         'idumb-context', 'idumb-config', 'idumb-config_read',
         'idumb-todo', 'idumb-todo_list',
-        'idumb-validate', 'idumb-chunker'
+        'idumb-validate',
+        'idumb-chunker', 'idumb-chunker_read', 'idumb-chunker_overview',
+        'idumb-chunker_parseHierarchy', 'idumb-chunker_shard', 'idumb-chunker_index', 'idumb-chunker_extract'
     ]
 
     // TIER 3: Researchers/Validators - read-only + anchoring
@@ -47,7 +52,9 @@ export function getAllowedTools(agentRole: string | null): string[] {
         'idumb-state', 'idumb-state_read', 'idumb-state_anchor',
         'idumb-context', 'idumb-config_read',
         'idumb-todo', 'idumb-todo_list',
-        'idumb-validate', 'idumb-chunker'
+        'idumb-validate',
+        'idumb-chunker', 'idumb-chunker_read', 'idumb-chunker_overview',
+        'idumb-chunker_parseHierarchy', 'idumb-chunker_shard', 'idumb-chunker_index', 'idumb-chunker_extract'
     ]
 
     // LEAF: Builder - write permissions
@@ -58,7 +65,11 @@ export function getAllowedTools(agentRole: string | null): string[] {
         'filesystem_read_text_file', 'filesystem_read_multiple_files',
         'filesystem_create_directory', 'filesystem_list_directory',
         'idumb-state', 'idumb-state_anchor', 'idumb-state_history',
-        'idumb-todo', 'idumb-todo_complete', 'idumb-todo_update'
+        'idumb-todo', 'idumb-todo_complete', 'idumb-todo_update',
+        // Full hierarchical chunker suite (including write)
+        'idumb-chunker', 'idumb-chunker_read', 'idumb-chunker_overview',
+        'idumb-chunker_parseHierarchy', 'idumb-chunker_shard', 'idumb-chunker_index',
+        'idumb-chunker_extract', 'idumb-chunker_insert', 'idumb-chunker_targetEdit'
     ]
 
     // LEAF: Validator - read-only validation
@@ -74,7 +85,9 @@ export function getAllowedTools(agentRole: string | null): string[] {
         'idumb-context', 'idumb-config_read',
         'idumb-todo', 'idumb-todo_list',
         'idumb-manifest', 'idumb-manifest_drift', 'idumb-manifest_conflicts',
-        'idumb-chunker', 'idumb-chunker_read', 'idumb-chunker_validate'
+        'idumb-chunker', 'idumb-chunker_read', 'idumb-chunker_validate',
+        'idumb-chunker_overview', 'idumb-chunker_parseHierarchy', 'idumb-chunker_shard',
+        'idumb-chunker_index', 'idumb-chunker_extract'
     ]
 
     const toolPermissions: Record<string, string[]> = {
@@ -290,7 +303,7 @@ YOU ARE: Builder (EXECUTION WORKER)
 3. Verify before changes, commit after
 
 🚫 CANNOT:
-- Spawn subagents (task: false)
+- Spawn alls (task: false)
 - Skip verification
 
 ${firstActionRequired['idumb-builder']}

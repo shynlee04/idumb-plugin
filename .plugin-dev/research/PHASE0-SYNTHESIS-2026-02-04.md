@@ -253,22 +253,22 @@ const SAFE_MESSAGE_FORMAT = {
 consumption_order:
   level_0_coordinator:
     required:
-      - .idumb/brain/state.json      # Phase, anchors
-      - .idumb/config.json           # Settings, language
+      - .idumb/idumb-brain/state.json      # Phase, anchors
+      - .idumb/idumb-brain/config.json           # Settings, language
     optional:
-      - .idumb/brain/todos.json      # Task list
-      - .idumb/sessions/{id}.json    # Session metadata
+      - .idumb/idumb-brain/todos.json      # Task list
+      - .idumb/idumb-brain/sessions/{id}.json    # Session metadata
       
   level_1_delegation:
     required:
-      - .idumb/brain/state.json      # Phase only
+      - .idumb/idumb-brain/state.json      # Phase only
     optional:
-      - .idumb/config.json           # Language only
+      - .idumb/idumb-brain/config.json           # Language only
       
   level_2_plus:
     required: []                      # No required reads
     optional:
-      - .idumb/brain/state.json      # Phase check only
+      - .idumb/idumb-brain/state.json      # Phase check only
 ```
 
 ### Spec 4: Purge/Archive Policy
@@ -278,7 +278,7 @@ consumption_order:
 purge_policy:
   state_history:
     max_entries: 50
-    archive_to: .idumb/brain/history/
+    archive_to: .idumb/idumb-brain/history/
     archive_trigger: entries > 50
     
   sessions:
@@ -293,7 +293,7 @@ purge_policy:
     
   execution_metrics:
     reset_on: session.created
-    archive_to: .idumb/brain/history/metrics-{date}.json
+    archive_to: .idumb/idumb-brain/history/metrics-{date}.json
 ```
 
 ---

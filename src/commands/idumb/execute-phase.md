@@ -1,5 +1,7 @@
 ---
 description: "Execute a phase plan with full governance and monitoring"
+id: cmd-execute-phase
+parent: commands-idumb
 agent: idumb-supreme-coordinator
 ---
 

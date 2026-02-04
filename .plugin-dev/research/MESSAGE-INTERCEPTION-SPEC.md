@@ -940,10 +940,10 @@ Before deploying each scenario:
 
 | File | Purpose | Schema |
 |------|---------|--------|
-| `.idumb/sessions/{sessionId}.json` | Session metadata | `SessionMetadata` |
-| `.idumb/sessions/{sessionId}-score.json` | Accumulated score | `AccumulatedScore` |
-| `.idumb/sessions/{sessionId}-purify.json` | Purification context | `PurificationContext` |
-| `.idumb/brain/state.json` | Global state | `IdumbState` |
+| `.idumb/idumb-brain/sessions/{sessionId}.json` | Session metadata | `SessionMetadata` |
+| `.idumb/idumb-brain/sessions/{sessionId}-score.json` | Accumulated score | `AccumulatedScore` |
+| `.idumb/idumb-brain/sessions/{sessionId}-purify.json` | Purification context | `PurificationContext` |
+| `.idumb/idumb-brain/state.json` | Global state | `IdumbState` |
 
 ### Session Metadata Schema
 

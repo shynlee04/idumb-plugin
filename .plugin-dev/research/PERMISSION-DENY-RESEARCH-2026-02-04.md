@@ -74,7 +74,7 @@ if (rule.action === "ask") {
 
 **Implication:** Until OpenCode fixes issue #7006, the plugin's `permission.ask` hook will NEVER be called. All permission enforcement must rely on:
 1. Agent frontmatter `permission:` blocks (OpenCode native)
-2. `tool.execute.before` hook (can throw to block, but doesn't work for subagents per #5894)
+2. `tool.execute.before` hook (can throw to block, but doesn't work for alls per #5894)
 3. `event` hook with `permission.asked` type (read-only, cannot modify)
 
 ### 1.3 Agent Frontmatter Permissions (Current)
@@ -164,7 +164,7 @@ This file contains a well-structured permission system with:
 | `grep` | Search content | Regex pattern |
 | `list` | List directories | Directory path |
 | `bash` | Shell commands | Parsed command |
-| `task` | Launch subagents | Subagent type |
+| `task` | Launch alls | all type |
 | `skill` | Load skills | Skill name |
 | `webfetch` | Fetch URLs | URL |
 | `websearch` | Web search | Query |
@@ -176,7 +176,7 @@ This file contains a well-structured permission system with:
 ```yaml
 ---
 description: "Agent description"
-mode: subagent
+mode: all
 permission:
   edit: deny
   bash:
@@ -208,7 +208,7 @@ permission:
 
 **Workaround Options:**
 1. **Primary:** Rely entirely on agent frontmatter `permission:` blocks
-2. **Secondary:** Use `tool.execute.before` hook with `throw new Error(...)` to block (but won't work for subagents)
+2. **Secondary:** Use `tool.execute.before` hook with `throw new Error(...)` to block (but won't work for alls)
 3. **Tertiary:** Wait for OpenCode to fix #7006
 
 ### 3.2 Agent Profile Gaps
@@ -319,7 +319,7 @@ bash:
 }
 ```
 
-**Limitation:** This won't work for subagent tool calls (per GitHub issue #5894).
+**Limitation:** This won't work for all tool calls (per GitHub issue #5894).
 
 **Step 2: Integrate deny-rules.yaml**
 
@@ -459,7 +459,7 @@ permission:
 ### GitHub Issues (Critical Context)
 4. Issue #7006: permission.ask hook not triggered
 5. Issue #9229: Duplicate of #7006
-6. Issue #5894: Subagent tool calls bypass plugin hooks
+6. Issue #5894: all tool calls bypass plugin hooks
 
 ### Internal Documentation
 7. `/template/governance/deny-rules.yaml` - Well-designed deny patterns

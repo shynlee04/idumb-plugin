@@ -1,5 +1,7 @@
 ---
 description: "Resume a previously idle iDumb session with context recovery"
+id: cmd-resume
+parent: commands-idumb
 mode: primary
 temperature: 0.1
 permission:
@@ -27,8 +29,8 @@ Resume a previously idle iDumb session, restoring context, anchors, and workflow
 - Need to recover previous session state
 
 ## Prerequisites
-- Session metadata exists in `.idumb/sessions/`
-- State file exists at `.idumb/brain/state.json`
+- Session metadata exists in `.idumb/idumb-brain/sessions/`
+- State file exists at `.idumb/idumb-brain/state.json`
 
 ## Workflow
 
@@ -39,7 +41,7 @@ Use checkIfResumedSession() to determine if this is a resumed session
 
 ### Step 2: Load Session Metadata
 ```
-Load metadata from .idumb/sessions/{sessionId}.json
+Load metadata from .idumb/idumb-brain/sessions/{sessionId}.json
 ```
 
 ### Step 3: Build Resume Context

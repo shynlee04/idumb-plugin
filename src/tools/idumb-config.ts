@@ -57,7 +57,7 @@ interface IdumbConfig {
   version: string                    // Schema version "0.2.0"
   initialized: string                // ISO timestamp of creation
   lastModified: string               // ISO timestamp of last change
-  
+
   // ═══════════════════════════════════════════════════════════════════════════
   // USER PREFERENCES - Personalization
   // ═══════════════════════════════════════════════════════════════════════════
@@ -69,7 +69,7 @@ interface IdumbConfig {
       documents: string              // Artifact language
     }
   }
-  
+
   // ═══════════════════════════════════════════════════════════════════════════
   // GOVERNANCE STATUS - Current state (linked to state.json)
   // ═══════════════════════════════════════════════════════════════════════════
@@ -84,14 +84,14 @@ interface IdumbConfig {
     validationsPassed: number        // Count of successful validations
     driftDetected: boolean           // True if state differs from artifacts
   }
-  
+
   // ═══════════════════════════════════════════════════════════════════════════
   // HIERARCHY CONTROL - The chain that cannot break
   // ═══════════════════════════════════════════════════════════════════════════
   hierarchy: {
     // Status progression - each level depends on prior
     levels: readonly ["milestone", "phase", "plan", "task"]
-    
+
     // Agent delegation chain - strict order
     agents: {
       order: readonly ["coordinator", "governance", "validator", "builder"]
@@ -102,33 +102,33 @@ interface IdumbConfig {
         builder: AgentPermission
       }
     }
-    
+
     // Chain integrity - if broken, block operations
     enforceChain: boolean            // Default: true
     blockOnChainBreak: boolean       // Default: true
   }
-  
+
   // ═══════════════════════════════════════════════════════════════════════════
   // AUTOMATION CONTROL - How agents behave
   // ═══════════════════════════════════════════════════════════════════════════
   automation: {
     // Derived from user.experience, but can be overridden
     mode: AutomationMode
-    
+
     // Expert-skeptic mode (from governance protocol)
     expertSkeptic: {
       enabled: boolean               // Always verify before acting
       requireEvidence: boolean       // Demand proof for claims
       doubleCheckDelegation: boolean // Verify delegation chains
     }
-    
+
     // Context-first enforcement
     contextFirst: {
       enforced: boolean              // Must read context before acting
       requiredFirstTools: string[]   // ["idumb-todo", "idumb-state"]
       blockWithoutContext: boolean   // Block if context not gathered
     }
-    
+
     // Workflow controls
     workflow: {
       research: boolean              // Enable research phase
@@ -137,29 +137,35 @@ interface IdumbConfig {
       commitOnComplete: boolean      // Git commit on phase complete
     }
   }
-  
+
   // ═══════════════════════════════════════════════════════════════════════════
   // PATH CONFIGURATION - Where everything lives
   // ═══════════════════════════════════════════════════════════════════════════
   paths: {
-    config: string                   // This file (self-referential)
-    state: string                    // Runtime state
-    
-    // Directories
+    root: string                       // Root .idumb/ directory
+    config: string                     // This file (self-referential)
+    state: string                      // Runtime state
+
+    // Brain directories (AI governance memory)
     brain: string
     history: string
     context: string
     governance: string
     validations: string
-    anchors: string
     sessions: string
-    
-    // Planning artifacts (read-only for iDumb)
-    planning: string
-    roadmap: string
-    planningState: string
+    drift: string
+    metadata: string
+
+    // Project output directories
+    output: string
+    phases: string
+    roadmaps: string
+    research: string
+
+    // User extensions
+    modules: string
   }
-  
+
   // ═══════════════════════════════════════════════════════════════════════════
   // STALENESS DETECTION - Prevent drift
   // ═══════════════════════════════════════════════════════════════════════════
@@ -169,7 +175,7 @@ interface IdumbConfig {
     checkOnLoad: boolean             // Check staleness at session start
     autoArchive: boolean             // Archive stale artifacts
   }
-  
+
   // ═══════════════════════════════════════════════════════════════════════════
   // TIMESTAMPS - Metadata control
   // ═══════════════════════════════════════════════════════════════════════════
@@ -179,7 +185,7 @@ interface IdumbConfig {
     injectInFrontmatter: boolean     // Add to YAML headers
     trackModifications: boolean      // Shadow tracking
   }
-  
+
   // ═══════════════════════════════════════════════════════════════════════════
   // ENFORCEMENT FLAGS - What to check on load
   // ═══════════════════════════════════════════════════════════════════════════
@@ -303,7 +309,7 @@ function getAutomationByExperience(experience: ExperienceLevel): IdumbConfig["au
       }
     }
   }
-  
+
   return settings[experience]
 }
 
@@ -319,12 +325,12 @@ function getAutomationByExperience(experience: ExperienceLevel): IdumbConfig["au
  */
 function getDefaultConfig(experience: ExperienceLevel = "guided"): IdumbConfig {
   const now = new Date().toISOString()
-  
+
   return {
     version: "0.2.0",
     initialized: now,
     lastModified: now,
-    
+
     user: {
       name: "Developer",
       experience,
@@ -333,7 +339,7 @@ function getDefaultConfig(experience: ExperienceLevel = "guided"): IdumbConfig {
         documents: "english"
       }
     },
-    
+
     status: {
       current: {
         milestone: null,
@@ -345,7 +351,7 @@ function getDefaultConfig(experience: ExperienceLevel = "guided"): IdumbConfig {
       validationsPassed: 0,
       driftDetected: false
     },
-    
+
     hierarchy: {
       levels: ["milestone", "phase", "plan", "task"] as const,
       agents: {
@@ -360,38 +366,42 @@ function getDefaultConfig(experience: ExperienceLevel = "guided"): IdumbConfig {
       enforceChain: true,
       blockOnChainBreak: true
     },
-    
+
     automation: getAutomationByExperience(experience),
-    
+
     paths: {
-      config: ".idumb/config.json",
-      state: ".idumb/brain/state.json",
-      brain: ".idumb/brain/",
-      history: ".idumb/brain/history/",
-      context: ".idumb/brain/context/",
-      governance: ".idumb/governance/",
-      validations: ".idumb/governance/validations/",
-      anchors: ".idumb/anchors/",
-      sessions: ".idumb/sessions/",
-      planning: ".planning/",
-      roadmap: ".planning/ROADMAP.md",
-      planningState: ".planning/STATE.md"
+      root: ".idumb/",
+      config: ".idumb/idumb-brain/config.json",
+      state: ".idumb/idumb-brain/state.json",
+      brain: ".idumb/idumb-brain/",
+      history: ".idumb/idumb-brain/history/",
+      context: ".idumb/idumb-brain/context/",
+      governance: ".idumb/idumb-brain/governance/",
+      validations: ".idumb/idumb-brain/governance/validations/",
+      sessions: ".idumb/idumb-brain/sessions/",
+      drift: ".idumb/idumb-brain/drift/",
+      metadata: ".idumb/idumb-brain/metadata/",
+      output: ".idumb/idumb-project-output/",
+      phases: ".idumb/idumb-project-output/phases/",
+      roadmaps: ".idumb/idumb-project-output/roadmaps/",
+      research: ".idumb/idumb-project-output/research/",
+      modules: ".idumb/idumb-modules/"
     },
-    
+
     staleness: {
       warningHours: 48,
       criticalHours: 168,
       checkOnLoad: true,
       autoArchive: false
     },
-    
+
     timestamps: {
       enabled: true,
       format: "ISO8601",
       injectInFrontmatter: true,
       trackModifications: true
     },
-    
+
     enforcement: {
       mustLoadConfig: true,
       mustHaveState: true,
@@ -433,23 +443,23 @@ function getDefaultState(): IdumbState {
 function ensureConfigExists(directory: string): IdumbConfig {
   const configPath = join(directory, ".idumb", "config.json")
   const idumbDir = join(directory, ".idumb")
-  
+
   // Create .idumb directory if missing
   if (!existsSync(idumbDir)) {
     mkdirSync(idumbDir, { recursive: true })
   }
-  
+
   // If config exists, read and validate
   if (existsSync(configPath)) {
     try {
       const content = readFileSync(configPath, "utf8")
       const config = JSON.parse(content) as IdumbConfig
-      
+
       // Validate required fields exist
       if (!config.version || !config.user || !config.hierarchy) {
         throw new Error("Config missing required fields")
       }
-      
+
       // Update lastModified for this access
       return config
     } catch (error) {
@@ -464,10 +474,10 @@ function ensureConfigExists(directory: string): IdumbConfig {
       }
     }
   }
-  
+
   // Generate default config
   const defaultConfig = getDefaultConfig("guided")
-  
+
   // Create all required directories
   const dirs = [
     join(directory, ".idumb", "brain"),
@@ -478,23 +488,23 @@ function ensureConfigExists(directory: string): IdumbConfig {
     join(directory, ".idumb", "anchors"),
     join(directory, ".idumb", "sessions")
   ]
-  
+
   for (const dir of dirs) {
     if (!existsSync(dir)) {
       mkdirSync(dir, { recursive: true })
     }
   }
-  
+
   // Write config
   writeFileSync(configPath, JSON.stringify(defaultConfig, null, 2))
-  
+
   // Also ensure state.json exists
   const statePath = join(directory, ".idumb", "brain", "state.json")
   if (!existsSync(statePath)) {
     const defaultState = getDefaultState()
     writeFileSync(statePath, JSON.stringify(defaultState, null, 2))
   }
-  
+
   return defaultConfig
 }
 
@@ -523,11 +533,11 @@ function loadConfig(directory: string): IdumbConfig {
 function saveConfig(directory: string, config: IdumbConfig): void {
   const configPath = getConfigPath(directory)
   const idumbDir = join(directory, ".idumb")
-  
+
   if (!existsSync(idumbDir)) {
     mkdirSync(idumbDir, { recursive: true })
   }
-  
+
   config.lastModified = new Date().toISOString()
   writeFileSync(configPath, JSON.stringify(config, null, 2))
 }
@@ -537,7 +547,7 @@ function saveConfig(directory: string, config: IdumbConfig): void {
  */
 function loadPlanningConfig(directory: string): PlanningConfig | null {
   const planningPath = getPlanningConfigPath(directory)
-  
+
   if (existsSync(planningPath)) {
     try {
       return JSON.parse(readFileSync(planningPath, "utf8"))
@@ -545,7 +555,7 @@ function loadPlanningConfig(directory: string): PlanningConfig | null {
       return null
     }
   }
-  
+
   return null
 }
 
@@ -554,29 +564,29 @@ function loadPlanningConfig(directory: string): PlanningConfig | null {
  */
 function syncStatusFromPlanning(directory: string, config: IdumbConfig): IdumbConfig {
   const stateMdPath = join(directory, ".planning", "STATE.md")
-  
+
   if (existsSync(stateMdPath)) {
     try {
       const content = readFileSync(stateMdPath, "utf8")
-      
+
       // Parse milestone
       const milestoneMatch = content.match(/Milestone:\s*\[([^\]]+)\]/i)
       if (milestoneMatch) {
         config.status.current.milestone = milestoneMatch[1]
       }
-      
+
       // Parse phase
       const phaseMatch = content.match(/Phase:\s*\[(\d+)\]\s*of\s*\[(\d+)\]\s*\(([^)]+)\)/i)
       if (phaseMatch) {
         config.status.current.phase = `${phaseMatch[1]}/${phaseMatch[2]} (${phaseMatch[3]})`
       }
-      
+
       // Parse plan
       const planMatch = content.match(/Plan:\s*\[([^\]]+)\]/i)
       if (planMatch) {
         config.status.current.plan = planMatch[1]
       }
-      
+
       // Parse task
       const taskMatch = content.match(/Task:\s*\[([^\]]+)\]/i)
       if (taskMatch) {
@@ -586,7 +596,7 @@ function syncStatusFromPlanning(directory: string, config: IdumbConfig): IdumbCo
       // Failed to parse - keep current status
     }
   }
-  
+
   return config
 }
 
@@ -596,11 +606,11 @@ function syncStatusFromPlanning(directory: string, config: IdumbConfig): IdumbCo
 function detectDrift(directory: string, config: IdumbConfig): boolean {
   // Check if state.json matches config status
   const statePath = join(directory, ".idumb", "brain", "state.json")
-  
+
   if (existsSync(statePath)) {
     try {
       const state = JSON.parse(readFileSync(statePath, "utf8"))
-      
+
       // Compare phase
       if (state.phase && config.status.current.phase) {
         // Simple drift detection - phases should align
@@ -612,7 +622,7 @@ function detectDrift(directory: string, config: IdumbConfig): boolean {
       // Can't detect drift if state is corrupted
     }
   }
-  
+
   return false
 }
 
@@ -645,13 +655,13 @@ export const read = tool({
   async execute(args, context) {
     const config = loadConfig(context.directory)
     const planningConfig = loadPlanningConfig(context.directory)
-    
+
     // Sync status from planning if available
     const syncedConfig = syncStatusFromPlanning(context.directory, config)
-    
+
     // Check for drift
     syncedConfig.status.driftDetected = detectDrift(context.directory, syncedConfig)
-    
+
     // Build merged view
     const result: any = {
       idumb: args.section ? (syncedConfig as any)[args.section] : syncedConfig,
@@ -663,7 +673,7 @@ export const read = tool({
         automationMode: syncedConfig.automation.mode
       }
     }
-    
+
     return JSON.stringify(result, null, 2)
   }
 })
@@ -680,21 +690,21 @@ export const update = tool({
   },
   async execute(args, context) {
     const config = loadConfig(context.directory)
-    
+
     // Check for reserved keys
     const reservedCheck = isReservedKey(args.section, args.key)
     if (reservedCheck.reserved) {
       return JSON.stringify({
         error: `Key '${args.key}' is reserved by ${reservedCheck.owner}`,
         message: `This value is controlled by ${reservedCheck.owner}, not iDumb. ` +
-                 `To change ${reservedCheck.owner} settings, use their respective configuration.`,
+          `To change ${reservedCheck.owner} settings, use their respective configuration.`,
         reservedKeys: {
           opencode: RESERVED_OPENCODE_KEYS,
           planning: RESERVED_PLANNING_KEYS
         }
       }, null, 2)
     }
-    
+
     // Prevent modification of protected sections
     if (["version", "initialized", "status", "hierarchy"].includes(args.section)) {
       return JSON.stringify({
@@ -702,7 +712,7 @@ export const update = tool({
         message: "Version, initialized, status, and hierarchy are controlled by the system."
       }, null, 2)
     }
-    
+
     try {
       // Parse value (might be JSON)
       let parsedValue: any
@@ -711,13 +721,13 @@ export const update = tool({
       } catch {
         parsedValue = args.value
       }
-      
+
       // Navigate to section
       const section = (config as any)[args.section]
       if (!section) {
         return JSON.stringify({ error: `Unknown section: ${args.section}` })
       }
-      
+
       // Handle dot notation
       const keys = args.key.split(".")
       let target = section
@@ -727,11 +737,11 @@ export const update = tool({
           return JSON.stringify({ error: `Unknown key path: ${args.key}` })
         }
       }
-      
+
       const finalKey = keys[keys.length - 1]
       const oldValue = target[finalKey]
       target[finalKey] = parsedValue
-      
+
       // If experience level changed, update automation settings
       if (args.section === "user" && args.key === "experience") {
         const newExperience = parsedValue as ExperienceLevel
@@ -739,9 +749,9 @@ export const update = tool({
           config.automation = getAutomationByExperience(newExperience)
         }
       }
-      
+
       saveConfig(context.directory, config)
-      
+
       return JSON.stringify({
         updated: true,
         section: args.section,
@@ -750,7 +760,7 @@ export const update = tool({
         newValue: parsedValue,
         experienceTriggeredAutomationUpdate: args.key === "experience"
       }, null, 2)
-      
+
     } catch (e) {
       return JSON.stringify({ error: (e as Error).message })
     }
@@ -761,7 +771,7 @@ export const update = tool({
  * Initialize configuration with defaults and planning detection
  */
 export const init = tool({
-  description: "Initialize .idumb/config.json with defaults and planning system detection",
+  description: "Initialize .idumb/idumb-brain/config.json with defaults and planning system detection",
   args: {
     userName: tool.schema.string().optional().describe("User's preferred name"),
     language: tool.schema.string().optional().describe("Communication language (english, vietnamese, etc.)"),
@@ -782,9 +792,9 @@ export const init = tool({
       }
       experience = mapping[args.governanceLevel] || "guided"
     }
-    
+
     const config = getDefaultConfig(experience)
-    
+
     // Apply overrides
     if (args.userName) {
       config.user.name = args.userName
@@ -793,10 +803,10 @@ export const init = tool({
       config.user.language.communication = args.language
       config.user.language.documents = args.language
     }
-    
+
     // Detect planning system
     const planningConfig = loadPlanningConfig(context.directory)
-    
+
     // Create all paths
     const pathsToCreate = [
       join(context.directory, ".idumb", "brain"),
@@ -807,22 +817,22 @@ export const init = tool({
       join(context.directory, ".idumb", "anchors"),
       join(context.directory, ".idumb", "sessions")
     ]
-    
+
     for (const path of pathsToCreate) {
       if (!existsSync(path)) {
         mkdirSync(path, { recursive: true })
       }
     }
-    
+
     saveConfig(context.directory, config)
-    
+
     // Ensure state.json exists
     const statePath = join(context.directory, ".idumb", "brain", "state.json")
     if (!existsSync(statePath)) {
       const defaultState = getDefaultState()
       writeFileSync(statePath, JSON.stringify(defaultState, null, 2))
     }
-    
+
     return JSON.stringify({
       initialized: true,
       config,
@@ -842,13 +852,13 @@ export const status = tool({
   args: {},
   async execute(args, context) {
     const config = loadConfig(context.directory)
-    
+
     // Sync from planning artifacts
     const syncedConfig = syncStatusFromPlanning(context.directory, config)
-    
+
     // Check for drift
     syncedConfig.status.driftDetected = detectDrift(context.directory, syncedConfig)
-    
+
     const result = {
       hierarchy: {
         levels: syncedConfig.hierarchy.levels,
@@ -866,7 +876,7 @@ export const status = tool({
         chainIntact: !syncedConfig.status.driftDetected
       }
     }
-    
+
     return JSON.stringify(result, null, 2)
   }
 })
@@ -880,17 +890,17 @@ export const sync = tool({
   async execute(args, context) {
     const config = loadConfig(context.directory)
     const planningConfig = loadPlanningConfig(context.directory)
-    
+
     if (!planningConfig) {
       return JSON.stringify({
         synced: false,
         reason: "Planning config not found at .planning/config.json"
       })
     }
-    
+
     // Sync status from STATE.md
     const syncedConfig = syncStatusFromPlanning(context.directory, config)
-    
+
     // Map planning settings to automation
     if (planningConfig.mode === "yolo") {
       syncedConfig.user.experience = "pro"
@@ -899,9 +909,9 @@ export const sync = tool({
       syncedConfig.user.experience = "guided"
       syncedConfig.automation = getAutomationByExperience("guided")
     }
-    
+
     saveConfig(context.directory, syncedConfig)
-    
+
     return JSON.stringify({
       synced: true,
       planningConfig,
@@ -924,11 +934,11 @@ export const ensure = tool({
   async execute(args, context) {
     const configPath = getConfigPath(context.directory)
     const existed = existsSync(configPath)
-    
+
     // If doesn't exist and experience provided, create with that level
     if (!existed && args.experience && ["pro", "guided", "strict"].includes(args.experience)) {
       const config = getDefaultConfig(args.experience as ExperienceLevel)
-      
+
       // Create directories
       const dirs = [
         join(context.directory, ".idumb", "brain"),
@@ -939,22 +949,22 @@ export const ensure = tool({
         join(context.directory, ".idumb", "anchors"),
         join(context.directory, ".idumb", "sessions")
       ]
-      
+
       for (const dir of dirs) {
         if (!existsSync(dir)) {
           mkdirSync(dir, { recursive: true })
         }
       }
-      
+
       saveConfig(context.directory, config)
-      
+
       // Ensure state.json
       const statePath = join(context.directory, ".idumb", "brain", "state.json")
       if (!existsSync(statePath)) {
         const defaultState = getDefaultState()
         writeFileSync(statePath, JSON.stringify(defaultState, null, 2))
       }
-      
+
       return JSON.stringify({
         existed: false,
         created: true,
@@ -963,10 +973,10 @@ export const ensure = tool({
         message: "Config auto-generated with specified experience level"
       }, null, 2)
     }
-    
+
     // Use ensureConfigExists for standard flow
     const config = ensureConfigExists(context.directory)
-    
+
     return JSON.stringify({
       existed,
       created: !existed,
@@ -989,18 +999,18 @@ export default tool({
     // CRITICAL: Ensure config exists first
     const config = ensureConfigExists(context.directory)
     const planningConfig = loadPlanningConfig(context.directory)
-    
+
     // Sync status
     const syncedConfig = syncStatusFromPlanning(context.directory, config)
     syncedConfig.status.driftDetected = detectDrift(context.directory, syncedConfig)
-    
+
     return JSON.stringify({
       config: syncedConfig,
       planning: planningConfig || null,
       meta: {
         configPath: getConfigPath(context.directory),
-        planningConfigPath: existsSync(getPlanningConfigPath(context.directory)) 
-          ? getPlanningConfigPath(context.directory) 
+        planningConfigPath: existsSync(getPlanningConfigPath(context.directory))
+          ? getPlanningConfigPath(context.directory)
           : null,
         experience: syncedConfig.user.experience,
         automationMode: syncedConfig.automation.mode,

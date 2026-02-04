@@ -1,5 +1,7 @@
 ---
 description: "Create or update project roadmap based on research and requirements"
+id: cmd-roadmap
+parent: commands-idumb
 agent: idumb-supreme-coordinator
 ---
 
@@ -31,7 +33,7 @@ steps:
   1_validate_prerequisites:
     action: Check for research or requirements
     sources:
-      - .idumb/governance/research/
+      - .idumb/idumb-brain/governance/research/
       - PROJECT.md
       - requirements.md
       - User input
@@ -70,7 +72,7 @@ steps:
   6_store_roadmap:
     action: Save roadmap
     paths:
-       - .idumb/governance/roadmap.md
+       - .idumb/idumb-brain/governance/roadmap.md
        - .planning/ROADMAP.md (if planning framework)
        
    7_update_state:

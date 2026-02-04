@@ -243,7 +243,7 @@ function checkIfResumedSession(sessionId: string, directory: string): boolean {
 | S5-R08 | NEVER intercept lower delegation resumptions | CRITICAL |
 
 **Critical Rule S5-R08 Explanation:**
-When a subagent session (Level 2+) resumes, the plugin MUST NOT inject governance as if it's a new primary session. Detection must check `sessionLevel` before injecting.
+When a all session (Level 2+) resumes, the plugin MUST NOT inject governance as if it's a new primary session. Detection must check `sessionLevel` before injecting.
 
 ```typescript
 // CORRECT: Check session level before injection
@@ -251,8 +251,8 @@ if (isResumedSession && sessionLevel === 1) {
   // Inject governance - this is a primary session resumption
   governancePrefix = buildResumeContext() + buildGovernancePrefix()
 } else if (isResumedSession && sessionLevel >= 2) {
-  // DO NOT inject governance - this is a subagent continuing work
-  log("Subagent resumption detected - skipping governance injection")
+  // DO NOT inject governance - this is a all continuing work
+  log("all resumption detected - skipping governance injection")
 }
 ```
 
@@ -317,9 +317,9 @@ permission:
 
 ---
 
-### Level 1: First Delegation (Subagent)
+### Level 1: First Delegation (all)
 
-**Scope:** First subagent spawned by coordinator
+**Scope:** First all spawned by coordinator
 
 **Governance Rules:**
 
@@ -337,9 +337,9 @@ permission:
 **Agents at Level 1:**
 - `idumb-high-governance` (mode: all)
 - `idumb-mid-coordinator` (mode: all)
-- `idumb-executor` (mode: subagent)
-- `idumb-planner` (mode: subagent)
-- `idumb-verifier` (mode: subagent)
+- `idumb-executor` (mode: all)
+- `idumb-planner` (mode: all)
+- `idumb-verifier` (mode: all)
 - Other Tier 1/2 agents
 
 **Permission Profile (Example: idumb-executor):**
@@ -362,8 +362,8 @@ permission:
 
 **User Visibility:**
 - User sees task delegation in UI
-- User can interrupt subagent work
-- User CANNOT see subagent's internal tool calls directly
+- User can interrupt all work
+- User CANNOT see all's internal tool calls directly
 
 **Parent-Child Linking:**
 ```typescript
@@ -394,7 +394,7 @@ if (toolName === "task") {
 
 ### Level 2+: Nested Delegations (Opaque)
 
-**Scope:** Subagents spawning subagents (depth 2-3)
+**Scope:** alls spawning alls (depth 2-3)
 
 **Governance Rules:**
 
@@ -446,8 +446,8 @@ if (toolName === "task") {
 ```
 
 **Agents at Level 2+:**
-- `idumb-builder` (mode: subagent, LEAF - cannot delegate)
-- `idumb-low-validator` (mode: subagent, LEAF - cannot delegate)
+- `idumb-builder` (mode: all, LEAF - cannot delegate)
+- `idumb-low-validator` (mode: all, LEAF - cannot delegate)
 - Any agent spawned by a Level 1 agent
 
 **Leaf Node Enforcement:**
@@ -532,13 +532,13 @@ permission:
 │                                          │ depth++ → depth=1             │
 │                                          ▼                               │
 │  depth=1    USER ←──────────(can stop)──→ GOVERNANCE / EXECUTOR          │
-│             (Level 1: User can stop)     (SUBAGENT)                      │
+│             (Level 1: User can stop)     (all)                      │
 │                                          │                               │
 │                                          │ task spawn                    │
 │                                          │ depth++ → depth=2             │
 │                                          ▼                               │
 │  depth=2    USER ←──(opaque)───────────→ VERIFIER / PLANNER              │
-│             (Level 2: Limited visibility)(SUBAGENT)                      │
+│             (Level 2: Limited visibility)(all)                      │
 │                                          │                               │
 │                                          │ task spawn                    │
 │                                          │ depth++ → depth=3             │
@@ -580,7 +580,7 @@ permission:
 - [x] S4: Session idle handling (line 2661)
 - [x] S5: Resumed session detection (checkIfResumedSession)
 - [x] S5: Resume context builder (buildResumeContext)
-- [ ] S5-R08: Prevent subagent resumption injection (NEEDS IMPLEMENTATION)
+- [ ] S5-R08: Prevent all resumption injection (NEEDS IMPLEMENTATION)
 
 ### Delegation Hierarchy Implementation
 
@@ -621,7 +621,7 @@ permission:
 1. Create session, wait 1+ hours
 2. Resume session
 3. Verify resume context + governance injected
-4. Verify NOT injected for Level 2+ subagent resumption
+4. Verify NOT injected for Level 2+ all resumption
 
 # Test Delegation Depth
 1. Spawn task (depth should go 0→1)

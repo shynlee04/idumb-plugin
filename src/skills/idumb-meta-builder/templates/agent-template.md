@@ -69,7 +69,7 @@ Level 4: idumb-builder
 **Pre-Operation Checkpoint:**
 ```yaml
 reads:
-  - .idumb/brain/state.json (current phase, anchors)
+  - .idumb/idumb-brain/state.json (current phase, anchors)
   - {other_required_state}
 ```
 
@@ -89,4 +89,4 @@ writes:
 - {sub_agent_2}: {purpose}
 
 **Return Path:**
-{how_to_handle_subagent_results}
+{how_to_handle_all_results}

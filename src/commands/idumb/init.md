@@ -1,5 +1,7 @@
 ---
 description: "Initialize iDumb governance for this project with bounce-back validation loops."
+id: cmd-init
+parent: commands-idumb
 agent: idumb-supreme-coordinator
 ---
 
@@ -38,7 +40,7 @@ Step 1 → Step 2 → Step 3 → Step 4 ──┬→ [PASS] → Step 5 → Step 
 ## YOUR TASK
 
 ### Step 1: Check for existing setup
-- Read `.idumb/brain/state.json` if exists
+- Read `.idumb/idumb-brain/state.json` if exists
 - Check if already initialized
 - If yes, report current state and ask if user wants to reinitialize
 
@@ -75,16 +77,16 @@ Return Format:
 Task: Create iDumb governance structure
 Directories:
   - .idumb/
-  - .idumb/brain/
-  - .idumb/brain/context/
-  - .idumb/brain/history/
-  - .idumb/governance/
-  - .idumb/governance/validations/
-  - .idumb/anchors/
-  - .idumb/sessions/
+  - .idumb/idumb-brain/
+  - .idumb/idumb-brain/context/
+  - .idumb/idumb-brain/history/
+  - .idumb/idumb-brain/governance/
+  - .idumb/idumb-brain/governance/validations/
+  - .idumb/idumb-brain/anchors/
+  - .idumb/idumb-brain/sessions/
 Files:
-  - .idumb/brain/state.json (create with template below)
-  - .idumb/config.json (create with template below)
+  - .idumb/idumb-brain/state.json (create with template below)
+  - .idumb/idumb-brain/config.json (create with template below)
 Template for state.json:
   {
     "version": "0.1.0",
@@ -113,9 +115,9 @@ Template for config.json:
     },
     "paths": {
       "state": {
-        "brain": ".idumb/brain/state.json",
-        "history": ".idumb/brain/history/",
-        "anchors": ".idumb/anchors/"
+        "brain": ".idumb/idumb-brain/state.json",
+        "history": ".idumb/idumb-brain/history/",
+        "anchors": ".idumb/idumb-brain/anchors/"
       }
     },
     "planning": {
@@ -137,9 +139,9 @@ Delegate to @idumb-low-validator:
 Task: Verify governance structure AND planning integration
 Checks:
   - .idumb/ directory exists
-  - .idumb/brain/state.json exists and is valid JSON
-  - .idumb/governance/ directory exists
-  - .idumb/config.json exists and is valid JSON
+  - .idumb/idumb-brain/state.json exists and is valid JSON
+  - .idumb/idumb-brain/governance/ directory exists
+  - .idumb/idumb-brain/config.json exists and is valid JSON
   - IF planning detected: Check required planning files exist
     - .planning/PROJECT.md (REQUIRED for planning)
     - .planning/STATE.md (REQUIRED for workflow)
@@ -311,9 +313,9 @@ initialization:
   planning_phase: [phase if planning detected and complete]
   governance_mode: hierarchical
   structure_created:
-    - .idumb/brain/state.json
-    - .idumb/governance/
-    - .idumb/anchors/
+    - .idumb/idumb-brain/state.json
+    - .idumb/idumb-brain/governance/
+    - .idumb/idumb-brain/anchors/
   agents_available:
     - idumb-supreme-coordinator (primary) - Switch with Tab
     - idumb-high-governance (all) - Mid-level coordination

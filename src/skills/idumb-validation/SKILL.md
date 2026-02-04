@@ -139,7 +139,7 @@ agent_structure_validation:
 
     - field: "mode"
       type: "enum"
-      values: ["primary", "subagent", "all"]
+      values: ["primary", "all", "all"]
       check: "matches_hierarchical_level"
 
     - field: "permission"
@@ -167,8 +167,8 @@ agent_integration_validation:
 
   required_connections:
     - reads_from:
-        - ".idumb/brain/state.json"
-        - ".idumb/config.json"
+        - ".idumb/idumb-brain/state.json"
+        - ".idumb/idumb-brain/config.json"
         - "Current TODO list"
 
     - writes_to:

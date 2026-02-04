@@ -1,5 +1,7 @@
 ---
 description: "Run full validation hierarchy - checks governance state, context integrity, and planning alignment"
+id: cmd-validate
+parent: commands-idumb
 agent: idumb-supreme-coordinator
 ---
 

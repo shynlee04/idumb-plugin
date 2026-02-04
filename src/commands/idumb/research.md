@@ -1,5 +1,7 @@
 ---
 description: "Execute comprehensive research phase using parallel agent mode"
+id: cmd-research
+parent: commands-idumb
 agent: idumb-supreme-coordinator
 ---
 
@@ -65,7 +67,7 @@ steps:
       
   7_store_research:
     action: Save research document
-    path: .idumb/governance/research/<timestamp>-<topic>.md
+    path: .idumb/idumb-brain/governance/research/<timestamp>-<topic>.md
     
   8_update_state:
     action: Record research completion

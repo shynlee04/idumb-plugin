@@ -24,7 +24,7 @@ chain_rules:
       - id: INIT-01
         command: /idumb:*
         must_before:
-          - exists: ".idumb/brain/state.json"
+          - exists: ".idumb/idumb-brain/state.json"
         except:
           - /idumb:init
           - /idumb:help
@@ -196,7 +196,7 @@ validation_protocol:
   on_command_received:
     steps:
       1. Parse command and extract phase number if applicable
-      2. Load current state from .idumb/brain/state.json
+      2. Load current state from .idumb/idumb-brain/state.json
       3. Check chain_rules for matching command
       4. For each must_before:
          - If file check: verify file exists
@@ -240,7 +240,7 @@ skip_conditions:
 ```yaml
 error_recovery:
   on_chain_violation:
-    1. Log violation to .idumb/governance/chain.log
+    1. Log violation to .idumb/idumb-brain/governance/chain.log
     2. Present user with options:
        a. Run prerequisite command automatically
        b. Override with --force (if allowed)

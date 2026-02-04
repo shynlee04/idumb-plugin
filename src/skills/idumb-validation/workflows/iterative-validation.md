@@ -10,7 +10,7 @@
 step: initial_assessment
 tool: idumb-validate
 scope: all
-output: save to .idumb/governance/initial-assessment-{timestamp}.json
+output: save to .idumb/idumb-brain/governance/initial-assessment-{timestamp}.json
 
 checks:
   - structure: "All files exist in correct locations"
@@ -129,7 +129,7 @@ checks:
 
 on_pass:
   generate: "validation-success-report-{timestamp}.md"
-  update: ".idumb/brain/state.json"
+  update: ".idumb/idumb-brain/state.json"
   anchor: "validation_complete"
   exit: "SUCCESS"
 
@@ -218,11 +218,11 @@ Every validation cycle must produce:
 
 ```yaml
 evidence_artifacts:
-  initial_assessment: ".idumb/governance/initial-{timestamp}.json"
-  gap_classification: ".idumb/governance/gaps-{timestamp}.json"
-  resolution_plan: ".idumb/governance/plan-{timestamp}.md"
-  execution_log: ".idumb/governance/execution-{timestamp}.json"
-  final_report: ".idumb/governance/report-{timestamp}.md"
+  initial_assessment: ".idumb/idumb-brain/governance/initial-{timestamp}.json"
+  gap_classification: ".idumb/idumb-brain/governance/gaps-{timestamp}.json"
+  resolution_plan: ".idumb/idumb-brain/governance/plan-{timestamp}.md"
+  execution_log: ".idumb/idumb-brain/governance/execution-{timestamp}.json"
+  final_report: ".idumb/idumb-brain/governance/report-{timestamp}.md"
 
 report_sections:
   - "Executive Summary"

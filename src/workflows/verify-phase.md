@@ -1,5 +1,7 @@
 ---
 name: verify-phase
+id: wf-verify-phase
+parent: workflows
 description: "Validates phase completion through goal-backward analysis and evidence collection"
 type: workflow
 version: 0.1.0
@@ -47,7 +49,7 @@ workflow:
       action: "Gather execution evidence"
       sources:
         - ".planning/phases/{N}/*SUMMARY.md" → completed tasks
-        - ".idumb/execution/{N}/checkpoints/" → task validations
+        - ".idumb/idumb-brain/execution/{N}/checkpoints/" → task validations
         - "git log --since={phase_start}" → commits (if git)
       output: evidence_bundle
       
@@ -219,11 +221,11 @@ chains_to:
 integration:
   reads_from:
     - ".planning/phases/{N}/*"
-    - ".idumb/execution/{N}/"
+    - ".idumb/idumb-brain/execution/{N}/"
     - "Entire codebase (for evidence)"
   writes_to:
     - ".planning/phases/{N}/*VERIFICATION.md"
-    - ".idumb/brain/state.json"
+    - ".idumb/idumb-brain/state.json"
   never_modifies:
     - "Source code"
     - "Other .planning/ files"

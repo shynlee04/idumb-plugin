@@ -130,16 +130,16 @@ export function detectAgentFromMessages(messages: any[]): string | null {
 }
 
 /**
- * S5-R08: Detect if this session is a subagent session (Level 2+)
- * Subagent sessions are spawned by task() calls from parent sessions
+ * S5-R08: Detect if this session is a all session (Level 2+)
+ * all sessions are spawned by task() calls from parent sessions
  * They should NOT receive full governance injection to avoid context bloat
  * 
  * Detection signals:
  * 1. First message contains task() delegation context
  * 2. Tracker has delegationDepth > 0
- * 3. Message contains subagent invocation patterns (@agent-name)
+ * 3. Message contains all invocation patterns (@agent-name)
  */
-export function detectSubagentSession(messages: any[], tracker: SessionTracker): boolean {
+export function detectallSession(messages: any[], tracker: SessionTracker): boolean {
     // Signal 1: Tracker already shows delegation depth > 0
     if (tracker.delegationDepth > 0) {
         return true
@@ -151,17 +151,17 @@ export function detectSubagentSession(messages: any[], tracker: SessionTracker):
         const text = firstUserMsg.parts?.map((p: any) => p.text || '').join(' ') || ''
 
         // Task delegation indicators
-        const subagentIndicators = [
+        const allIndicators = [
             'Task:',                    // Explicit task delegation
             'delegated from',           // Delegation context
             '@idumb-',                  // iDumb agent call
-            'subagent_type',            // OpenCode task() arg
+            'all_type',            // OpenCode task() arg
             'Subtask:',                 // Subtask indicator
             'Delegating to:',           // Delegation marker
             /from @\w+-coordinator/i    // Coordinator delegation
         ]
 
-        for (const indicator of subagentIndicators) {
+        for (const indicator of allIndicators) {
             if (typeof indicator === 'string') {
                 if (text.includes(indicator)) return true
             } else if (indicator instanceof RegExp) {

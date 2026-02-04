@@ -1,14 +1,16 @@
 ---
 name: state-template
+id: tpl-state
+parent: templates
 description: "Template for iDumb state documentation and schema"
 type: template
 version: 0.1.0
-output_pattern: ".idumb/brain/state.json"
+output_pattern: ".idumb/idumb-brain/state.json"
 ---
 
 # State Template
 
-Defines the schema for `.idumb/brain/state.json` - the central state store for iDumb governance.
+Defines the schema for `.idumb/idumb-brain/state.json` - the central state store for iDumb governance.
 
 ## JSON Schema
 

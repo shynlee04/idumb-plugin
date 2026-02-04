@@ -21,7 +21,7 @@ integration_points:
   # -------------------------------------------------------------------------
   reads_from: []
   # Example:
-  #   - source: ".idumb/brain/state.json"
+  #   - source: ".idumb/idumb-brain/state.json"
   #     fields: ["phase", "framework", "anchors"]
   #     purpose: "Get current governance state"
 
@@ -30,7 +30,7 @@ integration_points:
   # -------------------------------------------------------------------------
   writes_to: []
   # Example:
-  #   - target: ".idumb/brain/state.json"
+  #   - target: ".idumb/idumb-brain/state.json"
   #     fields: ["history", "lastValidation"]
   #     purpose: "Record validation action"
 
@@ -68,7 +68,7 @@ integration_points:
   # -------------------------------------------------------------------------
   depends_on: []
   # Example:
-  #   - component: ".idumb/brain/state.json"
+  #   - component: ".idumb/idumb-brain/state.json"
   #     reason: "Need current state to validate"
   #   - component: "idumb-state tool"
   #     reason: "Read state.json"

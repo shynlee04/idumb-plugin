@@ -1,5 +1,7 @@
 ---
 description: "Research workflow for gathering domain knowledge before planning"
+id: wf-research
+parent: workflows
 created: "2026-02-03"
 version: "1.0.0"
 ---

@@ -1,5 +1,7 @@
 ---
 description: "Interactive discussion about phase implementation approach"
+id: cmd-discuss-phase
+parent: commands-idumb
 agent: idumb-supreme-coordinator
 ---
 
@@ -65,7 +67,7 @@ steps:
     
   7_store_context:
     action: Save phase context
-    path: .idumb/governance/phases/<phase>-context.md
+    path: .idumb/idumb-brain/governance/phases/<phase>-context.md
     
   8_report:
     action: Display discussion summary

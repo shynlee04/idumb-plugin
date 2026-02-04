@@ -1,5 +1,7 @@
 ---
 name: transition
+id: wf-transition
+parent: workflows
 description: "Handles phase completion and transition to next phase"
 type: workflow
 version: 0.1.0
@@ -42,9 +44,9 @@ workflow:
     2_archive_phase:
       action: "Archive phase artifacts"
       method: |
-        mkdir -p .idumb/archive/phases/{N}
-        cp .planning/phases/{N}/*.md .idumb/archive/phases/{N}/ 2>/dev/null || true
-        cp .idumb/execution/{N}/*.json .idumb/archive/phases/{N}/ 2>/dev/null || true
+        mkdir -p .idumb/idumb-brain/archive/phases/{N}
+        cp .planning/phases/{N}/*.md .idumb/idumb-brain/archive/phases/{N}/ 2>/dev/null || true
+        cp .idumb/idumb-brain/execution/{N}/*.json .idumb/idumb-brain/archive/phases/{N}/ 2>/dev/null || true
       purpose: "Preserve execution history"
       
     3_update_roadmap_status:
@@ -52,7 +54,7 @@ workflow:
       method: |
         # Note: We don't modify .planning/ROADMAP.md directly
         # Instead, we update our shadow tracking
-        UPDATE_FILE=".idumb/brain/roadmap-status.json"
+        UPDATE_FILE=".idumb/idumb-brain/roadmap-status.json"
       updates:
         phase_{N}:
           status: "complete"
@@ -79,7 +81,7 @@ workflow:
     6_prepare_next:
       action: "Prepare next phase context"
       creates:
-        - ".idumb/brain/phase-{N+1}-prep.json"
+        - ".idumb/idumb-brain/phase-{N+1}-prep.json"
       content:
         previous_phase: "{N}"
         learnings: "Extracted from VERIFICATION.md"
@@ -119,7 +121,7 @@ milestone_completion:
       
     2_archive:
       action: "Archive entire milestone"
-      destination: ".idumb/archive/milestones/{milestone}/"
+      destination: ".idumb/idumb-brain/archive/milestones/{milestone}/"
       
     3_planning_sync:
       action: "Sync state with .planning if present"
@@ -140,7 +142,7 @@ milestone_completion:
 ```yaml
 artifacts:
   roadmap_status:
-    path: ".idumb/brain/roadmap-status.json"
+    path: ".idumb/idumb-brain/roadmap-status.json"
     schema:
       phases:
         "{N}":
@@ -151,14 +153,14 @@ artifacts:
           pass_rate: "percentage"
           
   phase_archive:
-    path: ".idumb/archive/phases/{N}/"
+    path: ".idumb/idumb-brain/archive/phases/{N}/"
     contains:
       - "All phase markdown files"
       - "All execution checkpoints"
       - "Final state snapshot"
       
   transition_log:
-    path: ".idumb/brain/transitions.log"
+    path: ".idumb/idumb-brain/transitions.log"
     format: "{timestamp}|{from_phase}|{to_phase}|{status}"
 ```
 
@@ -206,11 +208,11 @@ integration:
   reads_from:
     - ".planning/phases/{N}/*VERIFICATION.md"
     - ".planning/ROADMAP.md"
-    - ".idumb/brain/state.json"
+    - ".idumb/idumb-brain/state.json"
   writes_to:
-    - ".idumb/brain/roadmap-status.json"
-    - ".idumb/archive/"
-    - ".idumb/brain/state.json"
+    - ".idumb/idumb-brain/roadmap-status.json"
+    - ".idumb/idumb-brain/archive/"
+    - ".idumb/idumb-brain/state.json"
   never_modifies:
     - ".planning/ROADMAP.md"  # Planning owns this
     - ".planning/phases/{N}/*.md"  # Archived, not modified

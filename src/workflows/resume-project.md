@@ -1,5 +1,7 @@
 ---
 name: resume-project
+id: wf-resume-project
+parent: workflows
 description: "Restores project context after session break and routes to correct workflow"
 type: workflow
 version: 0.1.0
@@ -15,10 +17,10 @@ Handles context restoration when returning to a project after a session break. L
 ```yaml
 entry_conditions:
   must_have:
-    - exists: ".idumb/brain/state.json"
+    - exists: ".idumb/idumb-brain/state.json"
   should_have:
     - exists: ".planning/"
-    - exists: ".idumb/execution/"
+    - exists: ".idumb/idumb-brain/execution/"
   triggered_by:
     - "Session start with existing .idumb/"
     - "/idumb:resume command"
@@ -36,7 +38,7 @@ workflow:
     1_load_state:
       action: "Load iDumb state"
       method: |
-        STATE=$(cat .idumb/brain/state.json 2>/dev/null) || STATE="{}"
+        STATE=$(cat .idumb/idumb-brain/state.json 2>/dev/null) || STATE="{}"
       output: saved_state
       fallback: |
         # State file corrupted or missing
@@ -45,7 +47,7 @@ workflow:
     2_load_anchors:
       action: "Load context anchors"
       method: |
-        ANCHORS=$(jq '.anchors // []' .idumb/brain/state.json 2>/dev/null) || ANCHORS="[]"
+        ANCHORS=$(jq '.anchors // []' .idumb/idumb-brain/state.json 2>/dev/null) || ANCHORS="[]"
       output: context_anchors
       inject_to: "session context"
       
@@ -66,7 +68,7 @@ workflow:
           RESUME_AT = "transition or next phase"
         elif exists ".planning/phases/{N}/*SUMMARY.md":
           RESUME_AT = "verify-phase"
-        elif exists ".idumb/execution/{N}/progress.json":
+        elif exists ".idumb/idumb-brain/execution/{N}/progress.json":
           RESUME_AT = "execute-phase (resume)"
         elif exists ".planning/phases/{N}/*PLAN.md":
           RESUME_AT = "execute-phase (start)"
@@ -81,7 +83,7 @@ workflow:
     5_check_incomplete_tasks:
       action: "Check for incomplete execution"
       method: |
-        PROGRESS=$(cat .idumb/execution/*/progress.json 2>/dev/null | jq -s 'add')
+        PROGRESS=$(cat .idumb/idumb-brain/execution/*/progress.json 2>/dev/null | jq -s 'add')
         INCOMPLETE=$(echo "$PROGRESS" | jq '[.tasks[] | select(.status != "complete")]')
       output: incomplete_tasks
       
@@ -178,7 +180,7 @@ recovery:
     method: |
       # Rebuild state from artifacts
       PHASE=$(ls -1 .planning/phases/ 2>/dev/null | tail -1)
-      echo '{"phase":"'$PHASE'","recovered":true}' > .idumb/brain/state.json
+      echo '{"phase":"'$PHASE'","recovered":true}' > .idumb/idumb-brain/state.json
       
   scenario_execution_interrupted:
     detect: "progress.json shows in_progress tasks"
@@ -205,12 +207,12 @@ recovery:
 ```yaml
 artifacts:
   session_log:
-    path: ".idumb/brain/sessions.log"
+    path: ".idumb/idumb-brain/sessions.log"
     format: "{timestamp}|resume|{resume_point}|{anchors_count}"
     
   recovery_report:
     condition: "recovery was needed"
-    path: ".idumb/brain/recovery-{timestamp}.json"
+    path: ".idumb/idumb-brain/recovery-{timestamp}.json"
     content:
       scenario: "{recovery_type}"
       actions_taken: ["list"]
@@ -256,15 +258,15 @@ chains_to:
 integration:
   prompt_intercept:
     on_session_start: true
-    detection: "exists('.idumb/brain/state.json')"
+    detection: "exists('.idumb/idumb-brain/state.json')"
     action: "Trigger this workflow automatically"
   reads_from:
-    - ".idumb/brain/state.json"
-    - ".idumb/execution/*/progress.json"
+    - ".idumb/idumb-brain/state.json"
+    - ".idumb/idumb-brain/execution/*/progress.json"
     - ".planning/**/*.md"
   writes_to:
-    - ".idumb/brain/state.json"
-    - ".idumb/brain/sessions.log"
+    - ".idumb/idumb-brain/state.json"
+    - ".idumb/idumb-brain/sessions.log"
   never_modifies:
     - ".planning/*"
 ```

@@ -1,7 +1,7 @@
 /**
  * iDumb State Management Tool
  * 
- * Read and write the governance state stored in .idumb/brain/state.json
+ * Read and write the governance state stored in .idumb/idumb-brain/state.json
  * 
  * IMPORTANT: No console.log - would pollute TUI
  */
@@ -48,11 +48,11 @@ const DEFAULT_STATE: IdumbState = {
 }
 
 function getStatePath(directory: string): string {
-  return join(directory, ".idumb", "brain", "state.json")
+  return join(directory, ".idumb", "idumb-brain", "state.json")
 }
 
 function ensureDirectory(directory: string): void {
-  const brainDir = join(directory, ".idumb", "brain")
+  const brainDir = join(directory, ".idumb", "idumb-brain")
   if (!existsSync(brainDir)) {
     mkdirSync(brainDir, { recursive: true })
   }
@@ -79,7 +79,7 @@ function writeState(directory: string, state: IdumbState): void {
 
 // Read state
 export const read = tool({
-  description: "Read current iDumb governance state from .idumb/brain/state.json",
+  description: "Read current iDumb governance state from .idumb/idumb-brain/state.json",
   args: {},
   async execute(args, context) {
     const state = readState(context.directory)
@@ -98,12 +98,12 @@ export const write = tool({
   },
   async execute(args, context) {
     const state = readState(context.directory)
-    
+
     if (args.phase) state.phase = args.phase
     if (args.framework) state.framework = args.framework as IdumbState["framework"]
     if (args.lastValidation) state.lastValidation = args.lastValidation
     if (args.incrementValidation) state.validationCount++
-    
+
     writeState(context.directory, state)
     return `State updated: ${JSON.stringify(state, null, 2)}`
   },
@@ -119,7 +119,7 @@ export const anchor = tool({
   },
   async execute(args, context) {
     const state = readState(context.directory)
-    
+
     const anchor: Anchor = {
       id: `anchor-${Date.now()}`,
       created: new Date().toISOString(),
@@ -127,23 +127,23 @@ export const anchor = tool({
       content: args.content,
       priority: (args.priority || "normal") as Anchor["priority"],
     }
-    
+
     state.anchors.push(anchor)
-    
+
     // Keep only last 20 anchors
     if (state.anchors.length > 20) {
       // Keep critical ones, remove oldest normals first
       const critical = state.anchors.filter(a => a.priority === "critical")
       const high = state.anchors.filter(a => a.priority === "high")
       const normal = state.anchors.filter(a => a.priority === "normal")
-      
+
       state.anchors = [
         ...critical.slice(-5),
         ...high.slice(-10),
         ...normal.slice(-5),
       ]
     }
-    
+
     writeState(context.directory, state)
     return `Anchor created: ${anchor.id} (${anchor.type})`
   },
@@ -158,21 +158,21 @@ export const history = tool({
   },
   async execute(args, context) {
     const state = readState(context.directory)
-    
+
     const entry: HistoryEntry = {
       timestamp: new Date().toISOString(),
       action: args.action,
       agent: context.agent,
       result: args.result as HistoryEntry["result"],
     }
-    
+
     state.history.push(entry)
-    
+
     // Keep last 50 entries
     if (state.history.length > 50) {
       state.history = state.history.slice(-50)
     }
-    
+
     writeState(context.directory, state)
     return `History recorded: ${entry.action} -> ${entry.result}`
   },
@@ -187,20 +187,20 @@ export const getAnchors = tool({
   async execute(args, context) {
     const state = readState(context.directory)
     const filter = args.priorityFilter || "all"
-    
+
     let anchors = state.anchors
     if (filter !== "all") {
       anchors = anchors.filter(a => a.priority === filter)
     }
-    
+
     if (anchors.length === 0) {
       return "No anchors found"
     }
-    
-    const formatted = anchors.map(a => 
+
+    const formatted = anchors.map(a =>
       `[${a.priority.toUpperCase()}] ${a.type}: ${a.content}`
     ).join("\n")
-    
+
     return `## iDumb Anchors (${anchors.length})\n\n${formatted}`
   },
 })
@@ -242,7 +242,7 @@ export const createSession = tool({
   async execute(args, context) {
     ensureSessionsDir(context.directory)
     const state = readState(context.directory)
-    
+
     const record: SessionRecord = {
       sessionId: args.sessionId,
       createdAt: new Date().toISOString(),
@@ -251,7 +251,7 @@ export const createSession = tool({
       agent: context.agent || "unknown",
       status: "active",
     }
-    
+
     if (args.metadata) {
       try {
         record.metadata = JSON.parse(args.metadata)
@@ -259,10 +259,10 @@ export const createSession = tool({
         // Ignore invalid JSON
       }
     }
-    
+
     const sessionPath = join(getSessionsDir(context.directory), `${args.sessionId}.json`)
     writeFileSync(sessionPath, JSON.stringify(record, null, 2))
-    
+
     return JSON.stringify({
       status: "created",
       session: record,
@@ -281,14 +281,14 @@ export const modifySession = tool({
   },
   async execute(args, context) {
     const sessionPath = join(getSessionsDir(context.directory), `${args.sessionId}.json`)
-    
+
     if (!existsSync(sessionPath)) {
       return JSON.stringify({
         status: "error",
         message: `Session not found: ${args.sessionId}`,
       }, null, 2)
     }
-    
+
     let record: SessionRecord
     try {
       record = JSON.parse(readFileSync(sessionPath, "utf8"))
@@ -298,7 +298,7 @@ export const modifySession = tool({
         message: "Failed to read session file",
       }, null, 2)
     }
-    
+
     if (args.status) {
       record.status = args.status as SessionRecord["status"]
     }
@@ -313,9 +313,9 @@ export const modifySession = tool({
       }
     }
     record.updatedAt = new Date().toISOString()
-    
+
     writeFileSync(sessionPath, JSON.stringify(record, null, 2))
-    
+
     return JSON.stringify({
       status: "updated",
       session: record,
@@ -334,7 +334,7 @@ export const exportSession = tool({
   async execute(args, context) {
     const sessionPath = join(getSessionsDir(context.directory), `${args.sessionId}.json`)
     const state = readState(context.directory)
-    
+
     let sessionRecord: SessionRecord | null = null
     if (existsSync(sessionPath)) {
       try {
@@ -343,10 +343,10 @@ export const exportSession = tool({
         // Continue without session record
       }
     }
-    
+
     const includeHistory = args.includeHistory !== false
     const includeAnchors = args.includeAnchors !== false
-    
+
     const exportData = {
       exportedAt: new Date().toISOString(),
       sessionId: args.sessionId,
@@ -356,28 +356,28 @@ export const exportSession = tool({
         framework: state.framework,
         validationCount: state.validationCount,
       },
-      anchors: includeAnchors ? state.anchors.filter(a => 
+      anchors: includeAnchors ? state.anchors.filter(a =>
         a.priority === "critical" || a.priority === "high"
       ) : [],
       history: includeHistory ? state.history.slice(-20) : [],
     }
-    
+
     // Save to exports directory
     const exportsDir = join(context.directory, ".idumb", "brain", "exports")
     if (!existsSync(exportsDir)) {
       mkdirSync(exportsDir, { recursive: true })
     }
-    
+
     const exportPath = join(exportsDir, `${args.sessionId}-export.json`)
     writeFileSync(exportPath, JSON.stringify(exportData, null, 2))
-    
+
     // Update session status
     if (sessionRecord) {
       sessionRecord.status = "exported"
       sessionRecord.updatedAt = new Date().toISOString()
       writeFileSync(sessionPath, JSON.stringify(sessionRecord, null, 2))
     }
-    
+
     return JSON.stringify({
       status: "exported",
       path: exportPath,
@@ -395,17 +395,17 @@ export const listSessions = tool({
   },
   async execute(args, context) {
     const sessionsDir = getSessionsDir(context.directory)
-    
+
     if (!existsSync(sessionsDir)) {
       return JSON.stringify({
         sessions: [],
         count: 0,
       }, null, 2)
     }
-    
+
     const files = readdirSync(sessionsDir).filter(f => f.endsWith(".json"))
     const sessions: SessionRecord[] = []
-    
+
     for (const file of files) {
       try {
         const record = JSON.parse(readFileSync(join(sessionsDir, file), "utf8"))
@@ -416,10 +416,10 @@ export const listSessions = tool({
         // Skip invalid files
       }
     }
-    
+
     // Sort by updatedAt descending
     sessions.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
-    
+
     return JSON.stringify({
       sessions: sessions,
       count: sessions.length,
@@ -446,21 +446,21 @@ export const purgeOldSessions = tool({
     const maxAge = (args.maxAgeHours || 168) * 60 * 60 * 1000 // Convert to milliseconds
     const now = Date.now()
     const dryRun = args.dryRun || false
-    
+
     const deleted: { sessions: string[]; halts: string[] } = { sessions: [], halts: [] }
     const errors: string[] = []
-    
+
     // 1. Clean up old session files
     const sessionsDir = getSessionsDir(context.directory)
     if (existsSync(sessionsDir)) {
       const files = readdirSync(sessionsDir).filter(f => f.endsWith(".json"))
-      
+
       for (const file of files) {
         try {
           const filePath = join(sessionsDir, file)
           const stats = statSync(filePath)
           const age = now - stats.mtimeMs
-          
+
           if (age > maxAge) {
             if (!dryRun) {
               unlinkSync(filePath)
@@ -472,18 +472,18 @@ export const purgeOldSessions = tool({
         }
       }
     }
-    
+
     // 2. Clean up old halt checkpoints
     const executionDir = join(context.directory, ".idumb", "execution")
     if (existsSync(executionDir)) {
       const dirs = readdirSync(executionDir).filter(d => d.startsWith("halt-"))
-      
+
       for (const dir of dirs) {
         try {
           const dirPath = join(executionDir, dir)
           const stats = statSync(dirPath)
           const age = now - stats.mtimeMs
-          
+
           if (age > maxAge) {
             if (!dryRun) {
               // Remove directory recursively
@@ -500,7 +500,7 @@ export const purgeOldSessions = tool({
         }
       }
     }
-    
+
     // 3. Trim state.json history if too long
     if (!dryRun) {
       const state = readState(context.directory)
@@ -510,34 +510,34 @@ export const purgeOldSessions = tool({
         if (!existsSync(historyDir)) {
           mkdirSync(historyDir, { recursive: true })
         }
-        
+
         // Save excess history to archive
         const excess = state.history.slice(0, state.history.length - 50)
         const archivePath = join(historyDir, `history-${Date.now()}.json`)
         writeFileSync(archivePath, JSON.stringify(excess, null, 2))
-        
+
         // Keep only last 50 entries
         state.history = state.history.slice(-50)
         const statePath = join(context.directory, ".idumb", "brain", "state.json")
         writeFileSync(statePath, JSON.stringify(state, null, 2))
       }
-      
+
       // 4. Trim anchors if too many
       if (state.anchors.length > 20) {
         // Archive excess anchors, keeping critical/high priority
         const criticalAnchors = state.anchors.filter(a => a.priority === "critical" || a.priority === "high")
         const normalAnchors = state.anchors.filter(a => a.priority === "normal")
-        
+
         // Keep all critical/high, trim normal to fit in 20
         const maxNormal = 20 - criticalAnchors.length
         const keptAnchors = [...criticalAnchors, ...normalAnchors.slice(-Math.max(0, maxNormal))]
-        
+
         state.anchors = keptAnchors
         const statePath = join(context.directory, ".idumb", "brain", "state.json")
         writeFileSync(statePath, JSON.stringify(state, null, 2))
       }
     }
-    
+
     return JSON.stringify({
       status: dryRun ? "dry_run" : "purged",
       deleted: {

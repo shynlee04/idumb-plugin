@@ -108,7 +108,7 @@ gap_detection:
 input:
   spec: "User-provided text (markdown, plain text, or mixed)"
   context:
-    - current_phase: "from .idumb/brain/state.json"
+    - current_phase: "from .idumb/idumb-brain/state.json"
     - existing_modules: "from .idumb/idumb-modules/"
     - agent_permissions: "from src/agents/"
 ```
@@ -212,7 +212,7 @@ commands_required: []
 | Source | Purpose |
 |--------|---------|
 | User input | Raw specification to structure |
-| `.idumb/brain/state.json` | Current phase, context |
+| `.idumb/idumb-brain/state.json` | Current phase, context |
 | `.idumb/idumb-modules/` | Existing modules for composition |
 | `src/agents/` | Agent permission validation |
 
@@ -221,7 +221,7 @@ commands_required: []
 | Output | Location | Format |
 |--------|----------|--------|
 | Workflow modules | `.idumb/idumb-modules/` | Markdown with YAML |
-| Validation reports | `.idumb/governance/validations/` | JSON |
+| Validation reports | `.idumb/idumb-brain/governance/validations/` | JSON |
 | Module index | `.idumb/idumb-modules/INDEX.md` | Markdown |
 
 ### Delegates To
@@ -275,7 +275,7 @@ delegation_patterns:
 
 ```yaml
 pre_generation:
-  - [ ] Read current state from .idumb/brain/state.json
+  - [ ] Read current state from .idumb/idumb-brain/state.json
   - [ ] Check for conflicting existing modules
   - [ ] Identify all agents, tools, commands referenced
   - [ ] Classify workflow type and complexity

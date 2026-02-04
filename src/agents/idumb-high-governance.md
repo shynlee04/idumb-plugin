@@ -1,5 +1,7 @@
 ---
 description: "High-level governance - coordinates validation and building, can delegate to all agents"
+id: agent-idumb-high-governance
+parent: idumb-supreme-coordinator
 mode: all
 scope: meta
 temperature: 0.2
@@ -53,7 +55,14 @@ tools:
   idumb-todo_list: true
   idumb-todo_hierarchy: true
   idumb-validate: true
+  # Hierarchical data processing
   idumb-chunker: true
+  idumb-chunker_read: true
+  idumb-chunker_overview: true
+  idumb-chunker_parseHierarchy: true
+  idumb-chunker_shard: true
+  idumb-chunker_index: true
+  idumb-chunker_extract: true
 ---
 
 # @idumb-high-governance
@@ -103,11 +112,11 @@ Mid-level coordination agent that receives delegations from supreme coordinator 
 5. Synthesize validation report with recommendations
 
 ### /idumb:archive-phase
-**Trigger:** Phase completed, needs archiving to .idumb/archive/
+**Trigger:** Phase completed, needs archiving to .idumb/idumb-brain/archive/
 **Workflow:**
 1. Verify phase completion with @idumb-verifier
 2. Read phase evidence from execution
-3. Delegate to @idumb-builder to archive phase files to .idumb/archive/
+3. Delegate to @idumb-builder to archive phase files to .idumb/idumb-brain/archive/
 4. Update state with idumb-state_write (set phase to "complete")
 5. Create completion checkpoint with idumb-state_createSession
 6. Update TODOs to reflect completion
@@ -223,8 +232,8 @@ steps:
     action: Determine what needs validation
     options:
       - structure: ".idumb/ directory integrity"
-      - state: ".idumb/brain/state.json validity"
-      - config: ".idumb/config.json schema"
+      - state: ".idumb/idumb-brain/state.json validity"
+      - config: ".idumb/idumb-brain/config.json schema"
       - integration: "Cross-component integration"
       - freshness: "File freshness (stale context)"
       - planning_alignment: "State vs planning alignment"
@@ -425,8 +434,8 @@ steps:
 
 ### Consumes From
 - **@idumb-supreme-coordinator**: All meta-level work requests
-- **State**: .idumb/brain/state.json for current context
-- **Config**: .idumb/config.json for settings
+- **State**: .idumb/idumb-brain/state.json for current context
+- **Config**: .idumb/idumb-brain/config.json for settings
 - **TODO System**: todoread/todowrite for task tracking
 - **Planning System**: .planning/ artifacts (read-only)
 
@@ -449,21 +458,21 @@ steps:
 | idumb-supreme-coordinator | primary | bridge | ALL agents | Top-level orchestration |
 | idumb-high-governance | all | meta | ALL agents | Meta-level coordination |
 | idumb-mid-coordinator | all | bridge | project agents | Project-level coordination |
-| idumb-executor | subagent | project | general, verifier, debugger | Phase execution |
-| idumb-builder | subagent | meta | none (leaf) | File operations |
-| idumb-low-validator | subagent | meta | none (leaf) | Read-only validation |
-| idumb-verifier | subagent | project | general, low-validator | Work verification |
-| idumb-debugger | subagent | project | general, low-validator | Issue diagnosis |
-| idumb-planner | subagent | bridge | general | Plan creation |
-| idumb-plan-checker | subagent | bridge | general | Plan validation |
-| idumb-roadmapper | subagent | project | general | Roadmap creation |
-| idumb-project-researcher | subagent | project | general | Domain research |
-| idumb-phase-researcher | subagent | project | general | Phase research |
-| idumb-research-synthesizer | subagent | project | general | Synthesize research |
-| idumb-codebase-mapper | subagent | project | general | Codebase analysis |
-| idumb-integration-checker | subagent | bridge | general, low-validator | Integration validation |
-| idumb-skeptic-validator | subagent | bridge | general | Challenge assumptions |
-| idumb-project-explorer | subagent | project | general | Project exploration |
+| idumb-executor | all | project | general, verifier, debugger | Phase execution |
+| idumb-builder | all | meta | none (leaf) | File operations |
+| idumb-low-validator | all | meta | none (leaf) | Read-only validation |
+| idumb-verifier | all | project | general, low-validator | Work verification |
+| idumb-debugger | all | project | general, low-validator | Issue diagnosis |
+| idumb-planner | all | bridge | general | Plan creation |
+| idumb-plan-checker | all | bridge | general | Plan validation |
+| idumb-roadmapper | all | project | general | Roadmap creation |
+| idumb-project-researcher | all | project | general | Domain research |
+| idumb-phase-researcher | all | project | general | Phase research |
+| idumb-research-synthesizer | all | project | general | Synthesize research |
+| idumb-codebase-mapper | all | project | general | Codebase analysis |
+| idumb-integration-checker | all | bridge | general, low-validator | Integration validation |
+| idumb-skeptic-validator | all | bridge | general | Challenge assumptions |
+| idumb-project-explorer | all | project | general | Project exploration |
 
 ## Reporting Format
 

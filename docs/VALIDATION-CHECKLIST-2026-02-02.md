@@ -40,9 +40,9 @@ All 4 agent files have correct OpenCode frontmatter:
 | Agent | Mode | Hidden | Permission | Tools |
 |-------|------|--------|------------|-------|
 | idumb-supreme-coordinator | `primary` | - | edit: deny, write: deny | idumb-* |
-| idumb-high-governance | `subagent` | `true` | edit: deny, write: deny | idumb-* |
-| idumb-low-validator | `subagent` | `true` | edit: deny, write: deny, task: deny | idumb-* |
-| idumb-builder | `subagent` | `true` | edit: allow, write: allow, task: deny | idumb-* |
+| idumb-high-governance | `all` | `true` | edit: deny, write: deny | idumb-* |
+| idumb-low-validator | `all` | `true` | edit: deny, write: deny, task: deny | idumb-* |
+| idumb-builder | `all` | `true` | edit: allow, write: allow, task: deny | idumb-* |
 
 ### ✅ V2: Tools (PASS)
 
@@ -87,11 +87,11 @@ Plugin uses valid OpenCode hook signatures:
 - `skills/` → `.opencode/skills/`
 
 Creates `.idumb/` structure:
-- `.idumb/brain/state.json`
-- `.idumb/config.json`
-- `.idumb/governance/`
-- `.idumb/anchors/`
-- `.idumb/sessions/`
+- `.idumb/idumb-brain/state.json`
+- `.idumb/idumb-brain/config.json`
+- `.idumb/idumb-brain/governance/`
+- `.idumb/idumb-brain/anchors/`
+- `.idumb/idumb-brain/sessions/`
 
 ---
 

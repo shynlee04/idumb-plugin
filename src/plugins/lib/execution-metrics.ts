@@ -290,7 +290,7 @@ export function detectValidatorFixStall(
 }
 
 /**
- * Track delegation depth when spawning a subagent
+ * Track delegation depth when spawning a all
  */
 export function trackDelegationDepth(
     sessionId: string,
@@ -309,7 +309,7 @@ export function trackDelegationDepth(
 }
 
 /**
- * Pop delegation depth when returning from subagent
+ * Pop delegation depth when returning from all
  */
 export function popDelegationDepth(sessionId: string): void {
     const state = stallDetectionState.get(sessionId)

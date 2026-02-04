@@ -10,7 +10,7 @@ interface SessionTracker {
   firstToolName: string | null
   agentRole: string | null
   delegationDepth: number
-  sessionLevel: number  // 1=root, 2+=subagent
+  sessionLevel: number  // 1=root, 2+=all
   parentSession: string | null
   violationCount: number
   governanceInjected: boolean
@@ -76,17 +76,17 @@ function checkIfResumedSession(
 | 4 | Builder | N/A |
 | 5+ | **LOOP DETECTED** | **STOP** |
 
-### Subagent Detection
+### all Detection
 
 ```yaml
-subagent_indicators:
+all_indicators:
   - "First message contains 'Task:' delegation"
   - "Tracker.delegationDepth > 0"
   - "Message contains '@idumb-' agent invocation"
-  - "Contains 'subagent_type' parameter"
+  - "Contains 'all_type' parameter"
   - "Contains 'delegated from' pattern"
 
-subagent_rules:
+all_rules:
   - "Do NOT inject full governance (causes bloat)"
   - "Inject task-specific context only"
   - "Track parent session for return path"
@@ -96,7 +96,7 @@ subagent_rules:
 ### Detection Code
 
 ```typescript
-function detectSubagentSession(
+function detectallSession(
   messages: any[],
   tracker: SessionTracker
 ): boolean {
@@ -108,17 +108,17 @@ function detectSubagentSession(
   if (firstUserMsg) {
     const text = firstUserMsg.parts?.map(p => p.text).join(' ') || ''
 
-    const subagentIndicators = [
+    const allIndicators = [
       'Task:',                    // Explicit delegation
       'delegated from',           // Delegation context
       '@idumb-',                  // iDumb agent call
-      'subagent_type',            // OpenCode task() arg
+      'all_type',            // OpenCode task() arg
       'Subtask:',                 // Subtask indicator
       'Delegating to:',           // Delegation marker
       /from @\w+-coordinator/i    // Coordinator pattern
     ]
 
-    for (const indicator of subagentIndicators) {
+    for (const indicator of allIndicators) {
       if (typeof indicator === 'string') {
         if (text.includes(indicator)) return true
       } else if (indicator instanceof RegExp) {
@@ -159,7 +159,7 @@ interface SessionMetadata {
 ### Metadata Storage
 
 ```yaml
-location: ".idumb/sessions/{sessionId}.json"
+location: ".idumb/idumb-brain/sessions/{sessionId}.json"
 update_policy: "Update lastUpdated on each access"
 creation: "Auto-create on session.created hook"
 ```
@@ -218,7 +218,7 @@ root_session:
     - "Chain enforcement rules"
     - "Agent hierarchy"
 
-subagent_session:
+all_session:
   when: "sessionLevel >= 2"
   inject: "Minimal context + task scope"
   includes:
@@ -231,7 +231,7 @@ subagent_session:
     - "Complete chain rules"
     - "Unrelated anchors"
 
-resumed_subagent:
+resumed_all:
   when: "sessionLevel >= 2 AND idle > 1 hour"
   inject: "Re-establish delegation chain"
   includes:

@@ -21,7 +21,7 @@ CRITICAL path checks that step-02's frontmatter validation MISSES. This catches 
 - 📖 CRITICAL: Read the complete step file before taking any action
 - 🔄 CRITICAL: When loading next step with 'C', ensure entire file is read
 - ✅ Validation does NOT stop for user input - auto-proceed through all validation steps
-- ⚙️ If any instruction in this file references a subprocess, subagent, or tool you do not have access to, you MUST still achieve the instructed outcome in your main context thread and available toolset
+- ⚙️ If any instruction in this file references a subprocess, all, or tool you do not have access to, you MUST still achieve the instructed outcome in your main context thread and available toolset
 
 ### Step-Specific Rules:
 

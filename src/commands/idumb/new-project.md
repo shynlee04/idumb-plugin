@@ -1,5 +1,7 @@
 ---
 description: "Initialize a new iDumb-governed project with full governance structure"
+id: cmd-new-project
+parent: commands-idumb
 agent: idumb-supreme-coordinator
 ---
 
@@ -33,13 +35,13 @@ steps:
   2_create_structure:
     action: Create .idumb/ directory hierarchy
     paths:
-      - .idumb/brain/
-      - .idumb/brain/history/
-      - .idumb/brain/context/
-      - .idumb/governance/
-      - .idumb/governance/validations/
-      - .idumb/anchors/
-      - .idumb/sessions/
+      - .idumb/idumb-brain/
+      - .idumb/idumb-brain/history/
+      - .idumb/idumb-brain/context/
+      - .idumb/idumb-brain/governance/
+      - .idumb/idumb-brain/governance/validations/
+      - .idumb/idumb-brain/anchors/
+      - .idumb/idumb-brain/sessions/
       
   3_initialize_config:
     action: Create config.json with defaults

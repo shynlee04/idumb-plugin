@@ -1,5 +1,7 @@
 ---
 name: plan-phase
+id: wf-plan-phase
+parent: workflows
 description: "Creates detailed execution plan with tasks, dependencies, and validation criteria"
 type: workflow
 version: 0.1.0
@@ -193,7 +195,7 @@ integration:
   writes_to:
     - ".planning/phases/{N}/*PLAN.md"
     - ".planning/phases/{N}/RESEARCH.md"
-    - ".idumb/brain/state.json"
+    - ".idumb/idumb-brain/state.json"
   never_modifies:
     - ".planning/ROADMAP.md"
     - ".planning/PROJECT.md"

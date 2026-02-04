@@ -221,7 +221,7 @@ chain_rules_for_workflows:
     - rule: "WORKFLOW-01"
       command: "/workflow execution"
       must_before:
-        - exists: ".idumb/brain/state.json"
+        - exists: ".idumb/idumb-brain/state.json"
         - exists: "PLAN.md for execution workflows"
 
   # SHOULD-BEFORE Rules
@@ -352,7 +352,7 @@ source:
   lastContinued: '2025-01-02'
 
 target:
-  .idumb/brain/state.json:
+  .idumb/idumb-brain/state.json:
     version: "0.2.0"
     phase: "current phase"
     lastValidation: "ISO timestamp"
@@ -376,7 +376,7 @@ source:
   content: "State snapshot"
 
 target:
-  location: ".idumb/execution/{phase}/checkpoint-{id}.json"
+  location: ".idumb/idumb-brain/execution/{phase}/checkpoint-{id}.json"
   format:
     checkpoint_id: string
     timestamp: ISO-8601

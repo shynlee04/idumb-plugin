@@ -1,5 +1,7 @@
 ---
 description: "Show all iDumb commands and usage information"
+id: cmd-help
+parent: commands-idumb
 agent: idumb-supreme-coordinator
 ---
 
@@ -52,12 +54,12 @@ Display help information for the iDumb governance system.
   - Receives delegation from coordinator
   - Further delegates to validators/builders
 
-@idumb-low-validator (hidden subagent)
+@idumb-low-validator (hidden all)
   - Does actual validation work
   - grep, glob, file reads
   - Returns evidence-based results
 
-@idumb-builder (hidden subagent)
+@idumb-builder (hidden all)
   - Does actual file operations
   - Creates, edits, deletes files
   - Reports changes made
@@ -67,9 +69,9 @@ Display help information for the iDumb governance system.
 
 | Path | Purpose |
 |------|---------|
-| `.idumb/brain/state.json` | Current governance state |
-| `.idumb/governance/` | Validation history |
-| `.idumb/anchors/` | Context anchors |
+| `.idumb/idumb-brain/state.json` | Current governance state |
+| `.idumb/idumb-brain/governance/` | Validation history |
+| `.idumb/idumb-brain/anchors/` | Context anchors |
 
 ## TOOLS
 

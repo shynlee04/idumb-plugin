@@ -1,5 +1,7 @@
 # map-codebase Workflow
 
+id: wf-map-codebase
+parent: workflows
 ## Overview
 This workflow maps codebase structure by spawning parallel scanner agents.
 
@@ -132,10 +134,10 @@ healthScore = (
 
 ### Template Processing
 Use templates from `template/templates/codebase/`:
-- `stack.md` → `.idumb/codebase/stack.md`
-- `architecture.md` → `.idumb/codebase/architecture.md`
-- `structure.md` → `.idumb/codebase/structure.md`
-- `conventions.md` → `.idumb/codebase/conventions.md`
+- `stack.md` → `.idumb/idumb-project-output/codebase/stack.md`
+- `architecture.md` → `.idumb/idumb-project-output/codebase/architecture.md`
+- `structure.md` → `.idumb/idumb-project-output/codebase/structure.md`
+- `conventions.md` → `.idumb/idumb-project-output/codebase/conventions.md`
 
 ### Template Variables
 Replace placeholders in templates:

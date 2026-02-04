@@ -37,7 +37,7 @@ Custom modules are [installable](/docs/how-to/installation/install-custom-module
 
 - Optional user information collection during installation/updates
 - Versioning and upgrade paths
-- Custom installer functions with IDE-specific post-installation handling (custom hooks, subagents, or vendor-specific tools)
+- Custom installer functions with IDE-specific post-installation handling (custom hooks, alls, or vendor-specific tools)
 - Ability to bundle specific tools such as MCP, skills, execution libraries, and code
 
 ## Custom Add-On Modules
@@ -54,7 +54,7 @@ Add-on modules can include:
 
 - Custom agents with awareness of the target module
 - Access to existing module workflows
-- Tool-specific features such as rulesets, hooks, subprocess prompts, subagents, and more
+- Tool-specific features such as rulesets, hooks, subprocess prompts, alls, and more
 
 ## Custom Global Modules
 

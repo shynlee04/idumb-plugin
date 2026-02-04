@@ -1,5 +1,7 @@
 ---
 description: "Map codebase structure and generate analysis documents"
+id: cmd-map-codebase
+parent: commands-idumb
 agent: "idumb-supreme-coordinator"
 triggers: ["/idumb:map-codebase", "/map-codebase"]
 ---
@@ -24,8 +26,8 @@ Map the codebase structure and generate comprehensive analysis documents.
 4. Generates markdown documents from templates
 
 ## Output
-- `.idumb/codebase-map.json` - Structured data
-- `.idumb/codebase/*.md` - Generated documents
+- `.idumb/idumb-project-output/codebase-map.json` - Structured data
+- `.idumb/idumb-project-output/codebase/*.md` - Generated documents
 
 ## Example
 ```
@@ -62,6 +64,6 @@ parallel_scanners:
 
 ### Step 4: Generate Documents
 - Process templates with mapped data
-- Write to `.idumb/codebase/` directory
+- Write to `.idumb/idumb-project-output/codebase/` directory
 
 $ARGUMENTS

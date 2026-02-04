@@ -15,7 +15,7 @@ if (nodeVersion < 18) {
     process.exit(1);
 }
 
-import { existsSync, mkdirSync, cpSync, readFileSync, writeFileSync, readdirSync } from 'fs';
+import { existsSync, mkdirSync, cpSync, readFileSync, writeFileSync, readdirSync, rmSync, lstatSync } from 'fs';
 import { join, dirname, basename, sep } from 'path';
 import { fileURLToPath } from 'url';
 import { createInterface } from 'readline';
@@ -106,20 +106,18 @@ function prompt(question, defaultValue = '') {
 
 function copyDir(src, dest) {
     if (!existsSync(src)) return;
-    mkdirSync(dest, { recursive: true });
 
-    const entries = readdirSync(src, { withFileTypes: true });
-    for (const entry of entries) {
-        const srcPath = join(src, entry.name);
-        const destPath = join(dest, entry.name);
-
-        if (entry.isDirectory()) {
-            copyDir(srcPath, destPath);
-        } else {
-            const content = readFileSync(srcPath, 'utf8');
-            writeFileSync(destPath, content);
+    // Remove existing destination if it's a symlink or exists
+    try {
+        if (existsSync(dest) || lstatSync(dest)) {
+            rmSync(dest, { recursive: true, force: true });
         }
+    } catch (e) {
+        // Ignore - doesn't exist
     }
+
+    // Use cpSync for reliable recursive copying
+    cpSync(src, dest, { recursive: true });
 }
 
 function detectProject() {
@@ -576,30 +574,45 @@ async function step9_createIdumbDir(location, selectedLanguage = 'en') {
 
     const cwd = process.cwd();
 
-    // NEW DIRECTORY STRUCTURE
-    // .idumb-brain/ - AI governance memory
-    const brainDir = join(cwd, '.idumb-brain');
+    // NEW DIRECTORY STRUCTURE - All nested under .idumb/
+    const idumbRoot = join(cwd, '.idumb');
+
+    // .idumb/idumb-brain/ - AI governance memory
+    const brainDir = join(idumbRoot, 'idumb-brain');
     const brainSessionsDir = join(brainDir, 'sessions');
     const brainContextDir = join(brainDir, 'context');
     const brainGovernanceDir = join(brainDir, 'governance');
     const brainDriftDir = join(brainDir, 'drift');
+    const brainMetadataDir = join(brainDir, 'metadata');
 
-    // .idumb-project-output/ - Project artifacts (replaces .plan/)
-    const outputDir = join(cwd, '.idumb-project-output');
+    // .idumb/idumb-project-output/ - Project artifacts (replaces .plan/)
+    const outputDir = join(idumbRoot, 'idumb-project-output');
     const outputPhasesDir = join(outputDir, 'phases');
-    const outputArtifactsDir = join(outputDir, 'artifacts');
+    const outputRoadmapsDir = join(outputDir, 'roadmaps');
+    const outputResearchDir = join(outputDir, 'research');
+    const outputValidationsDir = join(outputDir, 'validations');
 
-    // Create .idumb-brain/ structure
+    // .idumb/idumb-modules/ - Optional user-generated extensions
+    const modulesDir = join(idumbRoot, 'idumb-modules');
+
+    // Create .idumb/ root and .idumb/idumb-brain/ structure
+    mkdirSync(idumbRoot, { recursive: true });
     mkdirSync(brainDir, { recursive: true });
     mkdirSync(brainSessionsDir, { recursive: true });
     mkdirSync(brainContextDir, { recursive: true });
     mkdirSync(brainGovernanceDir, { recursive: true });
     mkdirSync(brainDriftDir, { recursive: true });
+    mkdirSync(brainMetadataDir, { recursive: true });
 
-    // Create .idumb-project-output/ structure
+    // Create .idumb/idumb-project-output/ structure
     mkdirSync(outputDir, { recursive: true });
     mkdirSync(outputPhasesDir, { recursive: true });
-    mkdirSync(outputArtifactsDir, { recursive: true });
+    mkdirSync(outputRoadmapsDir, { recursive: true });
+    mkdirSync(outputResearchDir, { recursive: true });
+    mkdirSync(outputValidationsDir, { recursive: true });
+
+    // Create .idumb/idumb-modules/ (optional but create structure)
+    mkdirSync(modulesDir, { recursive: true });
 
     // Get user name (ask only if interactive)
     let userName = 'Developer';
@@ -692,16 +705,21 @@ async function step9_createIdumbDir(location, selectedLanguage = 'en') {
             },
 
             paths: {
-                brain: '.idumb-brain/',
-                state: '.idumb-brain/state.json',
-                config: '.idumb-brain/config.json',
-                sessions: '.idumb-brain/sessions/',
-                context: '.idumb-brain/context/',
-                governance: '.idumb-brain/governance/',
-                drift: '.idumb-brain/drift/',
-                output: '.idumb-project-output/',
-                phases: '.idumb-project-output/phases/',
-                artifacts: '.idumb-project-output/artifacts/'
+                root: '.idumb/',
+                brain: '.idumb/idumb-brain/',
+                state: '.idumb/idumb-brain/state.json',
+                config: '.idumb/idumb-brain/config.json',
+                sessions: '.idumb/idumb-brain/sessions/',
+                context: '.idumb/idumb-brain/context/',
+                governance: '.idumb/idumb-brain/governance/',
+                drift: '.idumb/idumb-brain/drift/',
+                metadata: '.idumb/idumb-brain/metadata/',
+                output: '.idumb/idumb-project-output/',
+                phases: '.idumb/idumb-project-output/phases/',
+                roadmaps: '.idumb/idumb-project-output/roadmaps/',
+                research: '.idumb/idumb-project-output/research/',
+                validations: '.idumb/idumb-project-output/validations/',
+                modules: '.idumb/idumb-modules/'
             },
 
             staleness: {

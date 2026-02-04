@@ -1,5 +1,7 @@
 ---
 description: "Diagnose and resolve issues in the project or workflow"
+id: cmd-debug
+parent: commands-idumb
 agent: idumb-supreme-coordinator
 ---
 

@@ -1,5 +1,7 @@
 ---
 name: verification-template
+id: tpl-verification
+parent: templates
 description: "Template for verification reports (VERIFICATION.md)"
 type: template
 version: 0.1.0

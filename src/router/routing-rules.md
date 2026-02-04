@@ -17,7 +17,7 @@ routing_table:
   # STATE: No .idumb/ directory exists
   state_uninitialized:
     detect:
-      - condition: "!exists('.idumb/brain/state.json')"
+      - condition: "!exists('.idumb/idumb-brain/state.json')"
     allowed_commands:
       - /idumb:init
       - /idumb:help

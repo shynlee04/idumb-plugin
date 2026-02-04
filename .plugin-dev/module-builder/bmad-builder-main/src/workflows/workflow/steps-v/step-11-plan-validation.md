@@ -20,7 +20,7 @@ To validate that a workflow plan (if it exists) has been fully implemented - all
 - 🛑 DO NOT BE LAZY - LOAD AND REVIEW EVERY FILE
 - 📖 CRITICAL: Read the complete step file before taking any action
 - ✅ This validation step only runs if a plan file exists
-- ⚙️ If any instruction references a subprocess, subagent, or tool you do not have access to, you MUST still achieve the outcome in your main context thread
+- ⚙️ If any instruction references a subprocess, all, or tool you do not have access to, you MUST still achieve the outcome in your main context thread
 
 ### Step-Specific Rules:
 

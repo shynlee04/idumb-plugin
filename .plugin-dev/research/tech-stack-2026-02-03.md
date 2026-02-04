@@ -151,7 +151,7 @@ CREATE TABLE relationships (
 );
 ```
 
-**Storage Path:** `.idumb/brain/idumb.db`
+**Storage Path:** `.idumb/idumb-brain/idumb.db`
 **Footprint:** ~15-20MB (includes prebuilt binaries)
 **Concurrency:** Multiple readers, single writer (WAL mode)
 
@@ -200,7 +200,7 @@ await search(orama, {
 - arrays
 - vector[n] (any dimension for embeddings)
 
-**Storage Path:** `.idumb/brain/search/`
+**Storage Path:** `.idumb/idumb-brain/search/`
 **Extensions:** `@orama/plugin-data-persistence` for disk-based persistence
 **Embeddings:** Local generation via Transformers.js (no external API calls)
 

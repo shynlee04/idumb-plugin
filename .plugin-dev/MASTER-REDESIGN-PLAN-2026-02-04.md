@@ -68,8 +68,8 @@ Phase 6: AGENT PROFILES (P3) → Final polish for workflow managers
 
 | Metric | Current | Target | Measurement |
 |--------|---------|--------|-------------|
-| Session files | 180+ | <20 (7-day rolling) | `ls .idumb/sessions/ | wc -l` |
-| Halt checkpoints | 35+ | ≤5 | `ls .idumb/execution/ | grep halt | wc -l` |
+| Session files | 180+ | <20 (7-day rolling) | `ls .idumb/idumb-brain/sessions/ | wc -l` |
+| Halt checkpoints | 35+ | ≤5 | `ls .idumb/idumb-brain/execution/ | grep halt | wc -l` |
 | Delegation depth accuracy | ❌ Always grows | ✅ Accurate push/pop | Test spawn→complete cycle |
 | `"*": deny` patterns | ~8 agents | 0 agents | `grep -r '"*": deny' template/agents/` |
 | Schema validation | Not implemented | All Tier 1 artifacts | Runtime validation logs |
@@ -143,7 +143,7 @@ if (toolName === "task") {
 
 ### BUG-002: Session File Explosion (P0-CRITICAL)
 
-**Location:** `.idumb/sessions/`
+**Location:** `.idumb/idumb-brain/sessions/`
 
 **Problem:**
 - 180+ session files accumulated
@@ -195,17 +195,17 @@ function cleanupOldSessions(directory: string, retentionDays: number = 7): numbe
 **Validation:**
 ```bash
 # Before fix:
-ls .idumb/sessions/ | wc -l  # 180+
+ls .idumb/idumb-brain/sessions/ | wc -l  # 180+
 
 # After fix (run, wait, create new session):
-ls .idumb/sessions/ | wc -l  # <20 (files older than 7 days deleted)
+ls .idumb/idumb-brain/sessions/ | wc -l  # <20 (files older than 7 days deleted)
 ```
 
 ---
 
 ### BUG-003: Halt Checkpoint Accumulation (P0-CRITICAL)
 
-**Location:** `.idumb/execution/halt-*/`
+**Location:** `.idumb/idumb-brain/execution/halt-*/`
 
 **Problem:**
 - 35+ halt checkpoint directories
@@ -251,10 +251,10 @@ function cleanupHaltCheckpoints(directory: string, keepCount: number = 5): numbe
 **Validation:**
 ```bash
 # Before:
-ls .idumb/execution/ | grep halt | wc -l  # 35+
+ls .idumb/idumb-brain/execution/ | grep halt | wc -l  # 35+
 
 # After:
-ls .idumb/execution/ | grep halt | wc -l  # ≤5
+ls .idumb/idumb-brain/execution/ | grep halt | wc -l  # ≤5
 ```
 
 ---
@@ -287,7 +287,7 @@ if (rule.action === "ask") {
 ```yaml
 # Since permission.ask hook is broken, rely on:
 1. Agent frontmatter permissions (works now)
-2. tool.execute.before hook with throw Error (partial, doesn't work for subagents)
+2. tool.execute.before hook with throw Error (partial, doesn't work for alls)
 3. Wait for OpenCode to fix #7006 (long-term)
 ```
 
@@ -444,7 +444,7 @@ permission:
 ```bash
 # After Phase 2 completion:
 1. grep -r '"*": deny' template/agents/  # Should return 0 results
-2. Test coordinator can spawn allowed subagents
+2. Test coordinator can spawn allowed alls
 3. Test coordinator CANNOT spawn unspecified agents (implicit deny)
 4. Test builder has full bash but not task
 5. Test validator can only read, not write
@@ -516,7 +516,7 @@ interface SessionMetadata {
   previousState: SessionState | null
   stateHistory: Array<{ state: SessionState; timestamp: string }>
   
-  // NEW: Delegation level (1 = primary, 2 = subagent, 3 = leaf)
+  // NEW: Delegation level (1 = primary, 2 = all, 3 = leaf)
   sessionLevel: 1 | 2 | 3
   
   // NEW: Child sessions spawned by this session
@@ -548,7 +548,7 @@ interface SessionMetadata {
 # After Phase 3 completion:
 1. Create session, verify sessionState: "beginning"
 2. Trigger compaction, verify sessionState: "compacted"
-3. Spawn subagent, verify sessionLevel: 2 on child
+3. Spawn all, verify sessionLevel: 2 on child
 4. Verify parentSession links correctly
 5. Complete task, verify childSessions updated
 6. Check stateHistory has all transitions
@@ -792,7 +792,7 @@ function calculateMessageScore(message: any): number {
 ### Primary Workflow: [Name]
 ```sequence
 TRIGGER: [When this workflow starts]
-1. READ governance state → .idumb/brain/state.json
+1. READ governance state → .idumb/idumb-brain/state.json
 2. VALIDATE current context → check freshness, conflicts
 3. DELEGATE to appropriate agent → /task agent [description]
 4. WAIT for result → accumulate output
@@ -802,7 +802,7 @@ TRIGGER: [When this workflow starts]
 
 ### Error Recovery Workflow: [Name]
 ```sequence
-TRIGGER: Subagent failure or error
+TRIGGER: all failure or error
 1. CAPTURE error context
 2. DETERMINE severity
 3. ESCALATE or RETRY based on severity
@@ -867,7 +867,7 @@ Phase 6 → Needs Phase 2 + Phase 3
 | **P2** | No `*: deny` patterns | `grep -r '"*": deny' template/agents/` | No matches |
 | **P2** | Permission enforcement | Test coordinator delegation | Only allowed agents work |
 | **P3** | Session state tracking | Create/compact/resume | State transitions logged |
-| **P3** | Parent-child linking | Spawn subagent | Links correct |
+| **P3** | Parent-child linking | Spawn all | Links correct |
 | **P4** | Word count detection | Send short/long messages | Thresholds work |
 | **P4** | Score accumulation | Send 10+ messages | Score increases with decay |
 | **P4** | TUI safety | Run for 1 hour | No background text |
@@ -948,8 +948,8 @@ Phase 6 → Needs Phase 2 + Phase 3
    npm run install:local
 
 5. Clear runtime state:
-   rm -rf .idumb/sessions/*.json
-   rm -rf .idumb/execution/halt-*
+   rm -rf .idumb/idumb-brain/sessions/*.json
+   rm -rf .idumb/idumb-brain/execution/halt-*
 ```
 
 ### Feature Flags
@@ -1031,8 +1031,8 @@ Day 5 (8 hours):
 
 | Metric | Threshold | Measurement |
 |--------|-----------|-------------|
-| Session file count | <20 at any time | `ls .idumb/sessions/ | wc -l` |
-| Halt checkpoint count | ≤5 at any time | `ls .idumb/execution/ | grep halt | wc -l` |
+| Session file count | <20 at any time | `ls .idumb/idumb-brain/sessions/ | wc -l` |
+| Halt checkpoint count | ≤5 at any time | `ls .idumb/idumb-brain/execution/ | grep halt | wc -l` |
 | Delegation depth accuracy | 100% accurate | Test: spawn→complete→verify=0 |
 | Permission enforcement | 100% of agents | `grep -r '"*": deny'` = 0 |
 | Schema validation | All Tier 1 artifacts | Corrupt → error logged |
@@ -1145,7 +1145,7 @@ definition_of_done:
 |--------|-----------|
 | OpenCode GitHub #7006 | `permission.ask` hook broken |
 | OpenCode GitHub #9229 | Duplicate confirming #7006 |
-| OpenCode GitHub #5894 | Subagent tool calls bypass hooks |
+| OpenCode GitHub #5894 | all tool calls bypass hooks |
 | OpenCode Docs (permissions) | Pattern syntax reference |
 
 ---

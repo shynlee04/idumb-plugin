@@ -54,7 +54,7 @@ Milestone → Phase → Plan → Task
 coordinator → governance → validator → builder
 ```
 
-**Critical Rule**: Coordinators delegate, validators validate, only builders write files. Every action is traceable through `.idumb/brain/state.json` history.
+**Critical Rule**: Coordinators delegate, validators validate, only builders write files. Every action is traceable through `.idumb/idumb-brain/state.json` history.
 
 ### Plugin Structure
 
@@ -109,10 +109,10 @@ Installer script that:
 Main event hook system (~3000 lines). Key responsibilities:
 - **Session tracking**: Tracks agent role, delegation depth, first tool used
 - **Checkpoint management**: Create/load/list/delete checkpoints for rollback
-- **State persistence**: Manages `.idumb/brain/state.json` with anchors and history
+- **State persistence**: Manages `.idumb/idumb-brain/state.json` with anchors and history
 - **Governance enforcement**: Intercepts tools to enforce permissions (LOG-ONLY mode currently)
 
-**Important**: The plugin is currently in "LOG-ONLY" mode after emergency fixes. It observes and logs violations but does NOT block tools. See `.idumb/brain/SESSION-HANDOFF-2026-02-03.md`.
+**Important**: The plugin is currently in "LOG-ONLY" mode after emergency fixes. It observes and logs violations but does NOT block tools. See `.idumb/idumb-brain/SESSION-HANDOFF-2026-02-03.md`.
 
 ### `src/tools/idumb-state.ts`
 State management tool with exports:
@@ -124,7 +124,7 @@ State management tool with exports:
 - `createSession`, `modifySession`, `exportSession`, `listSessions` - Session management
 - `purgeOldSessions` - Garbage collection for old sessions and checkpoints
 
-### `.idumb/brain/state.json`
+### `.idumb/idumb-brain/state.json`
 Single source of truth for governance state:
 ```json
 {
@@ -139,7 +139,7 @@ Single source of truth for governance state:
 }
 ```
 
-### `.idumb/config.json`
+### `.idumb/idumb-brain/config.json`
 User settings and governance configuration. Contains:
 - User profile (name, experience level, language preferences)
 - Hierarchy settings (agent order, permissions, chain enforcement)
@@ -149,19 +149,26 @@ User settings and governance configuration. Contains:
 ## Path Conventions
 
 ```
-.idumb/                    # Runtime state (writable by iDumb)
-├── brain/
-│   ├── state.json        # Governance state (SINGLE SOURCE OF TRUTH)
-│   ├── context/          # Preserved context artifacts
-│   ├── history/          # Archived history entries
-│   └── exports/          # Exported session data
-├── governance/
-│   └── validations/      # Validation reports (JSON)
-├── execution/            # Checkpoints per phase
-│   └── {phase}/
-│       └── checkpoint-{id}.json
-├── anchors/              # Critical decisions (survive compaction)
-└── sessions/             # Session tracking
+.idumb/                      # Root iDumb directory
+├── idumb-brain/             # AI governance memory (runtime state)
+│   ├── state.json           # Governance state (SINGLE SOURCE OF TRUTH)
+│   ├── config.json          # User settings and governance config
+│   ├── context/             # Preserved context artifacts
+│   ├── history/             # Archived history entries
+│   ├── governance/          # Governance rules and reports
+│   │   └── validations/     # Validation reports (JSON)
+│   ├── sessions/            # Session tracking
+│   ├── drift/               # Drift detection artifacts
+│   ├── metadata/            # Metadata storage
+│   └── execution/           # Checkpoints per phase
+│       └── {phase}/
+│           └── checkpoint-{id}.json
+├── idumb-project-output/    # Project artifacts (replaces .plan/)
+│   ├── phases/              # Phase outputs
+│   ├── roadmaps/            # Project roadmaps
+│   ├── research/            # Research outputs
+│   └── validations/         # Validation outputs
+└── idumb-modules/           # Optional user-generated extensions
 
 .planning/                # Planning artifacts (READ ONLY for iDumb)
 ├── PROJECT.md
@@ -199,7 +206,7 @@ User settings and governance configuration. Contains:
 
 ## Session Handoff
 
-When resuming work on iDumb itself, check `.idumb/brain/SESSION-HANDOFF-*.md` files for:
+When resuming work on iDumb itself, check `.idumb/idumb-brain/SESSION-HANDOFF-*.md` files for:
 - What was completed in previous sessions
 - Current known issues and their fixes
 - Remaining work by priority phase

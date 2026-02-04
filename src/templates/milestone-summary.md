@@ -1,5 +1,7 @@
 ---
 name: milestone-summary-template
+id: tpl-milestone-summary
+parent: templates
 description: "Template for milestone completion summaries"
 type: template
 version: 0.1.0
@@ -131,8 +133,8 @@ total_duration: "{duration}"
 ## Artifact Locations
 
 - Phase artifacts: `.planning/phases/{1..N}/`
-- Execution logs: `.idumb/execution/{1..N}/`
-- Archive: `.idumb/archive/milestones/{milestone}/`
+- Execution logs: `.idumb/idumb-brain/execution/{1..N}/`
+- Archive: `.idumb/idumb-brain/archive/milestones/{milestone}/`
 
 ---
 *Milestone completed on {date}*
@@ -185,7 +187,7 @@ archive:
     - "Clear execution directories"
     - "Update state to next milestone"
     
-  archive_path: ".idumb/archive/milestones/{milestone}/"
+  archive_path: ".idumb/idumb-brain/archive/milestones/{milestone}/"
   
   retention:
     keep_indefinitely: true

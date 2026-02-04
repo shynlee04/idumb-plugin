@@ -4,7 +4,7 @@ version: "0.1.0"
 created: "2026-02-03"
 purpose: "Document project technology stack - languages, frameworks, runtime, dependencies"
 consumed_by: ["idumb-codebase-mapper", "idumb-planner", "idumb-project-researcher"]
-produces: ".idumb/codebase/STACK.md"
+produces: ".idumb/idumb-project-output/codebase/STACK.md"
 validation:
   required_fields: ["languages", "frameworks", "runtime", "package_manager"]
   schema: "codebase-stack-schema-v1"

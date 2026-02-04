@@ -1,5 +1,7 @@
 ---
 description: "Create detailed implementation plan for a specific phase"
+id: cmd-plan-phase
+parent: commands-idumb
 agent: idumb-supreme-coordinator
 ---
 
@@ -69,7 +71,7 @@ steps:
       
   6_store_plan:
     action: Save phase plan
-    path: .idumb/governance/plans/<phase>-plan.md
+    path: .idumb/idumb-brain/governance/plans/<phase>-plan.md
     
   7_update_state:
     action: Record plan creation

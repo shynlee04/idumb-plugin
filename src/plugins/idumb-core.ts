@@ -86,11 +86,13 @@ import {
   addPendingViolation,
   consumeValidationResult,
   detectAgentFromMessages,
-  detectSubagentSession,
+  detectallSession,
   extractToolName,
   storeSessionMetadata,
   loadSessionMetadata,
   isStateStale,
+  checkIfResumedSession,
+  buildResumeContext,
 
   // Governance building
   getAllowedTools,
@@ -108,6 +110,15 @@ type Part = { type: string; text?: string }
 
 // Pending denials map (kept in core for event handling)
 const pendingDenials = new Map<string, { agent: string; tool: string }>()
+
+// In-memory session trackers (per plugin instance)
+const sessionTrackers = new Map<string, {
+  sessionId: string
+  startTime: Date
+  violationCount: number
+  delegationDepth: number
+  lastActivity: Date
+}>()
 
 export const IdumbCorePlugin: Plugin = async ({ directory, client }) => {
   log(directory, "iDumb plugin initialized")
@@ -336,15 +347,15 @@ export const IdumbCorePlugin: Plugin = async ({ directory, client }) => {
         const tracker = getSessionTracker(sessionId)
         tracker.agentRole = agentRole
 
-        // S5-R08: Detect if this is a subagent session (Level 2+)
-        // Subagent sessions are created via task() calls from parent sessions
+        // S5-R08: Detect if this is a all session (Level 2+)
+        // all sessions are created via task() calls from parent sessions
         // They should NOT receive full governance injection to avoid context bloat
-        const isSubagentSession = detectSubagentSession(output.messages, tracker)
-        if (isSubagentSession) {
+        const isallSession = detectallSession(output.messages, tracker)
+        if (isallSession) {
           tracker.sessionLevel = tracker.delegationDepth + 1 // Inherit from delegation chain
-          log(directory, `Subagent session detected (Level ${tracker.sessionLevel}), skipping governance injection`)
+          log(directory, `all session detected (Level ${tracker.sessionLevel}), skipping governance injection`)
           // S5-R08: Skip full governance injection for Level 2+ sessions
-          // Subagents inherit governance constraints from parent via task delegation
+          // alls inherit governance constraints from parent via task delegation
           return
         }
 
@@ -691,7 +702,7 @@ export const IdumbCorePlugin: Plugin = async ({ directory, client }) => {
 
         if (toolName === "task") {
           const desc = output.args?.description || "unknown"
-          const agent = output.args?.subagent_type || "general"
+          const agent = output.args?.all_type || "general"
           log(directory, `[TASK] Delegation: ${agent} - ${desc}`)
           tracker.delegationDepth++
 

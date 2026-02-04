@@ -189,7 +189,7 @@ Plans completed: [N]/[N]
 - [Plan 2 name]
 - [Plan 3 name]
 
-State: .idumb/brain/state.json updated
+State: .idumb/idumb-brain/state.json updated
 ```
 
 **Checkpoint Creation:**
@@ -208,7 +208,7 @@ docs(verify): [phase]-[plan] verification PASSED
 
 - Acceptance criteria: [N]/[N] met
 - Evidence: VERIFICATION.md generated
-- State: .idumb/brain/state.json updated
+- State: .idumb/idumb-brain/state.json updated
 ```
 
 ### 2.3 Traceable ID Systems
@@ -243,8 +243,8 @@ feat(task-003): implement JWT refresh
 | Plan | `.planning/phases/<N>-name/<N>-<name>-PLAN.md` | Related to 02-03-PKAN.md |
 | Summary | `.planning/phases/<N>-name/<N>-<name>-SUMMARY.md` | Documented in SUMMARY.md |
 | Research | `.planning/research/<topic>-YYYY-MM-DD.md` | Research: JWT-PATTERNS-2026-02-04.md |
-| State | `.idumb/brain/state.json` | State updated: phase="02" |
-| TODO | `.idumb/brain/todo.json` | Closed: task-003 ✓ |
+| State | `.idumb/idumb-brain/state.json` | State updated: phase="02" |
+| TODO | `.idumb/idumb-brain/todo.json` | Closed: task-003 ✓ |
 
 **Footer References:**
 ```
@@ -511,7 +511,7 @@ git show <commit-hash> --blame
 **For Governance Verification:**
 ```bash
 # Verify state commit
-git show <hash> -- .idumb/brain/state.json
+git show <hash> -- .idumb/idumb-brain/state.json
 
 # Check for proper metadata
 git show <hash> | grep "Related:"
@@ -626,7 +626,7 @@ git reflog show <hash>
 **iDumb Pattern:** Store expected hash in state.json, verify on commit
 
 ```json
-// .idumb/brain/state.json
+// .idumb/idumb-brain/state.json
 {
   "version": "0.2.0",
   "phase": "02",
@@ -641,7 +641,7 @@ git reflog show <hash>
 # .git/hooks/pre-commit
 
 # Get expected hash from state
-EXPECTED=$(jq -r '.expectedHash' .idumb/brain/state.json)
+EXPECTED=$(jq -r '.expectedHash' .idumb/idumb-brain/state.json)
 # Get current HEAD hash
 ACTUAL=$(git rev-parse HEAD)
 
@@ -691,7 +691,7 @@ git tag checkpoint-20260204-phase02
 git push origin checkpoint-20260204-phase02
 
 # Store in state
-echo '{"lastCheckpoint":"checkpoint-20260204-phase02"}' >> .idumb/brain/state.json
+echo '{"lastCheckpoint":"checkpoint-20260204-phase02"}' >> .idumb/idumb-brain/state.json
 ```
 
 **Restore:**
@@ -760,9 +760,9 @@ jq --arg hash "$HASH" --arg phase "$PHASE" '
   .lastCommitHash = $hash |
   .phase = $phase |
   .lastValidation = now
-' .idumb/brain/state.json > .idumb/brain/state.json.tmp
+' .idumb/idumb-brain/state.json > .idumb/idumb-brain/state.json.tmp
 
-mv .idumb/brain/state.json.tmp .idumb/brain/state.json
+mv .idumb/idumb-brain/state.json.tmp .idumb/idumb-brain/state.json
 
 # Track commit in history
 jq --arg hash "$HASH" --arg type "$(git log -1 --format=%s | cut -d'(' -f1)" --arg action "commit" '
@@ -773,9 +773,9 @@ jq --arg hash "$HASH" --arg type "$(git log -1 --format=%s | cut -d'(' -f1)" --a
     action: $action,
     result: "pass"
   }]
-' .idumb/brain/state.json > .idumb/brain/state.json.tmp
+' .idumb/idumb-brain/state.json > .idumb/idumb-brain/state.json.tmp
 
-mv .idumb/brain/state.json.tmp .idumb/brain/state.json
+mv .idumb/idumb-brain/state.json.tmp .idumb/idumb-brain/state.json
 ```
 
 ### 6.4 AI-Powered Commit Generation Hook
@@ -808,7 +808,7 @@ echo "$MESSAGE" > "$COMMIT_MSG_FILE"
 #!/bin/bash
 
 # 1. Check for state drift
-EXPECTED=$(jq -r '.expectedHash' .idumb/brain/state.json)
+EXPECTED=$(jq -r '.expectedHash' .idumb/idumb-brain/state.json)
 ACTUAL=$(git rev-parse HEAD)
 
 if [ "$EXPECTED" != "$ACTUAL" ] && [ -n "$EXPECTED" ]; then
@@ -817,7 +817,7 @@ if [ "$EXPECTED" != "$ACTUAL" ] && [ -n "$EXPECTED" ]; then
   echo "Actual hash: $ACTUAL"
   echo ""
   echo "Run: git reset --hard $EXPECTED"
-  echo "Or update state: jq '.expectedHash = \"$ACTUAL\"' .idumb/brain/state.json"
+  echo "Or update state: jq '.expectedHash = \"$ACTUAL\"' .idumb/idumb-brain/state.json"
   exit 1
 fi
 
@@ -1091,7 +1091,7 @@ Plans completed: 3/3
 - 02-02: token refresh
 - 02-03: logout flow
 
-State: .idumb/brain/state.json updated"
+State: .idumb/idumb-brain/state.json updated"
 git push
 
 # 5. Merge to main
@@ -1136,10 +1136,10 @@ git push origin checkpoint-20260204-phase02-task3
 # 2. Store in state
 jq --arg tag "checkpoint-20260204-phase02-task3" '
   .lastCheckpoint = $tag
-' .idumb/brain/state.json > .idumb/brain/state.json.tmp
+' .idumb/idumb-brain/state.json > .idumb/idumb-brain/state.json.tmp
 
-mv .idumb/brain/state.json.tmp .idumb/brain/state.json
-git add .idumb/brain/state.json
+mv .idumb/idumb-brain/state.json.tmp .idumb/idumb-brain/state.json
+git add .idumb/idumb-brain/state.json
 git commit -m "chore(checkpoint): create checkpoint after task-003
 
 Tag: checkpoint-20260204-phase02-task3

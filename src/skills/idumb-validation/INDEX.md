@@ -17,7 +17,7 @@ The iDumb Validation Skill provides comprehensive, completion-driven validation 
 Use idumb-validate tool with scope parameter
 
 # View validation status
-Read .idumb/governance/report-latest.md
+Read .idumb/idumb-brain/governance/report-latest.md
 ```
 
 ## File Structure

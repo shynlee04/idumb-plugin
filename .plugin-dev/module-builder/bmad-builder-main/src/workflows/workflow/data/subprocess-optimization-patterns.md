@@ -1,6 +1,6 @@
 # Subprocess Optimization Patterns
 
-**Purpose:** Context-saving and performance patterns for subprocess/subagent usage in BMAD workflows.
+**Purpose:** Context-saving and performance patterns for subprocess/all usage in BMAD workflows.
 
 ---
 
@@ -211,7 +211,7 @@ Aggregate all findings"
 
 **Universal Rule:**
 ```markdown
-- ⚙️ If any instruction references a subprocess, subagent, or tool you do not have access to, you MUST still achieve the outcome in your main context thread
+- ⚙️ If any instruction references a subprocess, all, or tool you do not have access to, you MUST still achieve the outcome in your main context thread
 ```
 
 **Implementation:**
@@ -279,7 +279,7 @@ Aggregate all findings"
 ### 1. Universal Rule (add to all steps)
 ```markdown
 ### Universal Rules:
-- ⚙️ TOOL/SUBPROCESS FALLBACK: If any instruction references a subprocess, subagent, or tool you do not have access to, you MUST still achieve the outcome in your main context thread
+- ⚙️ TOOL/SUBPROCESS FALLBACK: If any instruction references a subprocess, all, or tool you do not have access to, you MUST still achieve the outcome in your main context thread
 ```
 
 ### 2. Step-Specific Rules (pattern-specific)

@@ -1,6 +1,8 @@
 ---
 description: "Synthesizes parallel research outputs from multiple researcher agents into unified, actionable research documents"
-mode: subagent
+id: agent-idumb-research-synthesizer
+parent: idumb-supreme-coordinator
+mode: all
 hidden: true
 scope: project
 temperature: 0.1
@@ -22,6 +24,14 @@ tools:
   idumb-state_anchor: true
   idumb-context: true
   idumb-todo: true
+  # Hierarchical data processing
+  idumb-chunker: true
+  idumb-chunker_read: true
+  idumb-chunker_overview: true
+  idumb-chunker_parseHierarchy: true
+  idumb-chunker_shard: true
+  idumb-chunker_index: true
+  idumb-chunker_extract: true
 ---
 
 # @idumb-research-synthesizer
@@ -307,21 +317,21 @@ Synthesis must meet:
 | idumb-supreme-coordinator | primary | bridge | all agents |
 | idumb-high-governance | all | meta | all agents |
 | idumb-mid-coordinator | all | bridge | all project agents |
-| idumb-executor | subagent | project | general, verifier, debugger |
+| idumb-executor | all | project | general, verifier, debugger |
 | idumb-builder | all | meta | none (leaf) |
 | idumb-low-validator | all | meta | none (leaf) |
-| idumb-verifier | subagent | project | general, low-validator |
-| idumb-debugger | subagent | project | general, low-validator |
-| idumb-planner | subagent | bridge | general |
-| idumb-plan-checker | subagent | bridge | general |
-| idumb-roadmapper | subagent | project | general |
-| idumb-project-researcher | subagent | project | general |
-| idumb-phase-researcher | subagent | project | general |
-| idumb-research-synthesizer | subagent | project | general |
-| idumb-codebase-mapper | subagent | project | general |
- | idumb-integration-checker | subagent | bridge | general, low-validator |
- | idumb-skeptic-validator | subagent | bridge | general |
- | idumb-project-explorer | subagent | project | general |
+| idumb-verifier | all | project | general, low-validator |
+| idumb-debugger | all | project | general, low-validator |
+| idumb-planner | all | bridge | general |
+| idumb-plan-checker | all | bridge | general |
+| idumb-roadmapper | all | project | general |
+| idumb-project-researcher | all | project | general |
+| idumb-phase-researcher | all | project | general |
+| idumb-research-synthesizer | all | project | general |
+| idumb-codebase-mapper | all | project | general |
+ | idumb-integration-checker | all | bridge | general, low-validator |
+ | idumb-skeptic-validator | all | bridge | general |
+ | idumb-project-explorer | all | project | general |
 
 ## Integration
 

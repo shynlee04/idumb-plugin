@@ -1,5 +1,7 @@
 ---
 name: execute-phase
+id: wf-execute-phase
+parent: workflows
 description: "Executes plan tasks through builder agent with validation checkpoints"
 type: workflow
 version: 0.1.0
@@ -45,7 +47,7 @@ workflow:
     2_load_progress:
       action: "Check for existing progress"
       method: |
-        PROGRESS=$(cat .idumb/execution/{N}/progress.json 2>/dev/null) || PROGRESS="{}"
+        PROGRESS=$(cat .idumb/idumb-brain/execution/{N}/progress.json 2>/dev/null) || PROGRESS="{}"
       output: progress_state
       allows_resume: true
       
@@ -87,8 +89,8 @@ workflow:
         4e_checkpoint:
           action: "Save progress"
           writes:
-            - ".idumb/execution/{N}/progress.json"
-            - ".idumb/execution/{N}/checkpoint-{task.id}.json"
+            - ".idumb/idumb-brain/execution/{N}/progress.json"
+            - ".idumb/idumb-brain/execution/{N}/checkpoint-{task.id}.json"
             
     5_generate_summary:
       action: "Create execution summary"
@@ -108,7 +110,7 @@ workflow:
 checkpoints:
   enabled: true
   frequency: "after each task"
-  storage: ".idumb/execution/{N}/"
+  storage: ".idumb/idumb-brain/execution/{N}/"
   
   checkpoint_schema:
     id: "checkpoint-{task-id}"
@@ -227,11 +229,11 @@ chains_to:
 integration:
   reads_from:
     - ".planning/phases/{N}/*PLAN.md"
-    - ".idumb/execution/{N}/progress.json"
+    - ".idumb/idumb-brain/execution/{N}/progress.json"
   writes_to:
     - ".planning/phases/{N}/*SUMMARY.md"
-    - ".idumb/execution/{N}/"
-    - ".idumb/brain/state.json"
+    - ".idumb/idumb-brain/execution/{N}/"
+    - ".idumb/idumb-brain/state.json"
   git_interaction:
     - "Read current hash for checkpoints"
     - "NO direct commits (user responsibility)"

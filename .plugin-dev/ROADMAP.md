@@ -7,7 +7,7 @@ iDumb v2 ships as a plugin-powered meta-framework that makes agentic development
 ## Phases
 
 - [ ] **Phase 1: Contracts-First Governance Core** - Deterministic governance workflows using stable OpenCode primitives
-- [ ] **Phase 2: Brain MVP (Durable State + Schemas)** - Local-first durable memory under `.idumb/brain/`
+- [ ] **Phase 2: Brain MVP (Durable State + Schemas)** - Local-first durable memory under `.idumb/idumb-brain/`
 - [ ] **Phase 3: Retrieval + Hop-Reading** - Search + structural parsing + relationship traversal
 - [ ] **Phase 4: Auto-Governance Loops** - Drift detection + routine validation + persisted results
 - [ ] **Phase 5: Context Optimization** - Lazy rules + safe pruning policies
@@ -33,7 +33,7 @@ Plans:
 **Depends on**: Phase 1
 **Requirements**: INST-05, BRN-01, BRN-02, BRN-03, BRN-04
 **Success Criteria** (what must be TRUE):
-  1. Sessions/anchors/validations persist under `.idumb/brain/` and can be queried by ID
+  1. Sessions/anchors/validations persist under `.idumb/idumb-brain/` and can be queried by ID
   2. Invalid/unknown schema versions are rejected with actionable errors
   3. Relationship graph supports basic traversal (session tree, artifact links)
 **Plans**: TBD

@@ -10,7 +10,7 @@ Complete MUST-BEFORE and SHOULD-BEFORE dependency rules from `src/router/chain-e
 INIT-01:
   command: "/idumb:*"
   must_before:
-    - exists: ".idumb/brain/state.json"
+    - exists: ".idumb/idumb-brain/state.json"
   except:
     - "/idumb:init"
     - "/idumb:help"
@@ -165,7 +165,7 @@ readonly_commands:
 
 | Type | Description | Example |
 |------|-------------|---------|
-| `exists` | File must exist | `.idumb/brain/state.json` |
+| `exists` | File must exist | `.idumb/idumb-brain/state.json` |
 | `state` | State condition must be true | `phase.status = 'in_progress'` |
 | `validation` | Validation condition | `last_validation < 10 minutes ago` |
 | `one_of` | Any alternative must pass | `SUMMARY.md exists OR phase in_progress` |
@@ -174,7 +174,7 @@ readonly_commands:
 
 ```yaml
 on_chain_violation:
-  1: "Log violation to .idumb/governance/chain.log"
+  1: "Log violation to .idumb/idumb-brain/governance/chain.log"
   2: "Present user with options:"
      a: "Run prerequisite command automatically"
      b: "Override with --force (if allowed)"

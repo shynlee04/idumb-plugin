@@ -104,7 +104,7 @@ synthesis:
 ### Level 3: Low Validator
 
 **Agent:** `@idumb-low-validator`
-**Mode:** `subagent`
+**Mode:** `all`
 **Hidden:** `true`
 **Role:** Actual validation work
 
@@ -139,7 +139,7 @@ validation:
 ### Level 4: Builder
 
 **Agent:** `@idumb-builder`
-**Mode:** `subagent`
+**Mode:** `all`
 **Hidden:** `true`
 **Role:** Actual execution work
 

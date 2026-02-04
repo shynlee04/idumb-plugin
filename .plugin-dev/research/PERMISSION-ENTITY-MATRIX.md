@@ -169,22 +169,22 @@ The iDumb system defines 15 specialized agents with distinct permissions and res
 
 | Agent | Mode | Scope | Can Delegate To | Key Permissions |
 |-------|------|-------|-----------------|-----------------|
-| `idumb-executor` | subagent | project | general, verifier, debugger | task: conditional, bash: conditional, edit: deny, write: deny |
-| `idumb-verifier` | subagent | project | general, low-validator | task: conditional, bash: conditional, edit: deny, write: deny |
-| `idumb-debugger` | subagent | project | general, low-validator | task: conditional, bash: conditional, edit: deny, write: deny |
+| `idumb-executor` | all | project | general, verifier, debugger | task: conditional, bash: conditional, edit: deny, write: deny |
+| `idumb-verifier` | all | project | general, low-validator | task: conditional, bash: conditional, edit: deny, write: deny |
+| `idumb-debugger` | all | project | general, low-validator | task: conditional, bash: conditional, edit: deny, write: deny |
 
 #### Tier 3: Planning & Research (No Delegation)
 
 | Agent | Mode | Scope | Can Delegate To | Key Permissions |
 |-------|------|-------|-----------------|-----------------|
-| `idumb-planner` | subagent | bridge | general | task: conditional, bash: deny, edit: deny, write: deny |
-| `idumb-plan-checker` | subagent | bridge | general | task: conditional, bash: deny, edit: deny, write: deny |
-| `idumb-roadmapper` | subagent | project | NONE (leaf) | task: deny, bash: deny, edit: deny, write: deny |
-| `idumb-integration-checker` | subagent | bridge | general, low-validator | task: conditional, bash: deny, edit: deny, write: deny |
-| `idumb-project-researcher` | subagent | project | NONE (leaf) | task: deny, bash: deny, edit: deny, write: deny |
-| `idumb-phase-researcher` | subagent | project | NONE (leaf) | task: deny, bash: deny, edit: deny, write: deny |
-| `idumb-research-synthesizer` | subagent | project | NONE (leaf) | task: deny, bash: deny, edit: deny, write: deny |
-| `idumb-codebase-mapper` | subagent | project | NONE (leaf) | task: deny, bash: deny, edit: deny, write: deny |
+| `idumb-planner` | all | bridge | general | task: conditional, bash: deny, edit: deny, write: deny |
+| `idumb-plan-checker` | all | bridge | general | task: conditional, bash: deny, edit: deny, write: deny |
+| `idumb-roadmapper` | all | project | NONE (leaf) | task: deny, bash: deny, edit: deny, write: deny |
+| `idumb-integration-checker` | all | bridge | general, low-validator | task: conditional, bash: deny, edit: deny, write: deny |
+| `idumb-project-researcher` | all | project | NONE (leaf) | task: deny, bash: deny, edit: deny, write: deny |
+| `idumb-phase-researcher` | all | project | NONE (leaf) | task: deny, bash: deny, edit: deny, write: deny |
+| `idumb-research-synthesizer` | all | project | NONE (leaf) | task: deny, bash: deny, edit: deny, write: deny |
+| `idumb-codebase-mapper` | all | project | NONE (leaf) | task: deny, bash: deny, edit: deny, write: deny |
 
 #### Tier 4: Leaf Nodes (Execution)
 
@@ -328,43 +328,43 @@ LEVEL 2: HIGH GOVERNANCE
 │   └── Permissions: task=conditional, bash=conditional, edit=deny, write=deny
 │
 LEVEL 3: SPECIALIZED COORDINATORS
-├── idumb-executor (subagent)
+├── idumb-executor (all)
 │   └── Scope: project
 │   └── Can Delegate To: general, verifier, debugger
 │   └── Purpose: Phase execution coordination
 │
-├── idumb-verifier (subagent)
+├── idumb-verifier (all)
 │   └── Scope: project
 │   └── Can Delegate To: general, low-validator
 │   └── Purpose: Work verification
 │
-├── idumb-debugger (subagent)
+├── idumb-debugger (all)
 │   └── Scope: project
 │   └── Can Delegate To: general, low-validator
 │   └── Purpose: Issue diagnosis
 │
-├── idumb-planner (subagent)
+├── idumb-planner (all)
 │   └── Scope: bridge
 │   └── Can Delegate To: general
 │   └── Purpose: Plan creation
 │
-├── idumb-plan-checker (subagent)
+├── idumb-plan-checker (all)
 │   └── Scope: bridge
 │   └── Can Delegate To: general
 │   └── Purpose: Plan validation
 │
-├── idumb-integration-checker (subagent)
+├── idumb-integration-checker (all)
 │   └── Scope: bridge
 │   └── Can Delegate To: general, low-validator
 │   └── Purpose: Integration validation
 │
 LEVEL 4: RESEARCHERS (Leaf - No Delegation)
-├── idumb-roadmapper (subagent)
-├── idumb-project-researcher (subagent)
-├── idumb-phase-researcher (subagent)
-├── idumb-research-synthesizer (subagent)
-├── idumb-codebase-mapper (subagent)
-│   └── All: Mode=subagent, Scope=project
+├── idumb-roadmapper (all)
+├── idumb-project-researcher (all)
+├── idumb-phase-researcher (all)
+├── idumb-research-synthesizer (all)
+├── idumb-codebase-mapper (all)
+│   └── All: Mode=all, Scope=project
 │   └── All: task=deny, bash=deny, edit=deny, write=deny
 │   └── All: Can Delegate To: NONE
 │
@@ -764,7 +764,7 @@ CHAIN RULES (8 rules)
 
 4. **Add Chain Rule Visualization**: Create a visual representation of chain dependencies to help users understand why operations are blocked.
 
-5. **Implement Permission Auditing**: Log all permission decisions to `.idumb/governance/audit.log` for compliance and debugging.
+5. **Implement Permission Auditing**: Log all permission decisions to `.idumb/idumb-brain/governance/audit.log` for compliance and debugging.
 
 6. **Create Agent Capability Matrix**: A user-facing document showing what each agent can and cannot do.
 

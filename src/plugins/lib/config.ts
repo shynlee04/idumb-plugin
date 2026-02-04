@@ -18,7 +18,7 @@ import { getDefaultState } from "./state"
 // ============================================================================
 
 export function getConfigPath(directory: string): string {
-    return join(directory, ".idumb", "config.json")
+    return join(directory, ".idumb", "idumb-brain", "config.json")
 }
 
 export function getIdumbDir(directory: string): string {
@@ -89,18 +89,23 @@ export function getDefaultConfig(experience: "pro" | "guided" | "strict" = "guid
         },
         automation: automationSettings as any,
         paths: {
-            config: ".idumb/config.json",
-            state: ".idumb/brain/state.json",
-            brain: ".idumb/brain/",
-            history: ".idumb/brain/history/",
-            context: ".idumb/brain/context/",
-            governance: ".idumb/governance/",
-            validations: ".idumb/governance/validations/",
-            anchors: ".idumb/anchors/",
-            sessions: ".idumb/sessions/",
-            planning: ".planning/",
-            roadmap: ".planning/ROADMAP.md",
-            planningState: ".planning/STATE.md"
+            root: ".idumb/",
+            config: ".idumb/idumb-brain/config.json",
+            state: ".idumb/idumb-brain/state.json",
+            brain: ".idumb/idumb-brain/",
+            history: ".idumb/idumb-brain/history/",
+            context: ".idumb/idumb-brain/context/",
+            governance: ".idumb/idumb-brain/governance/",
+            validations: ".idumb/idumb-brain/governance/validations/",
+            sessions: ".idumb/idumb-brain/sessions/",
+            drift: ".idumb/idumb-brain/drift/",
+            metadata: ".idumb/idumb-brain/metadata/",
+            output: ".idumb/idumb-project-output/",
+            phases: ".idumb/idumb-project-output/phases/",
+            roadmaps: ".idumb/idumb-project-output/roadmaps/",
+            research: ".idumb/idumb-project-output/research/",
+            validationReports: ".idumb/idumb-project-output/validations/",
+            modules: ".idumb/idumb-modules/"
         },
         staleness: {
             warningHours: 48,
@@ -129,7 +134,7 @@ export function getDefaultConfig(experience: "pro" | "guided" | "strict" = "guid
 // ============================================================================
 
 /**
- * Read config from .idumb/config.json
+ * Read config from .idumb/idumb-brain/config.json
  * Returns null if config doesn't exist or is corrupted
  */
 export function readConfig(directory: string): InlineIdumbConfig | null {
@@ -146,7 +151,7 @@ export function readConfig(directory: string): InlineIdumbConfig | null {
 }
 
 /**
- * Write config to .idumb/config.json
+ * Write config to .idumb/idumb-brain/config.json
  * Creates .idumb directory if it doesn't exist
  */
 export function writeConfig(directory: string, config: InlineIdumbConfig): void {
@@ -206,13 +211,20 @@ export function ensureIdumbConfig(directory: string): InlineIdumbConfig {
 
     // Create all required directories
     const dirs = [
-        join(directory, ".idumb", "brain"),
-        join(directory, ".idumb", "brain", "history"),
-        join(directory, ".idumb", "brain", "context"),
-        join(directory, ".idumb", "governance"),
-        join(directory, ".idumb", "governance", "validations"),
-        join(directory, ".idumb", "anchors"),
-        join(directory, ".idumb", "sessions")
+        join(directory, ".idumb", "idumb-brain"),
+        join(directory, ".idumb", "idumb-brain", "history"),
+        join(directory, ".idumb", "idumb-brain", "context"),
+        join(directory, ".idumb", "idumb-brain", "governance"),
+        join(directory, ".idumb", "idumb-brain", "governance", "validations"),
+        join(directory, ".idumb", "idumb-brain", "sessions"),
+        join(directory, ".idumb", "idumb-brain", "drift"),
+        join(directory, ".idumb", "idumb-brain", "metadata"),
+        join(directory, ".idumb", "idumb-project-output"),
+        join(directory, ".idumb", "idumb-project-output", "phases"),
+        join(directory, ".idumb", "idumb-project-output", "roadmaps"),
+        join(directory, ".idumb", "idumb-project-output", "research"),
+        join(directory, ".idumb", "idumb-project-output", "validations"),
+        join(directory, ".idumb", "idumb-modules")
     ]
 
     for (const dir of dirs) {
@@ -225,7 +237,7 @@ export function ensureIdumbConfig(directory: string): InlineIdumbConfig {
     writeFileSync(configPath, JSON.stringify(defaultConfig, null, 2))
 
     // Also ensure state.json exists
-    const statePath = join(directory, ".idumb", "brain", "state.json")
+    const statePath = join(directory, ".idumb", "idumb-brain", "state.json")
     if (!existsSync(statePath)) {
         const defaultState = getDefaultState()
         writeFileSync(statePath, JSON.stringify(defaultState, null, 2))
@@ -257,11 +269,11 @@ export function validateEnforcementSettings(
 
     // Check mustHaveState - verify state.json exists
     if (config.enforcement?.mustHaveState) {
-        const statePath = join(directory, '.idumb', 'brain', 'state.json')
+        const statePath = join(directory, '.idumb', 'idumb-brain', 'state.json')
         if (!existsSync(statePath)) {
             log(directory, `[ENFORCEMENT] Creating missing state.json per mustHaveState=true`)
             // Auto-recover: create default state
-            const brainDir = join(directory, '.idumb', 'brain')
+            const brainDir = join(directory, '.idumb', 'idumb-brain')
             if (!existsSync(brainDir)) {
                 mkdirSync(brainDir, { recursive: true })
             }

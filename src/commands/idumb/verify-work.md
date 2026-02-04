@@ -1,5 +1,7 @@
 ---
 description: "Verify completion of work against acceptance criteria"
+id: cmd-verify-work
+parent: commands-idumb
 agent: idumb-supreme-coordinator
 ---
 

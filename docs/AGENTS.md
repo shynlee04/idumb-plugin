@@ -10,7 +10,7 @@
 
 ```
 1. READ your agent profile:     template/agents/{your-agent}.md
-2. READ governance state:       .idumb/brain/state.json  
+2. READ governance state:       .idumb/idumb-brain/state.json  
 3. READ current phase:          .planning/ROADMAP.md (find active phase)
 4. READ chain rules:            template/router/chain-enforcement.md
 5. ONLY THEN consider user request
@@ -49,7 +49,7 @@ plan_requirements:
 
 ```
 1. STOP all execution immediately
-2. LOG the issue to .idumb/brain/state.json history
+2. LOG the issue to .idumb/idumb-brain/state.json history
 3. IDENTIFY the root cause
 4. BOUNCE BACK to the appropriate level:
    - Task issue → bounce to plan level
@@ -103,7 +103,7 @@ import type { Plugin } from "@opencode-ai/plugin"
 // CRITICAL: NO console.log - pollutes TUI background
 // Use file logging or client.app.log() instead
 function log(directory: string, message: string): void {
-  // Write to .idumb/governance/plugin.log
+  // Write to .idumb/idumb-brain/governance/plugin.log
 }
 
 // INTERFACES: Define all types explicitly
@@ -141,7 +141,7 @@ export const stateRead = tool({
 ---
 # YAML Frontmatter - MUST be accurate for OpenCode API
 description: "Brief description of agent/command purpose"
-mode: primary | subagent | all
+mode: primary | all | all
 temperature: 0.1  # Low for deterministic governance
 permission:
   task:
@@ -294,7 +294,7 @@ These agents perform the actual work:
 
 **MUST-BEFORE Rules:**
 ```
-/idumb:* → requires .idumb/brain/state.json (except init, help)
+/idumb:* → requires .idumb/idumb-brain/state.json (except init, help)
 /idumb:roadmap → requires .planning/PROJECT.md
 /idumb:execute-phase → requires .planning/phases/{N}/*PLAN.md
 /idumb:verify-work → requires execution evidence

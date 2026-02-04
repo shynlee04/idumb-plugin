@@ -1,14 +1,16 @@
 ---
 name: config-template
+id: tpl-config
+parent: templates
 description: "Template for iDumb configuration schema"
 type: template
 version: 0.1.0
-output_pattern: ".idumb/config.json"
+output_pattern: ".idumb/idumb-brain/config.json"
 ---
 
 # Config Template
 
-Defines the schema for `.idumb/config.json` - user/project configuration for iDumb.
+Defines the schema for `.idumb/idumb-brain/config.json` - user/project configuration for iDumb.
 
 ## JSON Schema
 
@@ -63,7 +65,7 @@ Defines the schema for `.idumb/config.json` - user/project configuration for iDu
       "properties": {
         "planning": { "type": "string", "default": ".planning" },
         "idumb": { "type": "string", "default": ".idumb" },
-        "archive": { "type": "string", "default": ".idumb/archive" }
+        "archive": { "type": "string", "default": ".idumb/idumb-brain/archive" }
       }
     },
     "agents": {
@@ -114,7 +116,7 @@ Defines the schema for `.idumb/config.json` - user/project configuration for iDu
   "paths": {
     "planning": ".planning",
     "idumb": ".idumb",
-    "archive": ".idumb/archive"
+    "archive": ".idumb/idumb-brain/archive"
   },
   "agents": {
     "defaultTimeout": 300,

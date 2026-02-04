@@ -274,7 +274,7 @@ YOU ARE: Builder (EXECUTION WORKER)
 3. Verify before changes, commit after
 
 🚫 CANNOT:
-- Spawn subagents (task: false)
+- Spawn alls (task: false)
 - Skip verification
 
 ✅ REQUIRED FIRST ACTION:
@@ -353,14 +353,14 @@ Enhance the `tool.execute.before` hook to enforce first tool rules:
     // ==========================================
     
     if (toolName === "task") {
-      const subagentType = output.args?.subagent_type || 'general'
+      const allType = output.args?.all_type || 'general'
       const description = output.args?.description || 'unknown'
       
-      log(directory, `[DELEGATION] ${agentRole} → ${subagentType}: ${description}`)
+      log(directory, `[DELEGATION] ${agentRole} → ${allType}: ${description}`)
       
       // INJECT delegation context into the task prompt
       const originalPrompt = output.args?.prompt || ''
-      const delegationContext = buildDelegationContext(agentRole, subagentType, tracker.delegationDepth)
+      const delegationContext = buildDelegationContext(agentRole, allType, tracker.delegationDepth)
       
       // Prepend delegation context to the task prompt
       output.args.prompt = delegationContext + '\n\n' + originalPrompt
@@ -777,7 +777,7 @@ async function runInterceptionTests(directory: string): Promise<void> {
 1. **Copy the code blocks** into `idumb-core.ts`
 2. **Add imports** at top of file
 3. **Test** with `/idumb:init` and `/idumb:validate`
-4. **Monitor logs** in `.idumb/governance/plugin.log`
+4. **Monitor logs** in `.idumb/idumb-brain/governance/plugin.log`
 5. **Iterate** based on violation patterns
 
 This implementation transforms iDumb from "suggested guidelines" to "enforced governance" through technical interception at every critical decision point.

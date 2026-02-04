@@ -164,7 +164,7 @@ const isComplete = hasEvidence &&
 
 **What's Stored:**
 ```
-.idumb/brain/
+.idumb/idumb-brain/
 ├── sessions/          # Session metadata and hierarchy
 ├── anchors/           # Context anchors (checkpoint, decision, context)
 ├── governance/         # Validation results, history, actions
@@ -206,7 +206,7 @@ const isComplete = hasEvidence &&
 ```markdown
 ---
 description: "Brief description of agent purpose"
-mode: primary | subagent
+mode: primary | all
 scope: project | bridge | meta
 temperature: 0.1
 permission:
@@ -268,20 +268,20 @@ export const toolName = tool({
 | Command | Purpose | Trigger | Required Context |
 |----------|---------|----------|------------------|
 | `/idumb:init` | Initialize governance | First-time setup | None |
-| `/idumb:status` | Show current state | Check progress | `.idumb/brain/state.json` |
-| `/idumb:config` | View/edit config | Settings management | `.idumb/config.json` |
+| `/idumb:status` | Show current state | Check progress | `.idumb/idumb-brain/state.json` |
+| `/idumb:config` | View/edit config | Settings management | `.idumb/idumb-brain/config.json` |
 | `/idumb:validate` | Run validation checks | Quality assurance | Project structure |
 | `/idumb:help` | Show documentation | Help | None |
 
 **Command Hooks:**
 ```yaml
 pre_check:
-  - exists: ".idumb/brain/state.json"
+  - exists: ".idumb/idumb-brain/state.json"
   - loaded: "governance state"
   
 post_execute:
-  - log_to: ".idumb/governance/plugin.log"
-  - record_in: ".idumb/brain/history/"
+  - log_to: ".idumb/idumb-brain/governance/plugin.log"
+  - record_in: ".idumb/idumb-brain/history/"
 ```
 
 ### 4. Event System
@@ -482,7 +482,7 @@ graph LR
 
 ### Master Configuration
 
-**Location:** `.idumb/config.json`
+**Location:** `.idumb/idumb-brain/config.json`
 **Status:** SINGLE SOURCE OF TRUTH
 
 **Structure:**
@@ -517,10 +517,10 @@ graph LR
       }
     },
     "paths": {
-      "config": ".idumb/config.json",
-      "state": ".idumb/brain/state.json",
-      "brain": ".idumb/brain/",
-      "governance": ".idumb/governance/"
+      "config": ".idumb/idumb-brain/config.json",
+      "state": ".idumb/idumb-brain/state.json",
+      "brain": ".idumb/idumb-brain/",
+      "governance": ".idumb/idumb-brain/governance/"
     }
   }
 }

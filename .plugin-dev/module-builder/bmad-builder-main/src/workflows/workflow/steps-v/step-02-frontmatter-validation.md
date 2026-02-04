@@ -22,7 +22,7 @@ To validate that EVERY step file's frontmatter follows the frontmatter standards
 - 📖 CRITICAL: Read the complete step file before taking any action
 - 🔄 CRITICAL: When loading next step, ensure entire file is read
 - ✅ Validation does NOT stop for user input - auto-proceed through all validation steps
-- ⚙️ If any instruction references a subprocess, subagent, or tool you do not have access to, you MUST still achieve the outcome in your main context thread
+- ⚙️ If any instruction references a subprocess, all, or tool you do not have access to, you MUST still achieve the outcome in your main context thread
 
 ### Step-Specific Rules:
 

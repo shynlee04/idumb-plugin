@@ -212,7 +212,7 @@ export interface SessionTracker {
     firstToolName: string | null
     agentRole: string | null
     delegationDepth: number
-    sessionLevel: number  // S5-R08: Track session hierarchy level (1=root, 2+=subagent)
+    sessionLevel: number  // S5-R08: Track session hierarchy level (1=root, 2+=all)
     parentSession: string | null
     violationCount: number
     governanceInjected: boolean

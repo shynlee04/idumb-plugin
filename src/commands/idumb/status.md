@@ -1,5 +1,7 @@
 ---
 description: "Show current iDumb governance state, active anchors, and validation history"
+id: cmd-status
+parent: commands-idumb
 agent: idumb-supreme-coordinator
 ---
 
@@ -10,7 +12,7 @@ Generate a comprehensive status report of the current governance state.
 ## YOUR TASK
 
 1. **Read current state:**
-   - Load `.idumb/brain/state.json`
+   - Load `.idumb/idumb-brain/state.json`
    - Parse current phase, anchors, last validation
 
 2. **Check governance health:**

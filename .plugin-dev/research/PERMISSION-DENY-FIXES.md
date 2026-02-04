@@ -15,7 +15,7 @@ This document analyzes the permission deny patterns across all 15 iDumb agent pr
 
 1. **5 agents** have incorrect `task: "*": deny` patterns (violates Rule #1)
 2. **1 agent** has broad `bash: "*": deny` pattern (violates Rule #2)
-3. **3 agents** have `mode: all` but should be `mode: subagent` (scope confusion)
+3. **3 agents** have `mode: all` but should be `mode: all` (scope confusion)
 4. **3 missing agents** needed for complete hierarchy coverage
 
 ---
@@ -83,7 +83,7 @@ bash:
 |------|----------------|--------------|----------|
 | **primary** | No (top-level) | Yes (all agents) | Supreme coordinator only |
 | **all** | Yes | Yes (all agents) | High-level coordinators |
-| **subagent** | Yes | Limited/No | Worker agents, leaf nodes |
+| **all** | Yes | Limited/No | Worker agents, leaf nodes |
 
 ### Current Mode Assignments
 
@@ -91,21 +91,21 @@ bash:
 |-------|--------------|--------------|-------|
 | idumb-supreme-coordinator | primary | ✅ primary | Correct |
 | idumb-high-governance | all | ✅ all | Correct |
-| idumb-low-validator | all | ❌ **subagent** | Should not delegate |
-| idumb-builder | all | ❌ **subagent** | Should not delegate |
-| idumb-executor | subagent | ✅ subagent | Correct |
-| idumb-verifier | subagent | ✅ subagent | Correct |
-| idumb-debugger | subagent | ✅ subagent | Correct |
-| idumb-planner | subagent | ✅ subagent | Correct |
-| idumb-plan-checker | subagent | ✅ subagent | Correct |
-| idumb-integration-checker | subagent | ✅ subagent | Correct |
-| idumb-roadmapper | subagent | ✅ subagent | Correct |
-| idumb-project-researcher | subagent | ✅ subagent | Correct |
-| idumb-phase-researcher | subagent | ✅ subagent | Correct |
-| idumb-research-synthesizer | subagent | ✅ subagent | Correct |
-| idumb-codebase-mapper | subagent | ✅ subagent | Correct |
+| idumb-low-validator | all | ❌ **all** | Should not delegate |
+| idumb-builder | all | ❌ **all** | Should not delegate |
+| idumb-executor | all | ✅ all | Correct |
+| idumb-verifier | all | ✅ all | Correct |
+| idumb-debugger | all | ✅ all | Correct |
+| idumb-planner | all | ✅ all | Correct |
+| idumb-plan-checker | all | ✅ all | Correct |
+| idumb-integration-checker | all | ✅ all | Correct |
+| idumb-roadmapper | all | ✅ all | Correct |
+| idumb-project-researcher | all | ✅ all | Correct |
+| idumb-phase-researcher | all | ✅ all | Correct |
+| idumb-research-synthesizer | all | ✅ all | Correct |
+| idumb-codebase-mapper | all | ✅ all | Correct |
 
-**Note:** `idumb-low-validator` and `idumb-builder` are **LEAF NODES** - they should be `mode: subagent` because they cannot delegate further.
+**Note:** `idumb-low-validator` and `idumb-builder` are **LEAF NODES** - they should be `mode: all` because they cannot delegate further.
 
 ---
 
@@ -169,7 +169,7 @@ Verdict: ✅ EXCELLENT - Use as reference for other agents
 #### idumb-low-validator
 ```yaml
 Current:
-  mode: all           # ❌ Should be subagent
+  mode: all           # ❌ Should be all
   scope: meta
   permission:
     task:
@@ -189,19 +189,19 @@ Current:
     write: deny
 
 Issues:
-  1. mode: all → should be mode: subagent (leaf node)
+  1. mode: all → should be mode: all (leaf node)
   2. task: "*": deny → violates Rule #1
   
 Fixes:
-  - Change mode: subagent
-  - Remove task permission entirely (subagent doesn't spawn agents)
+  - Change mode: all
+  - Remove task permission entirely (all doesn't spawn agents)
   - OR change to: task: {} (empty = no task delegation)
 ```
 
 #### idumb-builder
 ```yaml
 Current:
-  mode: all           # ❌ Should be subagent
+  mode: all           # ❌ Should be all
   scope: meta
   permission:
     task:
@@ -212,11 +212,11 @@ Current:
     write: allow
 
 Issues:
-  1. mode: all → should be mode: subagent (leaf node)
+  1. mode: all → should be mode: all (leaf node)
   2. task: "*": deny → violates Rule #1 (though builder shouldn't spawn agents)
   
 Fixes:
-  - Change mode: subagent
+  - Change mode: all
   - Remove task permission entirely (builder is leaf node)
   - bash: "*": allow is acceptable for builder (needs full execution)
 ```
@@ -226,7 +226,7 @@ Fixes:
 #### idumb-executor
 ```yaml
 Current:
-  mode: subagent
+  mode: all
   scope: project
   permission:
     task:
@@ -254,7 +254,7 @@ Verdict: ✅ EXCELLENT - Use as reference
 #### idumb-verifier
 ```yaml
 Current:
-  mode: subagent
+  mode: all
   scope: project
   permission:
     task:
@@ -280,7 +280,7 @@ Verdict: ✅ CORRECT
 #### idumb-debugger
 ```yaml
 Current:
-  mode: subagent
+  mode: all
   scope: project
   permission:
     task:
@@ -307,7 +307,7 @@ Verdict: ✅ CORRECT
 #### idumb-roadmapper
 ```yaml
 Current:
-  mode: subagent
+  mode: all
   scope: project
   permission:
     task:
@@ -330,7 +330,7 @@ Fixes:
 #### idumb-project-researcher
 ```yaml
 Current:
-  mode: subagent
+  mode: all
   scope: project
   permission:
     task:
@@ -353,7 +353,7 @@ Fixes:
 #### idumb-phase-researcher
 ```yaml
 Current:
-  mode: subagent
+  mode: all
   scope: project
   permission:
     task:
@@ -376,7 +376,7 @@ Fixes:
 #### idumb-research-synthesizer
 ```yaml
 Current:
-  mode: subagent
+  mode: all
   scope: project
   permission:
     task:
@@ -399,7 +399,7 @@ Fixes:
 #### idumb-codebase-mapper
 ```yaml
 Current:
-  mode: subagent
+  mode: all
   scope: project
   permission:
     task:
@@ -427,7 +427,7 @@ Fixes:
 #### idumb-planner
 ```yaml
 Current:
-  mode: subagent
+  mode: all
   scope: bridge
   permission:
     task:
@@ -447,7 +447,7 @@ Verdict: ✅ CORRECT
 #### idumb-plan-checker
 ```yaml
 Current:
-  mode: subagent
+  mode: all
   scope: bridge
   permission:
     task:
@@ -467,7 +467,7 @@ Verdict: ✅ CORRECT
 #### idumb-integration-checker
 ```yaml
 Current:
-  mode: subagent
+  mode: all
   scope: bridge
   permission:
     task:
@@ -511,7 +511,7 @@ Verdict: ✅ CORRECT
 **Key Insight:**
 - META agents handle the iDumb framework itself
 - PROJECT agents handle the user's actual project code
-- PROJECT agents delegate file writes to `general` subagent, NOT `idumb-builder`
+- PROJECT agents delegate file writes to `general` all, NOT `idumb-builder`
 
 ### 4.2 Missing Agents
 
@@ -520,7 +520,7 @@ The current hierarchy is missing 3 critical agents:
 #### Missing Agent 1: idumb-skeptic-validator
 ```yaml
 Purpose: Questions assumptions and challenges conclusions
-Mode: subagent
+Mode: all
 Scope: bridge
 Role: 
   - Reviews plans and research for logical flaws
@@ -543,7 +543,7 @@ Tools:
 #### Missing Agent 2: idumb-project-explorer
 ```yaml
 Purpose: Uses innate explorer for project analysis
-Mode: subagent
+Mode: all
 Scope: project
 Role:
   - Explores unfamiliar codebases
@@ -608,9 +608,9 @@ Tools:
 | Agent | Current Issue | Fix Required | Priority |
 |-------|---------------|--------------|----------|
 | **idumb-supreme-coordinator** | `bash: "*": deny` too broad | Add specific bash allows | High |
-| **idumb-low-validator** | `mode: all` should be `subagent` | Change mode | Medium |
+| **idumb-low-validator** | `mode: all` should be `all` | Change mode | Medium |
 | **idumb-low-validator** | `task: "*": deny` | Remove task permission | High |
-| **idumb-builder** | `mode: all` should be `subagent` | Change mode | Medium |
+| **idumb-builder** | `mode: all` should be `all` | Change mode | Medium |
 | **idumb-builder** | `task: "*": deny` | Remove task permission | High |
 | **idumb-roadmapper** | `task: "*": deny` | Add specific allows | High |
 | **idumb-project-researcher** | `task: "*": deny` | Add specific allows | High |
@@ -646,7 +646,7 @@ permission:
     "*": deny
 
 # AFTER (correct)
-mode: subagent
+mode: all
 permission:
   # Remove task entirely - leaf node doesn't spawn agents
   # OR: task: {} (empty object)
@@ -661,7 +661,7 @@ permission:
     "*": deny
 
 # AFTER (correct)
-mode: subagent
+mode: all
 permission:
   # Remove task entirely - leaf node doesn't spawn agents
 ```
@@ -689,8 +689,8 @@ permission:
 
 | Agent | Current Mode | New Mode | Current Scope | New Scope | Reason |
 |-------|--------------|----------|---------------|-----------|--------|
-| idumb-low-validator | all | **subagent** | meta | meta | Leaf node, no delegation |
-| idumb-builder | all | **subagent** | meta | meta | Leaf node, no delegation |
+| idumb-low-validator | all | **all** | meta | meta | Leaf node, no delegation |
+| idumb-builder | all | **all** | meta | meta | Leaf node, no delegation |
 
 ---
 
@@ -701,7 +701,7 @@ permission:
 ```yaml
 ---
 description: "Questions assumptions and challenges conclusions to prevent confirmation bias"
-mode: subagent
+mode: all
 scope: bridge
 temperature: 0.2
 permission:
@@ -769,7 +769,7 @@ skeptic_review:
 ```yaml
 ---
 description: "Explores unfamiliar codebases using innate explorer for initial context gathering"
-mode: subagent
+mode: all
 scope: project
 temperature: 0.2
 permission:
@@ -915,16 +915,16 @@ Sits between high-governance and project agents to:
 idumb-supreme-coordinator (primary, bridge)
   └─→ idumb-high-governance (all, meta)
         ├─→ idumb-mid-coordinator (all, bridge) [NEW]
-        │     ├─→ idumb-executor (subagent, project)
-        │     ├─→ idumb-planner (subagent, bridge)
-        │     ├─→ idumb-project-researcher (subagent, project)
-        │     ├─→ idumb-project-explorer (subagent, project) [NEW]
-        │     └─→ idumb-skeptic-validator (subagent, bridge) [NEW]
-        ├─→ idumb-verifier (subagent, project)
-        ├─→ idumb-debugger (subagent, project)
-        ├─→ idumb-integration-checker (subagent, bridge)
-        ├─→ idumb-low-validator (subagent, meta) [LEAF]
-        └─→ idumb-builder (subagent, meta) [LEAF]
+        │     ├─→ idumb-executor (all, project)
+        │     ├─→ idumb-planner (all, bridge)
+        │     ├─→ idumb-project-researcher (all, project)
+        │     ├─→ idumb-project-explorer (all, project) [NEW]
+        │     └─→ idumb-skeptic-validator (all, bridge) [NEW]
+        ├─→ idumb-verifier (all, project)
+        ├─→ idumb-debugger (all, project)
+        ├─→ idumb-integration-checker (all, bridge)
+        ├─→ idumb-low-validator (all, meta) [LEAF]
+        └─→ idumb-builder (all, meta) [LEAF]
 ```
 
 ---
@@ -933,9 +933,9 @@ idumb-supreme-coordinator (primary, bridge)
 
 ### Phase 1: Fix Existing Agents
 - [ ] Fix idumb-supreme-coordinator bash permissions
-- [ ] Fix idumb-low-validator mode (all → subagent)
+- [ ] Fix idumb-low-validator mode (all → all)
 - [ ] Remove idumb-low-validator task permission
-- [ ] Fix idumb-builder mode (all → subagent)
+- [ ] Fix idumb-builder mode (all → all)
 - [ ] Remove idumb-builder task permission
 - [ ] Fix idumb-roadmapper task permissions
 - [ ] Fix idumb-project-researcher task permissions
@@ -979,7 +979,7 @@ Use `idumb-high-governance`, `idumb-executor`, and `idumb-verifier` as reference
 
 ## Sources
 
-1. [Session Handoff: Permission Manipulation Mastery](/Users/apple/Documents/coding-projects/idumb/.idumb/brain/SESSION-HANDOFF-2026-02-03-PERMISSION-MANIPULATION.md) - Task 4 requirements
+1. [Session Handoff: Permission Manipulation Mastery](/Users/apple/Documents/coding-projects/idumb/.idumb/idumb-brain/SESSION-HANDOFF-2026-02-03-PERMISSION-MANIPULATION.md) - Task 4 requirements
 2. [iDumb Core Plugin](/Users/apple/Documents/coding-projects/idumb/template/plugins/idumb-core.ts) - Tool permission tiers
 3. [AGENTS.md](/Users/apple/Documents/coding-projects/idumb/AGENTS.md) - Agent hierarchy documentation
 4. All 15 agent profiles in `/Users/apple/Documents/coding-projects/idumb/template/agents/`

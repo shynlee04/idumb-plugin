@@ -1,5 +1,7 @@
 ---
 name: plan-template
+id: tpl-plan
+parent: templates
 description: "Template for phase execution plans (PLAN.md)"
 type: template
 version: 0.1.0

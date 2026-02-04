@@ -4,7 +4,7 @@ version: "0.1.0"
 created: "2026-02-03"
 purpose: "Document coding conventions, style guidelines, and patterns to follow"
 consumed_by: ["idumb-codebase-mapper", "idumb-builder", "idumb-planner"]
-produces: ".idumb/codebase/CONVENTIONS.md"
+produces: ".idumb/idumb-project-output/codebase/CONVENTIONS.md"
 validation:
   required_fields: ["code_style", "patterns", "anti_patterns", "examples"]
   schema: "codebase-conventions-schema-v1"

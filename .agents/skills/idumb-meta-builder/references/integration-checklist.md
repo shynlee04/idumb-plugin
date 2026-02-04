@@ -16,14 +16,14 @@ agent_permissions:
     tools: ["idumb-state", "idumb-validate", "idumb-todo"]
 
   validator:
-    mode: "subagent"
+    mode: "all"
     can_delegate: false
     can_write: false
     can_read: true
     tools: ["grep", "glob", "read", "idump-validate"]
 
   builder:
-    mode: "subagent"
+    mode: "all"
     can_delegate: false
     can_write: true
     can_bash: true
@@ -56,7 +56,7 @@ rules:
   agent_mode_matches:
     check: "Agent mode compatible with delegation"
     coordinator_mode: ["primary", "all"]
-    worker_mode: ["subagent"]
+    worker_mode: ["all"]
 
   permission_sufficient:
     check: "Agent has permission for required action"
@@ -146,7 +146,7 @@ command_schema:
 
   optional_fields:
     - triggers: "When command auto-triggers"
-    - mode: "Subagent mode"
+    - mode: "all mode"
     - permission: "Permission overrides"
 ```
 
@@ -239,7 +239,7 @@ modify_validation:
 
   backup_before:
     check: "Backup created if file is critical"
-    critical_files: [".idumb/brain/state.json", ".idump/config.json"]
+    critical_files: [".idumb/idumb-brain/state.json", ".idump/config.json"]
 
   atomic_operation:
     check: "Modify is atomic (write temp, then move)"

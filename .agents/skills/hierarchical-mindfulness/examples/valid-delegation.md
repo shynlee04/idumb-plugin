@@ -15,7 +15,7 @@ delegation_depth: 0
 session_state: "Active (idle 15 minutes)"
 
 position_assessment:
-  state_read: ".idumb/brain/state.json"
+  state_read: ".idumb/idumb-brain/state.json"
   current_phase: "Phase 3 - Implementation"
   governance_level: "standard"
   active_anchors: 3 critical, 2 high
@@ -175,7 +175,7 @@ synthesis:
 ## Key Mindfulness Elements
 
 1. **Position Awareness**: Coordinator knows it's Level 1, delegates to Level 2
-2. **Context Injection**: Phase, anchors, and state provided to subagents
+2. **Context Injection**: Phase, anchors, and state provided to alls
 3. **Tracking**: All delegations have IDs for traceability
 4. **Acceptance Criteria**: Clear validation requirements before building
 5. **Return Path**: Each level returns appropriate format for its parent

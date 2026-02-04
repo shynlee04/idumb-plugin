@@ -49,7 +49,7 @@ interface SessionMetadata {
 }
 ```
 
-**Purpose:** Persistent metadata stored in `.idumb/sessions/{sessionId}.json`
+**Purpose:** Persistent metadata stored in `.idumb/idumb-brain/sessions/{sessionId}.json`
 
 ### 1.3 Session Events Currently Handled
 
@@ -155,7 +155,7 @@ interface StallDetection {
 - No rollback mechanism for partial execution
 - No checkpoint on abort
 - No "resume from interruption" capability
-- Level 2/3 subagent sessions would be orphaned
+- Level 2/3 all sessions would be orphaned
 
 #### S5: New Session Manipulation
 **Current:**
@@ -178,10 +178,10 @@ interface StallDetection {
 Level 1: User ↔ Primary agent (supreme-coordinator)
     │    ← User CAN intervene here
     │
-Level 2: Primary → Subagent (high-governance, executor, etc.)
+Level 2: Primary → all (high-governance, executor, etc.)
     │    ← User CANNOT intervene here
     │
-Level 3: Subagent → Leaf (builder, validator)
+Level 3: all → Leaf (builder, validator)
          ← User CANNOT intervene here
 ```
 
@@ -227,7 +227,7 @@ if (toolName === "task") {
 1. **Parent-Child Session Linking:**
    - When `supreme-coordinator` spawns `high-governance`, a new session is created
    - No `parentSession` ID propagation
-   - Cannot trace: "which primary session spawned this subagent?"
+   - Cannot trace: "which primary session spawned this all?"
 
 2. **Level Detection:**
    - No way to determine: "is this session L1, L2, or L3?"
@@ -252,7 +252,7 @@ if (toolName === "task") {
 | ID | Gap | Impact | Priority |
 |----|-----|--------|----------|
 | G1 | No explicit `sessionState` field | Cannot determine current state for state machine | **P0** |
-| G2 | No user interruption detection (S4) | Orphaned subagent sessions, no rollback | **P0** |
+| G2 | No user interruption detection (S4) | Orphaned all sessions, no rollback | **P0** |
 | G3 | `popDelegationDepth()` never called | Depth counter keeps growing incorrectly | **P1** |
 | G4 | No parent-child session linking | Cannot trace delegation graph | **P1** |
 | G5 | L2/L3 sessions not distinguishable | Cannot enforce "user-L1-only" rule | **P1** |
@@ -320,7 +320,7 @@ if (toolName === "task") {
 ┌──────────────────────────────────────────────────────────────────────────────┐
 │                                                                              │
 │   ┌─────────────────────────────────────────────────────────────────────┐   │
-│   │                    SUBAGENT SESSIONS (L2)                           │   │
+│   │                    all SESSIONS (L2)                           │   │
 │   │                                                                     │   │
 │   │   supreme-coordinator ───task()───▶ high-governance (new session)  │   │
 │   │                        ├──task()───▶ executor (new session)        │   │
@@ -419,7 +419,7 @@ if (toolName === "task") {
     parentMetadata.childSessions = parentMetadata.childSessions || []
     parentMetadata.childSessions.push({
       sessionId: childSessionId,
-      agent: output.args?.subagent_type,
+      agent: output.args?.all_type,
       createdAt: new Date().toISOString()
     })
     // ... save ...
@@ -446,7 +446,7 @@ interface SessionMetadata {
 **Determine level based on:**
 - L1: `parentSession === null`
 - L2: `parentSession !== null` AND `parentAgentRole` is coordinator
-- L3: `parentSession !== null` AND `parentAgentRole` is subagent (executor, etc.)
+- L3: `parentSession !== null` AND `parentAgentRole` is all (executor, etc.)
 
 ### 6.2 Medium-Term Fixes (P2)
 
@@ -548,8 +548,8 @@ export const sessionCreate = tool({
    - Lines 3188-3197: Task completion handling (missing pop)
 
 2. Session metadata samples:
-   - `.idumb/sessions/ses_3df5bab97ffe5TUBJ7KEU2z6x8.json`
-   - `.idumb/sessions/ses_newproj_001.json`
+   - `.idumb/idumb-brain/sessions/ses_3df5bab97ffe5TUBJ7KEU2z6x8.json`
+   - `.idumb/idumb-brain/sessions/ses_newproj_001.json`
 
 ---
 

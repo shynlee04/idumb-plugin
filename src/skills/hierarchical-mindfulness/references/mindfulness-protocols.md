@@ -8,7 +8,7 @@ Before ANY delegation, verify:
 
 ```yaml
 position_assessment:
-  - "Read .idumb/brain/state.json"
+  - "Read .idumb/idumb-brain/state.json"
   - "Identify current phase"
   - "Check delegation depth (< 5)"
   - "Verify agent role matches permissions"

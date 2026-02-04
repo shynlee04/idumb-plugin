@@ -378,20 +378,20 @@ function checkIfResumedSession(sessionId: string, directory: string): boolean {
 
 | Aspect | Details |
 |--------|---------|
-| Scope | First subagent spawned by coordinator |
+| Scope | First all spawned by coordinator |
 | Agents | `idumb-high-governance`, `idumb-mid-coordinator`, etc. |
 | Tracking | `tracker.delegationDepth++`, `trackDelegationDepth()` |
 | Spawn Tracking | `trackAgentSpawn()` updates execution metrics |
 | Parent Link | Potentially set via `tracker.parentSession` |
 
 ### Level 2+: Nested Delegations
-**User Control:** OPAQUE (user doesn't see subagent work directly)
+**User Control:** OPAQUE (user doesn't see all work directly)
 **Enforcement Level:** LOG ONLY (in current implementation)
 **Interception Possible:** Limited - mainly logging
 
 | Aspect | Details |
 |--------|---------|
-| Scope | Subagents spawning subagents |
+| Scope | alls spawning alls |
 | Max Depth | 3 (enforced via `trackDelegationDepth()`) |
 | Violation | `MAX_DELEGATION_DEPTH_EXCEEDED` triggers emergency halt |
 | Pop Mechanism | `popDelegationDepth()` called on task completion |
@@ -416,7 +416,7 @@ Line 3195 shows `popDelegationDepth(sessionId)` is now called in `tool.execute.a
 - `edit: deny`, `write: deny`
 
 ### 5.2 `all` Mode
-**Definition:** Can be used at any hierarchy level (top-level or subagent)
+**Definition:** Can be used at any hierarchy level (top-level or all)
 **Agents:**
 - `idumb-high-governance`
 - `idumb-mid-coordinator`
@@ -428,7 +428,7 @@ Line 3195 shows `popDelegationDepth(sessionId)` is now called in `tool.execute.a
 - `bash: allow` for tests and git, deny for others
 - `edit: deny`, `write: deny`
 
-### 5.3 `subagent` Mode
+### 5.3 `all` Mode
 **Definition:** Hidden, delegated to by higher agents, not user-invocable
 **Agents:** (15 agents)
 - `idumb-builder` (LEAF - can write)
@@ -548,7 +548,7 @@ These entities can emulate or adjust context:
 │                    Tier 3: Leaf Nodes                                │
 │  ┌──────────────────────────┐  ┌──────────────────────────┐         │
 │  │     idumb-builder        │  │   idumb-low-validator    │         │
-│  │     mode: subagent       │  │     mode: subagent       │         │
+│  │     mode: all       │  │     mode: all       │         │
 │  │     scope: meta          │  │     scope: meta          │         │
 │  │  ┌─────────────────────┐ │  │  ┌─────────────────────┐ │         │
 │  │  │ ONLY agent that can │ │  │  │ Read-only validation│ │         │
@@ -631,8 +631,8 @@ These entities can emulate or adjust context:
 
 | Directory | File Count | Status |
 |-----------|------------|--------|
-| `.idumb/sessions/` | 190+ session files | GC tool exists, waiting for 7-day age |
-| `.idumb/execution/halt-*/` | 49+ halt checkpoints | GC tool exists, waiting for 7-day age |
+| `.idumb/idumb-brain/sessions/` | 190+ session files | GC tool exists, waiting for 7-day age |
+| `.idumb/idumb-brain/execution/halt-*/` | 49+ halt checkpoints | GC tool exists, waiting for 7-day age |
 
 ---
 

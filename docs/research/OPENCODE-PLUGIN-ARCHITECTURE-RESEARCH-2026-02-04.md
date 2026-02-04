@@ -180,7 +180,7 @@ Top-level orchestration agent that delegates all work.
 
 **Required Frontmatter Fields:**
 - `description` (required): Brief description of agent
-- `mode` (optional): "primary" | "subagent" | "all"
+- `mode` (optional): "primary" | "all" | "all"
 - `temperature` (optional): 0.0-1.0 (default: model-specific)
 - `model` (optional): Override model (format: provider/model-id)
 - `prompt` (optional): Path to custom system prompt file
@@ -255,13 +255,13 @@ Top-level orchestration agent that delegates all work.
 | Type | Mode | Can Delegate | Description |
 |------|-------|--------------|-------------|
 | Primary | `primary` | Yes (via task tool, @mention) | Main conversational agents |
-| Subagent | `subagent` | No (leaf node) | Specialized assistants |
+| all | `all` | No (leaf node) | Specialized assistants |
 
 **Built-in Agents:**
 - **Build** (primary): Full tool access, standard for development
 - **Plan** (primary): Restricted, analysis and planning only
-- **General** (subagent): Multi-step tasks, full access
-- **Explore** (subagent): Read-only exploration
+- **General** (all): Multi-step tasks, full access
+- **Explore** (all): Read-only exploration
 
 **Delegation Patterns:**
 
@@ -290,12 +290,12 @@ Top-level orchestration agent that delegates all work.
 - `temperature`: 0.0-1.0 (lower = more focused, higher = more creative)
 - `maxSteps` (deprecated, use `steps`): Limit agentic iterations
 - `disable`: Hide agent from UI
-- `hidden`: Remove from @autocomplete (subagents only)
+- `hidden`: Remove from @autocomplete (alls only)
 - `model`: Override default model
 - `tools`: Enable/disable specific tools
 - `permission`: Granular permission control
-- `task`: Control which subagents can be invoked
-- `subtask`: Force subagent invocation
+- `task`: Control which alls can be invoked
+- `subtask`: Force all invocation
 - `color`: UI hex color
 - `top_p`: Response diversity (0.0-1.0)
 
@@ -344,7 +344,7 @@ Focus on failing tests and suggest fixes.
 - `agent`: Which agent should execute command
 - `model`: Override model for this command
 - `template`: Prompt template (for JSON config)
-- `subtask`: Force subagent invocation
+- `subtask`: Force all invocation
 
 ### 3.3 Command Execution Flow
 
@@ -540,16 +540,16 @@ function writeState(directory: string, config: Config): void {
 ```
 
 **Directory Paths for State:**
-- `.idumb/brain/state.json` - Governance state
-- `.idumb/config.json` - Configuration
-- `.idumb/governance/` - Validation reports
-- `.idumb/anchors/` - Persistent context
+- `.idumb/idumb-brain/state.json` - Governance state
+- `.idumb/idumb-brain/config.json` - Configuration
+- `.idumb/idumb-brain/governance/` - Validation reports
+- `.idumb/idumb-brain/anchors/` - Persistent context
 
 ### 5.2 Context Sharing Across Agents
 
 **Agent Delegation Context:**
 ```typescript
-// Agent spawns subagent with context
+// Agent spawns all with context
 const taskResult = await context.client.task.invoke({
   agent: "idumb-builder",
   input: {
@@ -808,9 +808,9 @@ export const validateStructure = tool({
     
     // Check required files exist
     const requiredFiles = [
-      ".idumb/brain/state.json",
-      ".idumb/config.json",
-      ".idumb/governance/"
+      ".idumb/idumb-brain/state.json",
+      ".idumb/idumb-brain/config.json",
+      ".idumb/idumb-brain/governance/"
     ]
     
     for (const file of requiredFiles) {
@@ -1983,8 +1983,8 @@ You are initializing iDumb governance for this project.
 
 1. **Check for existing setup**
    - Use `glob` to check for `.idumb/` directory
-   - Read `.idumb/brain/state.json` if exists
-   - Read `.idumb/config.json` if exists
+   - Read `.idumb/idumb-brain/state.json` if exists
+   - Read `.idumb/idumb-brain/config.json` if exists
 
 2. **Detect project context**
    - Check for `.planning/` directory (planning indicator)
@@ -1996,17 +1996,17 @@ You are initializing iDumb governance for this project.
 
 3. **Create iDumb governance structure**
    **DELEGATE TO @idumb-builder** to create:
-   - `.idumb/brain/`
-   - `.idumb/brain/history/`
-   - `.idumb/brain/context/`
-   - `.idumb/governance/`
-   - `.idumb/governance/validations/`
-   - `.idumb/anchors/`
-   - `.idumb/sessions/`
+   - `.idumb/idumb-brain/`
+   - `.idumb/idumb-brain/history/`
+   - `.idumb/idumb-brain/context/`
+   - `.idumb/idumb-brain/governance/`
+   - `.idumb/idumb-brain/governance/validations/`
+   - `.idumb/idumb-brain/anchors/`
+   - `.idumb/idumb-brain/sessions/`
 
 4. **Initialize state files**
    **DELEGATE TO @idumb-builder** to create:
-   - `.idumb/brain/state.json` with template:
+   - `.idumb/idumb-brain/state.json` with template:
      ```json
      {
        "version": "0.2.0",
@@ -2019,7 +2019,7 @@ You are initializing iDumb governance for this project.
        "history": []
      }
      ```
-   - `.idumb/config.json` with template:
+   - `.idumb/idumb-brain/config.json` with template:
      ```json
      {
        "version": "0.2.0",
@@ -2036,14 +2036,14 @@ You are initializing iDumb governance for this project.
          "autoValidation": true
        },
        "paths": {
-         "state": ".idumb/brain/state.json",
-         "brain": ".idumb/brain/",
-         "history": ".idumb/brain/history/",
-         "context": ".idumb/brain/context/",
-         "governance": ".idumb/governance/",
-         "validations": ".idumb/governance/validations/",
-         "anchors": ".idumb/anchors/",
-         "sessions": ".idumb/sessions/",
+         "state": ".idumb/idumb-brain/state.json",
+         "brain": ".idumb/idumb-brain/",
+         "history": ".idumb/idumb-brain/history/",
+         "context": ".idumb/idumb-brain/context/",
+         "governance": ".idumb/idumb-brain/governance/",
+         "validations": ".idumb/idumb-brain/governance/validations/",
+         "anchors": ".idumb/idumb-brain/anchors/",
+         "sessions": ".idumb/idumb-brain/sessions/",
          "planning": ".planning/",
          "roadmap": ".planning/ROADMAP.md",
          "planningState": ".planning/STATE.md"
@@ -2054,8 +2054,8 @@ You are initializing iDumb governance for this project.
 5. **Validate structure AND planning completeness**
    **DELEGATE TO @idumb-low-validator** to verify:
    - `.idumb/` directory exists
-   - `.idumb/brain/state.json` exists AND is valid JSON
-   - `.idumb/config.json` exists AND is valid JSON
+   - `.idumb/idumb-brain/state.json` exists AND is valid JSON
+   - `.idumb/idumb-brain/config.json` exists AND is valid JSON
    - At least 1 anchor exists
    - History has at least 1 entry
    - IF planning detected: Check required planning files exist
@@ -2118,7 +2118,7 @@ else
 1. **NEVER create files directly** - You have write: false, edit: false. You MUST delegate all file operations to @idumb-builder.
 2. **ALWAYS delegate validation to @idumb-low-validator** - Validation work requires read-only access.
 3. **ALWAYS track delegations** - Know who did what, when.
-4. **ALWAYS read state first** - Check .idumb/brain/state.json before acting.
+4. **ALWAYS read state first** - Check .idumb/idumb-brain/state.json before acting.
 5. **ALWAYS use todoread first** - Check TODOs before any action.
 ```
 

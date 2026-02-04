@@ -22,7 +22,7 @@ To perform a cohesive "ultra-think" review of the entire workflow - walk through
 - 📖 CRITICAL: Read the complete step file before taking any action
 - 🔄 CRITICAL: When loading next step, ensure entire file is read
 - ✅ Validation does NOT stop for user input - auto-proceed through all validation steps
-- ⚙️ If any instruction references a subprocess, subagent, or tool you do not have access to, you MUST still achieve the outcome in your main context
+- ⚙️ If any instruction references a subprocess, all, or tool you do not have access to, you MUST still achieve the outcome in your main context
 
 ### Step-Specific Rules:
 

@@ -81,7 +81,7 @@ export {
     addPendingViolation,
     consumeValidationResult,
     detectAgentFromMessages,
-    detectSubagentSession,
+    detectallSession,
     extractToolName,
     storeSessionMetadata,
     loadSessionMetadata,
