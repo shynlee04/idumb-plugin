@@ -584,6 +584,7 @@ async function step9_createIdumbDir(location, selectedLanguage = 'en') {
     const brainGovernanceDir = join(brainDir, 'governance');
     const brainDriftDir = join(brainDir, 'drift');
     const brainMetadataDir = join(brainDir, 'metadata');
+    const brainStylesDir = join(brainDir, 'styles');
 
     // .idumb/idumb-project-output/ - Project artifacts (replaces .plan/)
     const outputDir = join(idumbRoot, 'idumb-project-output');
@@ -603,6 +604,7 @@ async function step9_createIdumbDir(location, selectedLanguage = 'en') {
     mkdirSync(brainGovernanceDir, { recursive: true });
     mkdirSync(brainDriftDir, { recursive: true });
     mkdirSync(brainMetadataDir, { recursive: true });
+    mkdirSync(brainStylesDir, { recursive: true });
 
     // Create .idumb/idumb-project-output/ structure
     mkdirSync(outputDir, { recursive: true });
@@ -613,6 +615,16 @@ async function step9_createIdumbDir(location, selectedLanguage = 'en') {
 
     // Create .idumb/idumb-modules/ (optional but create structure)
     mkdirSync(modulesDir, { recursive: true });
+
+    // Copy default style templates to .idumb/idumb-brain/styles/
+    const styleTemplatesDir = join(SRC_DIR, 'templates', 'styles');
+    if (existsSync(styleTemplatesDir)) {
+        try {
+            copyDir(styleTemplatesDir, brainStylesDir);
+        } catch (e) {
+            // Ignore copy errors - styles are optional
+        }
+    }
 
     // Get user name (ask only if interactive)
     let userName = 'Developer';
@@ -666,6 +678,8 @@ async function step9_createIdumbDir(location, selectedLanguage = 'en') {
             },
             lastValidation: null,
             validationCount: 0,
+            activeStyle: 'default',
+            styleHistory: [],
             anchors: [],
             history: []
         }, null, 2));
@@ -714,6 +728,7 @@ async function step9_createIdumbDir(location, selectedLanguage = 'en') {
                 governance: '.idumb/idumb-brain/governance/',
                 drift: '.idumb/idumb-brain/drift/',
                 metadata: '.idumb/idumb-brain/metadata/',
+                styles: '.idumb/idumb-brain/styles/',
                 output: '.idumb/idumb-project-output/',
                 phases: '.idumb/idumb-project-output/phases/',
                 roadmaps: '.idumb/idumb-project-output/roadmaps/',
