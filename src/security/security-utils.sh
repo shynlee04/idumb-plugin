@@ -29,7 +29,6 @@ sanitize_path() {
     path="${path#/}"
     # Remove any remaining dangerous patterns
     path="${path//..//}"
-    path="${path//\//}"
     echo "$path"
 }
 

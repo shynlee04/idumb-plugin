@@ -5,8 +5,8 @@
 set -euo pipefail
 
 atomic_write() {
-    local target_file="$1"
-    local content="$2"
+    local content="$1"
+    local target_file="$2"
     local temp_file="${target_file}.tmp.$$"
     local lock_file="${target_file}.lock"
     local lock_timeout=5
