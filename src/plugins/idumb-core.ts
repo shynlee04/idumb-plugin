@@ -99,7 +99,12 @@ import {
   buildValidationFailureMessage,
   buildViolationGuidance,
   buildPostCompactReminder,
-  buildCompactionContext
+  buildCompactionContext,
+
+  // Style management
+  loadStyle,
+  type StyleContent,
+  cleanupStaleSessions
 } from "./lib"
 
 // Part type for command hook output
@@ -108,14 +113,11 @@ type Part = { type: string; text?: string }
 // Pending denials map (kept in core for event handling)
 const pendingDenials = new Map<string, { agent: string; tool: string; timestamp?: string; shouldBlock?: boolean }>()
 
+// Output style constants
+const MAX_COMPACTION_CONTEXT_CHARS = 3000
+
 // In-memory session trackers (per plugin instance)
-const sessionTrackers = new Map<string, {
-  sessionId: string
-  startTime: Date
-  violationCount: number
-  lastActivity: Date
-  governanceInjected: boolean
-}>()
+const sessionTrackers = new Map<string, SessionTracker>()
 
 export const IdumbCorePlugin: Plugin = async ({ directory, client }) => {
   log(directory, "iDumb plugin initialized")
@@ -147,6 +149,18 @@ export const IdumbCorePlugin: Plugin = async ({ directory, client }) => {
 
           // P3-T3: Initialize stall detection state
           getStallDetectionState(sessionId as string)
+
+          // Initialize output style for this session
+          const styleState = readState(directory)
+          const activeStyle = styleState?.activeStyle || 'default'
+          const tracker = sessionTrackers.get(sessionId as string)
+          if (tracker) {
+            tracker.activeStyle = activeStyle
+            log(directory, `[STYLE] Session ${sessionId} initialized with style: ${activeStyle}`)
+          }
+
+          // Run cleanup on new session creation (Phase 0)
+          cleanupStaleSessions()
 
           // Phase 7 - Task 7.4: Validate enforcement.* settings at session start
           // Per Framework Mindset: "Must at least read and loaded by LLM at starting runtime"
@@ -266,6 +280,15 @@ export const IdumbCorePlugin: Plugin = async ({ directory, client }) => {
           if (command.startsWith("idumb:") || command.startsWith("idumb-")) {
             addHistoryEntry(directory, `idumb_command:${command}`, "plugin", "pass")
           }
+
+          // Clear style cache when style command executed
+          if (command === "idumb:style" || command.startsWith("idumb:style ")) {
+            log(directory, `[STYLE] Style command detected, clearing all caches`)
+            sessionTrackers.forEach((trk) => {
+              trk.styleCache = undefined
+              // Don't clear activeStyle - let it reload from state on next message
+            })
+          }
         }
 
         // NEW: Session resumed handler
@@ -324,10 +347,87 @@ export const IdumbCorePlugin: Plugin = async ({ directory, client }) => {
         // Append to compaction context (don't replace)
         output.context.push(context)
 
-        log(directory, `Injected ${context.split("\n").length} lines of context`)
+        log(directory, `Injected ${context.split("\\n").length} lines of context`)
+
+        // Preserve active style across compaction (minimal format)
+        const styleState = readState(directory)
+        if (styleState?.activeStyle && styleState.activeStyle !== 'default') {
+          // Check budget before adding
+          const currentSize = output.context.join('').length
+          const styleNote = `\n[Active Style: ${styleState.activeStyle}]`
+          
+          if (currentSize + styleNote.length < MAX_COMPACTION_CONTEXT_CHARS) {
+            output.context.push(styleNote)
+            log(directory, `[STYLE] Preserved '${styleState.activeStyle}' in compaction context`)
+          } else {
+            log(directory, `[STYLE] Skipped style in compaction - budget exceeded`)
+          }
+        }
       } catch (error) {
         // Silent fail with logging - never break OpenCode
         log(directory, `[ERROR] compaction hook failed: ${error instanceof Error ? error.message : String(error)}`)
+      }
+    },
+
+    // ========================================================================
+    // SYSTEM PROMPT TRANSFORMATION (Output Style Injection)
+    // ========================================================================
+
+    "experimental.chat.system.transform": async (
+      input: { sessionID?: string; model?: any },
+      output: { system: string[] }
+    ) => {
+      try {
+        const sessionId = input.sessionID || 'unknown'
+        log(directory, `[STYLE] System transform for session ${sessionId}`)
+
+        // Get session-specific style (from tracker or state)
+        const tracker = sessionTrackers.get(sessionId)
+        let activeStyle = tracker?.activeStyle
+        
+        if (!activeStyle) {
+          // Fall back to state.json
+          const state = readState(directory)
+          activeStyle = state?.activeStyle || 'default'
+          
+          // Cache in tracker for future messages
+          if (tracker) {
+            tracker.activeStyle = activeStyle
+          }
+        }
+
+        // Skip injection for default style (no extra instructions)
+        if (activeStyle === 'default') {
+          log(directory, `[STYLE] Default style, skipping injection`)
+          return
+        }
+
+        // Idempotency check - use unique marker
+        const STYLE_MARKER = `<!-- IDUMB:STYLE:${activeStyle} -->`
+        if (output.system.some((s: string) => s.includes('<!-- IDUMB:STYLE:'))) {
+          log(directory, `[STYLE] Already injected, skipping`)
+          return
+        }
+
+        // Load from cache or parse file
+        let styleContent: StyleContent | null | undefined = tracker?.styleCache
+        if (!styleContent) {
+          styleContent = loadStyle(directory, activeStyle)
+          
+          if (styleContent && tracker) {
+            tracker.styleCache = styleContent
+          }
+        }
+
+        // Inject with marker
+        if (styleContent?.instructions) {
+          const injection = `${STYLE_MARKER}\n\n## Output Style: ${activeStyle}\n\n${styleContent.instructions}`
+          output.system.push(injection)
+          log(directory, `[STYLE] Injected '${activeStyle}' (${styleContent.instructions.length} chars)`)
+        }
+      } catch (error) {
+        log(directory, `[ERROR] system.transform failed: ${error instanceof Error ? error.message : String(error)}`)
+        // Graceful degradation - continue without style
       }
     },
 
