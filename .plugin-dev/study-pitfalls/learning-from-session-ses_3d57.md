@@ -69,7 +69,7 @@ The map-codebase command forces specific flows through skill activations:
    - Prevents context overflow from scanning entire codebase
 
 2. **Research Artifact Writing** (`idumb-research-writer`)
-   - Writes structured artifacts to `.idumb/idumb-project-output/codebase/`
+   - Writes structured artifacts to `.idumb/project-output/codebase/`
    - Enables persistent codebase analysis results
 
 </skills>
@@ -90,7 +90,7 @@ if [ ! -d ".idumb" ]; then
 fi
 
 # Check output directory
-mkdir -p .idumb/idumb-project-output/codebase
+mkdir -p .idumb/project-output/codebase
 
 # Verify templates (optional)
 [ -d ".opencode/templates" ] && HAS_TEMPLATES=true
@@ -112,7 +112,7 @@ parallel_scanners:
       - Dependencies (package.json, Cargo.toml, go.mod, etc.)
       - Build tools and configuration
       - Runtime requirements
-    output: .idumb/idumb-project-output/codebase/tech-stack.json
+    output: .idumb/project-output/codebase/tech-stack.json
 
   arch_scanner:
     agent: @idumb-codebase-mapper
@@ -124,7 +124,7 @@ parallel_scanners:
       - Module boundaries
       - Entry points
       - Dependency flow direction
-    output: .idumb/idumb-project-output/codebase/architecture.json
+    output: .idumb/project-output/codebase/architecture.json
 
   quality_scanner:
     agent: @idumb-codebase-mapper
@@ -136,7 +136,7 @@ parallel_scanners:
       - Linting configuration
       - Type safety (TypeScript strict, etc.)
       - Documentation coverage
-    output: .idumb/idumb-project-output/codebase/quality.json
+    output: .idumb/project-output/codebase/quality.json
 
   concerns_scanner:
     agent: @idumb-codebase-mapper
@@ -149,7 +149,7 @@ parallel_scanners:
       - Circular dependencies
       - Security anti-patterns
       - Outdated dependencies
-    output: .idumb/idumb-project-output/codebase/concerns.json
+    output: .idumb/project-output/codebase/concerns.json
 ```
 
 **Scanner Execution:**
@@ -170,7 +170,7 @@ Wait for all scanners to complete and validate outputs.
 ```bash
 # Verify all outputs exist
 for focus in tech arch quality concerns; do
-  file=".idumb/idumb-project-output/codebase/${focus}.json"
+  file=".idumb/project-output/codebase/${focus}.json"
   if [ ! -f "$file" ]; then
     echo "WARNING: Scanner output missing: $file"
   fi
@@ -258,11 +258,11 @@ Task: Generate codebase documentation
 Template: (if available) .opencode/templates/codebase-docs.md
 
 Generate:
-  - .idumb/idumb-project-output/codebase/README.md (overview)
-  - .idumb/idumb-project-output/codebase/tech-stack.md
-  - .idumb/idumb-project-output/codebase/architecture.md
-  - .idumb/idumb-project-output/codebase/quality-report.md
-  - .idumb/idumb-project-output/codebase/concerns-report.md
+  - .idumb/project-output/codebase/README.md (overview)
+  - .idumb/project-output/codebase/tech-stack.md
+  - .idumb/project-output/codebase/architecture.md
+  - .idumb/project-output/codebase/quality-report.md
+  - .idumb/project-output/codebase/concerns-report.md
 ```
 
 ## Step 7: Create Anchors for Critical Findings
@@ -295,7 +295,7 @@ result: "pass"
 
 ## Codebase Map JSON Structure
 
-**Path:** `.idumb/idumb-project-output/codebase/codebase-map.json`
+**Path:** `.idumb/project-output/codebase/codebase-map.json`
 
 ```json
 {
@@ -389,12 +389,12 @@ result: "pass"
   └── Low: 12 (style issues)
 
   Output:
-  ├── .idumb/idumb-project-output/codebase/codebase-map.json
-  ├── .idumb/idumb-project-output/codebase/README.md
-  ├── .idumb/idumb-project-output/codebase/tech-stack.md
-  ├── .idumb/idumb-project-output/codebase/architecture.md
-  ├── .idumb/idumb-project-output/codebase/quality-report.md
-  └── .idumb/idumb-project-output/codebase/concerns-report.md
+  ├── .idumb/project-output/codebase/codebase-map.json
+  ├── .idumb/project-output/codebase/README.md
+  ├── .idumb/project-output/codebase/tech-stack.md
+  ├── .idumb/project-output/codebase/architecture.md
+  ├── .idumb/project-output/codebase/quality-report.md
+  └── .idumb/project-output/codebase/concerns-report.md
 
   Next:
   1. /idumb:research - Research specific concerns
@@ -441,13 +441,13 @@ result: "pass"
 
 ```bash
 # Verify outputs exist
-ls -la .idumb/idumb-project-output/codebase/
+ls -la .idumb/project-output/codebase/
 
 # Validate JSON syntax
-cat .idumb/idumb-project-output/codebase/codebase-map.json | jq .
+cat .idumb/project-output/codebase/codebase-map.json | jq .
 
 # Check summary
-head -50 .idumb/idumb-project-output/codebase/README.md
+head -50 .idumb/project-output/codebase/README.md
 ```
 
 </success_criteria>
@@ -552,7 +552,7 @@ Tool: bash
 **Input:**
 ```json
 {
-  "command": "if [ -d \".idumb\" ]; then mkdir -p .idumb/idumb-project-output/codebase && echo \"READY\"; else echo \"MISSING_IDUMB\"; fi",
+  "command": "if [ -d \".idumb\" ]; then mkdir -p .idumb/project-output/codebase && echo \"READY\"; else echo \"MISSING_IDUMB\"; fi",
   "description": "Kiểm tra thư mục .idumb và tạo thư mục output"
 }
 ```
@@ -569,7 +569,7 @@ Tool: task
 **Input:**
 ```json
 {
-  "prompt": "Analyze technology stack:\n- Languages and versions\n- Frameworks detected\n- Dependencies (package.json, Cargo.toml, go.mod, etc.)\n- Build tools and configuration\n- Runtime requirements\n\nOutput: .idumb/idumb-project-output/codebase/tech-stack.json",
+  "prompt": "Analyze technology stack:\n- Languages and versions\n- Frameworks detected\n- Dependencies (package.json, Cargo.toml, go.mod, etc.)\n- Build tools and configuration\n- Runtime requirements\n\nOutput: .idumb/project-output/codebase/tech-stack.json",
   "subagent_type": "idumb-codebase-mapper",
   "description": "Phân tích Tech Stack",
   "command": "/idumb:map-codebase tech"
@@ -579,7 +579,7 @@ Tool: task
 ```
 ## Đã hoàn thành phân tích Tech Stack
 
-Tệp JSON đã được tạo tại: `.idumb/idumb-project-output/codebase/tech-stack.json`
+Tệp JSON đã được tạo tại: `.idumb/project-output/codebase/tech-stack.json`
 
 ### Tóm tắt Tech Stack
 
@@ -613,14 +613,14 @@ Tool: task
 ```json
 {
   "description": "Phân tích Architecture",
-  "prompt": "Analyze architecture:\n- Directory structure patterns\n- Layer separation (api, domain, infra)\n- Module boundaries\n- Entry points\n- Dependency flow direction\n\nOutput: .idumb/idumb-project-output/codebase/architecture.json",
+  "prompt": "Analyze architecture:\n- Directory structure patterns\n- Layer separation (api, domain, infra)\n- Module boundaries\n- Entry points\n- Dependency flow direction\n\nOutput: .idumb/project-output/codebase/architecture.json",
   "command": "/idumb:map-codebase arch",
   "subagent_type": "idumb-codebase-mapper"
 }
 ```
 **Output:**
 ```
-Đã hoàn thành phân tích kiến trúc và ghi kết quả vào file `.idumb/idumb-project-output/codebase/architecture.json`.
+Đã hoàn thành phân tích kiến trúc và ghi kết quả vào file `.idumb/project-output/codebase/architecture.json`.
 
 **Tóm tắt kiến trúc:**
 *   **Cấu trúc:** Monorepo-like trong `src/`, kết hợp tổ chức theo tính năng (`components/ide`) và theo lớp (`lib/db`).
@@ -640,7 +640,7 @@ Tool: task
 ```json
 {
   "command": "/idumb:map-codebase quality",
-  "prompt": "Analyze code quality:\n- Test coverage (files, not lines)\n- Test frameworks detected\n- Linting configuration\n- Type safety (TypeScript strict, etc.)\n- Documentation coverage\n\nOutput: .idumb/idumb-project-output/codebase/quality.json",
+  "prompt": "Analyze code quality:\n- Test coverage (files, not lines)\n- Test frameworks detected\n- Linting configuration\n- Type safety (TypeScript strict, etc.)\n- Documentation coverage\n\nOutput: .idumb/project-output/codebase/quality.json",
   "subagent_type": "idumb-codebase-mapper",
   "description": "Phân tích Code Quality"
 }
@@ -667,7 +667,7 @@ Tool: task
     *   **JSDoc**: Mức độ bao phủ thấp trong code (ví dụ: `src/lib/utils.ts` không có comment).
 
 File kết quả đã được lưu tại:
-`.idumb/idumb-project-output/codebase/quality.json`
+`.idumb/project-output/codebase/quality.json`
 
 <task_metadata>
 session_id: ses_3d572b711ffeliQjmTmN6Ci7aj
@@ -683,7 +683,7 @@ Tool: task
 {
   "command": "/idumb:map-codebase concerns",
   "description": "Phân tích Concerns",
-  "prompt": "Identify concerns:\n- TODO/FIXME/HACK comments\n- Large files (>500 lines)\n- Complex functions (high nesting)\n- Circular dependencies\n- Security anti-patterns\n- Outdated dependencies\n\nOutput: .idumb/idumb-project-output/codebase/concerns.json",
+  "prompt": "Identify concerns:\n- TODO/FIXME/HACK comments\n- Large files (>500 lines)\n- Complex functions (high nesting)\n- Circular dependencies\n- Security anti-patterns\n- Outdated dependencies\n\nOutput: .idumb/project-output/codebase/concerns.json",
   "subagent_type": "idumb-codebase-mapper"
 }
 ```
@@ -698,7 +698,7 @@ Tool: task
 
 | Document | Path | Status |
 |----------|------|--------|
-| Concerns Data | `.idumb/idumb-project-output/codebase/concerns.json` | ✅ Created |
+| Concerns Data | `.idumb/project-output/codebase/concerns.json` | ✅ Created |
 
 ### Key Findings
 
@@ -763,7 +763,7 @@ Tool: task
 ```json
 {
   "description": "Tổng hợp kết quả phân tích thành codebase-map.json",
-  "prompt": "Tổng hợp kết quả phân tích codebase từ các file JSON trong `.idumb/idumb-project-output/codebase/` (tech-stack.json, architecture.json, quality.json, concerns.json) thành một file duy nhất `codebase-map.json`.\n\nNhiệm vụ:\n1. Đọc 4 file JSON đầu vào.\n2. Hợp nhất dữ liệu theo chiến lược deep merge.\n3. Xếp hạng ưu tiên các vấn đề (concerns).\n4. Tính toán thống kê tổng hợp.\n5. Ghi kết quả vào `.idumb/idumb-project-output/codebase/codebase-map.json`.\n\nĐảm bảo định dạng JSON hợp lệ và đầy đủ các trường như yêu cầu trong tài liệu lệnh.",
+  "prompt": "Tổng hợp kết quả phân tích codebase từ các file JSON trong `.idumb/project-output/codebase/` (tech-stack.json, architecture.json, quality.json, concerns.json) thành một file duy nhất `codebase-map.json`.\n\nNhiệm vụ:\n1. Đọc 4 file JSON đầu vào.\n2. Hợp nhất dữ liệu theo chiến lược deep merge.\n3. Xếp hạng ưu tiên các vấn đề (concerns).\n4. Tính toán thống kê tổng hợp.\n5. Ghi kết quả vào `.idumb/project-output/codebase/codebase-map.json`.\n\nĐảm bảo định dạng JSON hợp lệ và đầy đủ các trường như yêu cầu trong tài liệu lệnh.",
   "command": "/idumb:map-codebase synthesize",
   "subagent_type": "idumb-research-synthesizer"
 }
@@ -786,7 +786,7 @@ Tool: task
 {
   "command": "/idumb:map-codebase build-docs",
   "description": "Tạo tài liệu Markdown chi tiết từ kết quả phân tích",
-  "prompt": "Tạo tài liệu Markdown chi tiết từ các file JSON phân tích trong `.idumb/idumb-project-output/codebase/`.\n\nNhiệm vụ:\n1. Đọc các file `tech-stack.json`, `architecture.json`, `quality.json`, `concerns.json`.\n2. Tạo các file Markdown tương ứng tại cùng thư mục:\n   - `tech-stack.md`: Chi tiết công nghệ, phiên bản, dependencies.\n   - `architecture.md`: Mô tả cấu trúc, phân lớp, luồng dữ liệu.\n   - `quality-report.md`: Báo cáo coverage, linting, typing.\n   - `concerns-report.md`: Danh sách vấn đề, TODOs, nợ kỹ thuật.\n\nYêu cầu:\n- Sử dụng ngôn ngữ Tiếng Việt.\n- Trình bày rõ ràng, sử dụng bảng và danh sách.\n- Đảm bảo tính chính xác so với dữ liệu JSON nguồn.",
+  "prompt": "Tạo tài liệu Markdown chi tiết từ các file JSON phân tích trong `.idumb/project-output/codebase/`.\n\nNhiệm vụ:\n1. Đọc các file `tech-stack.json`, `architecture.json`, `quality.json`, `concerns.json`.\n2. Tạo các file Markdown tương ứng tại cùng thư mục:\n   - `tech-stack.md`: Chi tiết công nghệ, phiên bản, dependencies.\n   - `architecture.md`: Mô tả cấu trúc, phân lớp, luồng dữ liệu.\n   - `quality-report.md`: Báo cáo coverage, linting, typing.\n   - `concerns-report.md`: Danh sách vấn đề, TODOs, nợ kỹ thuật.\n\nYêu cầu:\n- Sử dụng ngôn ngữ Tiếng Việt.\n- Trình bày rõ ràng, sử dụng bảng và danh sách.\n- Đảm bảo tính chính xác so với dữ liệu JSON nguồn.",
   "subagent_type": "idumb-builder"
 }
 ```
@@ -794,7 +794,7 @@ Tool: task
 ```
 ## FILE CREATED
 
-**Path:** `.idumb/idumb-project-output/codebase/` (4 files)
+**Path:** `.idumb/project-output/codebase/` (4 files)
 **Verified:** ✅ Yes (File system check passed)
 
 Tôi đã hoàn thành việc đọc dữ liệu JSON và tạo 4 file tài liệu Markdown tương ứng. Dưới đây là báo cáo chi tiết:
@@ -865,14 +865,14 @@ Tool: task
   "command": "/idumb:map-codebase build-readme",
   "description": "Tạo README.md tổng hợp cho báo cáo codebase",
   "subagent_type": "idumb-builder",
-  "prompt": "Tạo file `.idumb/idumb-project-output/codebase/README.md` dựa trên dữ liệu từ `codebase-map.json` và các file báo cáo chi tiết.\n\nNội dung cần bao gồm:\n1.  Tiêu đề: \"Báo cáo Phân tích Codebase: vkode-agent\"\n2.  Tổng quan dự án (lấy từ statistics trong map).\n3.  Tóm tắt 4 khía cạnh: Tech Stack, Architecture, Quality, Concerns.\n4.  Liên kết đến các file chi tiết:\n    -   [Tech Stack](./tech-stack.md)\n    -   [Architecture](./architecture.md)\n    -   [Quality Report](./quality-report.md)\n    -   [Concerns Report](./concerns-report.md)\n5.  Các vấn đề cần ưu tiên giải quyết (từ concerns).\n\nSử dụng tiếng Việt. Trình bày chuyên nghiệp."
+  "prompt": "Tạo file `.idumb/project-output/codebase/README.md` dựa trên dữ liệu từ `codebase-map.json` và các file báo cáo chi tiết.\n\nNội dung cần bao gồm:\n1.  Tiêu đề: \"Báo cáo Phân tích Codebase: vkode-agent\"\n2.  Tổng quan dự án (lấy từ statistics trong map).\n3.  Tóm tắt 4 khía cạnh: Tech Stack, Architecture, Quality, Concerns.\n4.  Liên kết đến các file chi tiết:\n    -   [Tech Stack](./tech-stack.md)\n    -   [Architecture](./architecture.md)\n    -   [Quality Report](./quality-report.md)\n    -   [Concerns Report](./concerns-report.md)\n5.  Các vấn đề cần ưu tiên giải quyết (từ concerns).\n\nSử dụng tiếng Việt. Trình bày chuyên nghiệp."
 }
 ```
 **Output:**
 ```
 ## FILE CREATED
 
-**Path:** `.idumb/idumb-project-output/codebase/README.md`
+**Path:** `.idumb/project-output/codebase/README.md`
 **Size:** 3235 bytes
 **Verified:** yes (ls & head check)
 
@@ -995,13 +995,13 @@ Quá trình phân tích toàn diện codebase đã hoàn tất. Dưới đây l�
 
 ### 📂 Output Files
 
-Tất cả báo cáo đã được lưu tại `.idumb/idumb-project-output/codebase/`:
+Tất cả báo cáo đã được lưu tại `.idumb/project-output/codebase/`:
 
-*   📄 [README.md](.idumb/idumb-project-output/codebase/README.md) (Báo cáo tổng hợp)
-*   📄 [tech-stack.md](.idumb/idumb-project-output/codebase/tech-stack.md)
-*   📄 [architecture.md](.idumb/idumb-project-output/codebase/architecture.md)
-*   📄 [quality-report.md](.idumb/idumb-project-output/codebase/quality-report.md)
-*   📄 [concerns-report.md](.idumb/idumb-project-output/codebase/concerns-report.md)
+*   📄 [README.md](.idumb/project-output/codebase/README.md) (Báo cáo tổng hợp)
+*   📄 [tech-stack.md](.idumb/project-output/codebase/tech-stack.md)
+*   📄 [architecture.md](.idumb/project-output/codebase/architecture.md)
+*   📄 [quality-report.md](.idumb/project-output/codebase/quality-report.md)
+*   📄 [concerns-report.md](.idumb/project-output/codebase/concerns-report.md)
 *   🗃️ Các file JSON dữ liệu gốc (`codebase-map.json`, `tech-stack.json`, v.v.)
 
 ### Governance

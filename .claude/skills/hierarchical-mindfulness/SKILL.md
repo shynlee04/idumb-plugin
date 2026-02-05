@@ -101,7 +101,7 @@ Before delegating, verify:
 
 ```yaml
 checklist:
-  1: "Read .idumb/idumb-brain/state.json"
+  1: "Read .idumb/brain/state.json"
   2: "Identify current phase"
   3: "Check delegation depth"
   4: "Verify agent role matches permissions"

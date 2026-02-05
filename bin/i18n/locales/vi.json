@@ -71,19 +71,19 @@
         "number": "2",
         "title": "Cấu Trúc Thư Mục",
         "explanation": "iDumb sẽ tạo cấu trúc sau:",
-        "brain": ".idumb-brain/        ← Bộ não AI (phiên, trạng thái, ngữ cảnh)",
+        "brain": ".idumb/brain/        ← Bộ não AI (phiên, trạng thái, ngữ cảnh)",
         "brainState": "├── state.json       ← Trạng thái quản trị chính",
         "brainSessions": "├── sessions/        ← Lịch sử phiên làm việc",
         "brainContext": "├── context/         ← Bộ nhớ ngữ cảnh",
         "brainDrift": "└── drift/           ← Phát hiện thay đổi",
-        "output": ".idumb-project-output/ ← Artifacts dự án (thay thế .planning/)",
+        "output": ".idumb/project-output/ ← Artifacts dự án (thay thế .planning/)",
         "outputProject": "├── PROJECT.md       ← Định nghĩa dự án",
         "outputRoadmap": "├── ROADMAP.md       ← Lộ trình thực hiện",
         "outputPhases": "└── phases/          ← Kế hoạch từng giai đoạn",
-        "modules": ".idumb-modules/      ← [TÙY CHỌN] Modules mở rộng",
+        "modules": ".idumb/modules/      ← [TÙY CHỌN] Modules mở rộng",
         "modulesNote": "└── (tự động tạo)    ← Tools, templates, skills bổ sung",
         "opencode": ".opencode/           ← Templates framework (chỉ đọc)",
-        "createModules": "Tạo .idumb-modules/ (modules mở rộng)?",
+        "createModules": "Tạo .idumb/modules/ (modules mở rộng)?",
         "prompt": "[y/n]:"
       },
       "governance": {
@@ -219,7 +219,7 @@
         },
         "brain": {
           "number": "11",
-          "title": "Tạo Thư Mục .idumb-brain"
+          "title": "Tạo Thư Mục .idumb/brain"
         }
       }
     },

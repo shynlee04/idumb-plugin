@@ -677,7 +677,7 @@ async function step9_createIdumbDir(location, selectedLanguage = 'en') {
         }
     }
 
-    // Create state.json in .idumb-brain/
+    // Create state.json in .idumb/brain/
     const stateFile = join(brainDir, 'state.json');
     if (!existsSync(stateFile)) {
         writeFileSync(stateFile, JSON.stringify({
@@ -703,7 +703,7 @@ async function step9_createIdumbDir(location, selectedLanguage = 'en') {
         }, null, 2));
     }
 
-    // Create config.json in .idumb-brain/
+    // Create config.json in .idumb/brain/
     const configFile = join(brainDir, 'config.json');
     if (!existsSync(configFile)) {
         writeFileSync(configFile, JSON.stringify({
@@ -855,8 +855,8 @@ async function showComplete(targetDir, location, selectedLanguage = 'en') {
 
     // Read config to show user settings for local install
     if (location.type === 'local') {
-        // Updated to new path: .idumb-brain/config.json
-        const configPath = join(process.cwd(), '.idumb-brain', 'config.json');
+        // Updated to new path: .idumb/brain/config.json
+        const configPath = join(process.cwd(), '.idumb', 'brain', 'config.json');
         let userName = 'Developer';
         let userLang = selectedLanguage === 'vi' ? 'vietnamese' : 'english';
         if (existsSync(configPath)) {
@@ -871,7 +871,7 @@ async function showComplete(targetDir, location, selectedLanguage = 'en') {
             ? '  ├── Experience: guided (mặc định - AI giải thích trước hành động)'
             : '  ├── Experience: guided (default - AI explains before actions)');
         print(`  ├── ${isVi ? 'Ngôn ngữ' : 'Language'}:   ${userLang.charAt(0).toUpperCase() + userLang.slice(1)}`);
-        print(`  └── Config:     .idumb-brain/config.json`);
+        print(`  └── Config:     .idumb/brain/config.json`);
         print('');
     }
 

@@ -17,7 +17,7 @@ Ingest → Classify → Transform → Validate → Integrate → Evolve → (rep
 ```yaml
 validation_failures:
   source: "Validation reports"
-  location: ".idumb/idumb-brain/governance/validations/{report}.json"
+  location: ".idumb/brain/governance/validations/{report}.json"
   contains:
     - "Schema validation errors"
     - "Integration failures"

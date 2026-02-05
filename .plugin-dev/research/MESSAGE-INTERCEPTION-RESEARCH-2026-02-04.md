@@ -215,7 +215,7 @@ Last Validation: ${state?.lastValidation || 'Never'}
 |--------|---------|----------|-----|
 | Long detection | NOT IMPLEMENTED | Word count + file patterns | ❌ MISSING |
 | Accumulated scoring | NOT IMPLEMENTED | Score tracking with decay | ❌ MISSING |
-| Score persistence | NOT IMPLEMENTED | `.idumb/idumb-brain/sessions/{id}-score.json` | ❌ MISSING |
+| Score persistence | NOT IMPLEMENTED | `.idumb/brain/sessions/{id}-score.json` | ❌ MISSING |
 | Purification trigger | NOT IMPLEMENTED | Score > 100 threshold | ❌ MISSING |
 
 **Recommended Insertion Point:** After Scenario 2 check, before post-compact detection
@@ -548,7 +548,7 @@ newScore = currentScore * decayFactor
 
 ### Persistence
 
-**File:** `.idumb/idumb-brain/sessions/{sessionId}-score.json`
+**File:** `.idumb/brain/sessions/{sessionId}-score.json`
 
 ```json
 {
@@ -707,8 +707,8 @@ message.parts.unshift({
 
 | File | Purpose |
 |------|---------|
-| `.idumb/idumb-brain/sessions/{id}-score.json` | Accumulated score persistence |
-| `.idumb/idumb-brain/sessions/{id}-purify.json` | Purification context storage |
+| `.idumb/brain/sessions/{id}-score.json` | Accumulated score persistence |
+| `.idumb/brain/sessions/{id}-purify.json` | Purification context storage |
 
 ---
 

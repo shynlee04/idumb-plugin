@@ -283,7 +283,7 @@ Fresh Context → Execute → Persist → Next Iteration → Fresh Context → .
 
 **iDumb Specifics:**
 - Multi-session execution for complex phases
-- Persistent storage in `.idumb/idumb-brain/`
+- Persistent storage in `.idumb/brain/`
 - Guardrails tracking learned patterns
 
 **Recommended Limits:**
@@ -448,7 +448,7 @@ def detect_plateau_slope(values, window_size=5, slope_threshold=0.001):
                          │
                          ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│  Layer 1: State Persistence (.idumb/idumb-brain/)                    │
+│  Layer 1: State Persistence (.idumb/brain/)                    │
 │  └─ Event sourcing for audit trail                             │
 │     ├─ iterations.log (append-only)                           │
 │     ├─ checkpoints/ (snapshots for resume)                     │
@@ -643,9 +643,9 @@ override:
 
 # State Persistence
 persistence:
-  iteration_log: ".idumb/idumb-brain/iterations.log"
-  checkpoint_dir: ".idumb/idumb-brain/checkpoints"
-  audit_dir: ".idumb/idumb-brain/audit"
+  iteration_log: ".idumb/brain/iterations.log"
+  checkpoint_dir: ".idumb/brain/checkpoints"
+  audit_dir: ".idumb/brain/audit"
   retain_days: 30
   checkpoint_interval: 100             # Save checkpoint every 100 iterations
 ```
@@ -854,7 +854,7 @@ model_profiles:                       # Stage-based model assignment
 
 1. **Create Iteration Tracking Infrastructure**
    ```typescript
-   // .idumb/idumb-brain/iterations.log (append-only)
+   // .idumb/brain/iterations.log (append-only)
    interface IterationEvent {
      eventId: string
      timestamp: Date
@@ -1210,7 +1210,7 @@ export class MultiLayerIterationEnforcer {
 
 ### 9.1 Phase 1: Core Infrastructure (Week 1-2)
 
-- [ ] Create .idumb/idumb-brain/ structure (iterations.log, checkpoints/, audit/)
+- [ ] Create .idumb/brain/ structure (iterations.log, checkpoints/, audit/)
 - [ ] Implement Redis-backed iteration counter
 - [ ] Create IterationLimitEnforcer class
 - [ ] Add plugin interceptor to @opencode-ai/plugin

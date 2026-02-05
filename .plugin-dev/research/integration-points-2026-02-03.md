@@ -467,7 +467,7 @@ mcpServers: {
   'filesystem': {
     description: 'Access local project files',
     tools: ['read_file', 'write_file', 'list_directory'],
-    brainIntegration: '.idumb/idumb-brain/'
+    brainIntegration: '.idumb/brain/'
   },
   
   // Brain database queries
@@ -514,7 +514,7 @@ mcpServers: {
     }
   },
   handler: async ({ query, params }) => {
-    const db = openDatabase('.idumb/idumb-brain/idumb.db');
+    const db = openDatabase('.idumb/brain/idumb.db');
     const stmt = db.prepare(query);
     const result = stmt.all(...params);
     return { result, rowCount: result.length };
@@ -542,7 +542,7 @@ mcpServers: {
     }
   },
   handler: async ({ query, mode }) => {
-    const orama = await loadOrama('.idumb/idumb-brain/search/');
+    const orama = await loadOrama('.idumb/brain/search/');
     const results = await search(orama, { term: query, mode });
     return { results, count: results.length };
   }
@@ -564,11 +564,11 @@ mcpServers: {
     }
   },
   handler: async ({ includeHistory }) => {
-    const state = readState('.idumb/idumb-brain/state.json');
+    const state = readState('.idumb/brain/state.json');
     let response = { ...state };
     
     if (includeHistory) {
-      response.history = readHistory('.idumb/idumb-brain/history/');
+      response.history = readHistory('.idumb/brain/history/');
     }
     
     return response;
@@ -594,12 +594,12 @@ mcpServers: {
 
 **State Reading:**
 ```typescript
-// .idumb/idumb-brain/state.json
+// .idumb/brain/state.json
 const state = readState(directory);
 
 // OpenCode's read tool
 await read({
-  filePath: '.idumb/idumb-brain/state.json'
+  filePath: '.idumb/brain/state.json'
 });
 
 // Validation
@@ -628,7 +628,7 @@ await write({
 
 // Atomic writes (temp + rename)
 await edit({
-  filePath: '.idumb/idumb-brain/state.json',
+  filePath: '.idumb/brain/state.json',
   edits: [{
     oldText: '"phase": "init"',
     newText: '"phase": "planning"'
@@ -806,7 +806,7 @@ brain.execute('INSERT INTO history (action, result) VALUES (?, ?)',
    ```typescript
    // Configurable opt-in
    if (config.backup.enabled) {
-     await uploadToCloud('.idumb/idumb-brain/', config.backup.provider);
+     await uploadToCloud('.idumb/brain/', config.backup.provider);
    }
    ```
 
@@ -1080,7 +1080,7 @@ interface AuditLog {
 
 // Log on every operation
 const logAudit = (entry: AuditLog) => {
-  const logPath = '.idumb/idumb-brain/governance/audit.log';
+  const logPath = '.idumb/brain/governance/audit.log';
   const line = JSON.stringify(entry) + '\n';
   appendFileSync(logPath, line);
 };

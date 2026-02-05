@@ -161,7 +161,7 @@ wait
 ### 3. Error Handling Tests
 ```bash
 # Test with corrupted state.json
-echo "invalid" > .idumb/idumb-brain/state.json
+echo "invalid" > .idumb/brain/state.json
 ./health-check.sh
 ```
 

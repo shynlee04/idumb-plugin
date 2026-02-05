@@ -80,13 +80,54 @@ function writeState(directory: string, state: IdumbState): void {
 
 // Read state
 export const read = tool({
-  description: "Read current iDumb governance state from .idumb/brain/state.json",
-  args: {},
+  description: "Read current iDumb governance state from .idumb/brain/state.json with automatic smart delegation enhancements",
+  args: {
+    includeContext: tool.schema.boolean().optional().describe("Include smart context analysis (automatically enabled for research agents)"),
+    readableFormat: tool.schema.boolean().optional().describe("Return human-readable summary (automatically enabled for human-facing outputs)"),
+    autoEnhance: tool.schema.boolean().optional().describe("Auto-apply smart delegation based on caller context")
+  },
   async execute(args, context) {
     const state = readState(context.directory)
-    return JSON.stringify(state, null, 2)
+    
+    // Auto-detect if caller is a research agent and auto-enable smart features
+    const isResearchAgent = context.agent?.includes('research') || 
+                           context.agent?.includes('explorer') ||
+                           context.agent?.includes('mapper');
+    
+    const shouldAutoEnhance = args.autoEnhance !== false && (
+      isResearchAgent || 
+      args.includeContext || 
+      args.readableFormat
+    );
+    
+    // Apply smart delegation enhancements if requested or auto-detected
+    if (shouldAutoEnhance) {
+      const enhancementResult = await enhanceDelegation({
+        phase: state?.phase,
+        filePath: getStatePath(context.directory),
+        output: JSON.stringify(state),
+        agentType: context.agent || 'unknown',
+        isResearchContext: isResearchAgent
+      });
+      
+      if (args.readableFormat) {
+        return enhancementResult.contextSummary;
+      }
+      
+      // Add smart context to state
+      if (state) {
+        (state as any).smartContext = {
+          activatedComponents: enhancementResult.activatedComponents,
+          summary: enhancementResult.contextSummary,
+          agentType: context.agent || 'unknown',
+          autoEnhanced: true
+        };
+      }
+    }
+    
+    return JSON.stringify(state, null, 2);
   },
-})
+});
 
 // Write/update state
 export const write = tool({

@@ -229,9 +229,9 @@ AI Mode [1]: Default
 │    Research: All 3 servers enabled                              │
 │                                                                     │
 │  Directory Structure:                                              │
-│    ✓ .idumb/idumb-brain/     (Governance memory)               │
-│    ✓ .idumb/idumb-project-output/ (Artifacts, not plans)        │
-│    ✓ .idumb/idumb-modules/      (Extensions)                   │
+│    ✓ .idumb/brain/     (Governance memory)               │
+│    ✓ .idumb/project-output/ (Artifacts, not plans)        │
+│    ✓ .idumb/modules/      (Extensions)                   │
 │                                                                     │
 │  Next Steps:                                                        │
 │    1. Run /idumb:status to verify governance                   │
@@ -478,11 +478,11 @@ function validateChain(artifact: Artifact): boolean {
   },
 
   "paths": {
-    "brain": ".idumb/idumb-brain/",
-    "state": ".idumb/idumb-brain/state.json",
-    "config": ".idumb/idumb-brain/config.json",
-    "projectOutput": ".idumb/idumb-project-output/",
-    "modules": ".idumb/idumb-modules/"
+    "brain": ".idumb/brain/",
+    "state": ".idumb/brain/state.json",
+    "config": ".idumb/brain/config.json",
+    "projectOutput": ".idumb/project-output/",
+    "modules": ".idumb/modules/"
   }
 }
 ```
@@ -690,7 +690,7 @@ feat(phase-02): implement JWT authentication
 - Add refresh endpoint
 - Update tests
 
-Related: .idumb/idumb-project-output/phases/phase-02-auth/PLAN.md
+Related: .idumb/project-output/phases/phase-02-auth/PLAN.md
 State: phase="02"
 Validation: PASSED (2026-02-04T12:00:00Z)
 Session: ses_abc123
@@ -703,7 +703,7 @@ Session: ses_abc123
 git tag checkpoint-20260204-phase02-task3
 
 # Store in state
-echo '{"lastCheckpoint": "checkpoint-20260204-phase02-task3"}' >> .idumb/idumb-brain/state.json
+echo '{"lastCheckpoint": "checkpoint-20260204-phase02-task3"}' >> .idumb/brain/state.json
 
 # Git commit with metadata
 git commit -m "chore(checkpoint): checkpoint after task-003
@@ -810,8 +810,8 @@ TC-GIT-01: Atomic Commits
 
 ### New Files Created
 
-1. `.idumb/idumb-brain/config.json` - Enhanced configuration schema
-2. `.idumb/idumb-brain/schema.json` - Configuration validation schema
+1. `.idumb/brain/config.json` - Enhanced configuration schema
+2. `.idumb/brain/schema.json` - Configuration validation schema
 3. `.plugin-dev/research/GOVERNANCE-CONFIG-SYSTEM-2026-02-04.md` - Config specification
 4. `.plugin-dev/research/PHASE-1-VALIDATION-GAP-ANALYSIS-2026-02-04.md` - Gap analysis
 
@@ -824,7 +824,7 @@ TC-GIT-01: Atomic Commits
 
 ### Files Removed
 
-1. `.planning/` (migrated to `.idumb/idumb-project-output/planning/`)
+1. `.planning/` (migrated to `.idumb/project-output/planning/`)
 2. Old config.json format (migrated to new schema)
 
 ---

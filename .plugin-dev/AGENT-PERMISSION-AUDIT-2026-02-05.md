@@ -82,10 +82,10 @@ permission:
     "general": allow
   edit:
     allow:
-      - ".idumb/idumb-brain/governance/**"  # Only governance files
+      - ".idumb/brain/governance/**"  # Only governance files
   write:
     allow:
-      - ".idumb/idumb-brain/governance/**"
+      - ".idumb/brain/governance/**"
 ```
 
 ---
@@ -258,12 +258,12 @@ permission:
     "idumb-integration-checker": allow
   edit:
     allow:
-      - ".idumb/idumb-project-output/**/*.md"
-      - ".idumb/idumb-brain/governance/validations/**"
+      - ".idumb/project-output/**/*.md"
+      - ".idumb/brain/governance/validations/**"
   write:
     allow:
-      - ".idumb/idumb-project-output/**/*.md"
-      - ".idumb/idumb-brain/governance/validations/**"
+      - ".idumb/project-output/**/*.md"
+      - ".idumb/brain/governance/validations/**"
 ```
 
 ---

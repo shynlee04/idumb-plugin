@@ -130,7 +130,7 @@ Level 4: idumb-builder
 
 **Delegates to:** idumb-builder
 **Workflow:** src/workflows/agent-creation.md
-**Chain Rule:** AGENT-01: Must exist .idumb/idumb-brain/state.json
+**Chain Rule:** AGENT-01: Must exist .idumb/brain/state.json
 
 ### Command: /idumb:agent validate
 
@@ -143,7 +143,7 @@ Level 4: idumb-builder
 **Pre-Creation Checkpoint:**
 ```yaml
 reads:
-  - .idumb/idumb-brain/state.json (current phase, active anchors)
+  - .idumb/brain/state.json (current phase, active anchors)
   - src/agents/ (existing agents to avoid conflicts)
 ```
 

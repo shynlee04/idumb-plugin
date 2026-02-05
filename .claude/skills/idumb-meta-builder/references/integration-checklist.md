@@ -239,7 +239,7 @@ modify_validation:
 
   backup_before:
     check: "Backup created if file is critical"
-    critical_files: [".idumb/idumb-brain/state.json", ".idump/config.json"]
+    critical_files: [".idumb/brain/state.json", ".idump/config.json"]
 
   atomic_operation:
     check: "Modify is atomic (write temp, then move)"

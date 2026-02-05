@@ -71,19 +71,19 @@
         "number": "2",
         "title": "Directory Structure",
         "explanation": "iDumb will create the following structure:",
-        "brain": ".idumb-brain/        ← AI Brain (sessions, state, context)",
+        "brain": ".idumb/brain/        ← AI Brain (sessions, state, context)",
         "brainState": "├── state.json       ← Master governance state",
         "brainSessions": "├── sessions/        ← Work session history",
         "brainContext": "├── context/         ← Context memory",
         "brainDrift": "└── drift/           ← Change detection",
-        "output": ".idumb-project-output/ ← Project Artifacts (replaces .planning/)",
+        "output": ".idumb/project-output/ ← Project Artifacts (replaces .planning/)",
         "outputProject": "├── PROJECT.md       ← Project definition",
         "outputRoadmap": "├── ROADMAP.md       ← Implementation roadmap",
         "outputPhases": "└── phases/          ← Phase plans",
-        "modules": ".idumb-modules/      ← [OPTIONAL] Custom extensions",
+        "modules": ".idumb/modules/      ← [OPTIONAL] Custom extensions",
         "modulesNote": "└── (auto-generated) ← Extra tools, templates, skills",
         "opencode": ".opencode/           ← Framework templates (read-only)",
-        "createModules": "Create .idumb-modules/ (custom extensions)?",
+        "createModules": "Create .idumb/modules/ (custom extensions)?",
         "prompt": "[y/n]:"
       },
       "governance": {
@@ -219,7 +219,7 @@
         },
         "brain": {
           "number": "11",
-          "title": "Creating .idumb-brain Directory"
+          "title": "Creating .idumb/brain Directory"
         }
       }
     },

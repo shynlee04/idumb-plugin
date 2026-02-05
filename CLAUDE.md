@@ -87,7 +87,7 @@ Milestone → Phase → Plan → Task
 coordinator → governance → validator → builder
 ```
 
-**Critical Rule**: Coordinators delegate, validators validate, only builders write files. Every action is traceable through `.idumb/idumb-brain/state.json` history.
+**Critical Rule**: Coordinators delegate, validators validate, only builders write files. Every action is traceable through `.idumb/brain/state.json` history.
 
 ### Plugin Structure
 
@@ -170,7 +170,7 @@ Installer script that:
 Main event hook system. Key responsibilities:
 - **Session tracking**: Tracks agent role, delegation depth, first tool used
 - **Checkpoint management**: Create/load/list/delete checkpoints for rollback
-- **State persistence**: Manages `.idumb/idumb-brain/state.json` with anchors and history
+- **State persistence**: Manages `.idumb/brain/state.json` with anchors and history
 - **Governance enforcement**: Intercepts tools to enforce permissions
 - **Security**: Input validation, sanitization, and pre-write gates
 
@@ -204,7 +204,7 @@ All iDumb tools:
 - `idumb-quality.ts` - Quality metrics
 - `idumb-security.ts` - Security checks
 
-### `.idumb/idumb-brain/state.json`
+### `.idumb/brain/state.json`
 Single source of truth for governance state:
 ```json
 {
@@ -219,7 +219,7 @@ Single source of truth for governance state:
 }
 ```
 
-### `.idumb/idumb-brain/config.json`
+### `.idumb/brain/config.json`
 User settings and governance configuration. Contains:
 - User profile (name, experience level, language preferences)
 - Hierarchy settings (agent order, permissions, chain enforcement)
@@ -313,7 +313,7 @@ See `SECURITY_FIXES_SUMMARY.md` for complete security documentation.
 
 ## Session Handoff
 
-When resuming work on iDumb itself, check `.idumb/idumb-brain/SESSION-HANDOFF-*.md` files for:
+When resuming work on iDumb itself, check `.idumb/brain/SESSION-HANDOFF-*.md` files for:
 - What was completed in previous sessions
 - Current known issues and their fixes
 - Remaining work by priority phase

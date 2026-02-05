@@ -49,7 +49,7 @@ interface SessionMetadata {
 }
 ```
 
-**Purpose:** Persistent metadata stored in `.idumb/idumb-brain/sessions/{sessionId}.json`
+**Purpose:** Persistent metadata stored in `.idumb/brain/sessions/{sessionId}.json`
 
 ### 1.3 Session Events Currently Handled
 
@@ -548,8 +548,8 @@ export const sessionCreate = tool({
    - Lines 3188-3197: Task completion handling (missing pop)
 
 2. Session metadata samples:
-   - `.idumb/idumb-brain/sessions/ses_3df5bab97ffe5TUBJ7KEU2z6x8.json`
-   - `.idumb/idumb-brain/sessions/ses_newproj_001.json`
+   - `.idumb/brain/sessions/ses_3df5bab97ffe5TUBJ7KEU2z6x8.json`
+   - `.idumb/brain/sessions/ses_newproj_001.json`
 
 ---
 

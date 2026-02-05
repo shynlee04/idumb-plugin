@@ -19,7 +19,7 @@ Set up the iDumb governance framework by creating the `.idumb/` directory struct
 <execution_context>
 
 ## Reference Files (Read Before Execution)
-- `.idumb/idumb-brain/state.json` - Check if already initialized
+- `.idumb/brain/state.json` - Check if already initialized
 - `.planning/` - Detect planning framework
 - `.planning/PROJECT.md` - Project definition
 - `.planning/STATE.md` - Current state
@@ -93,7 +93,7 @@ Set up the iDumb governance framework by creating the `.idumb/` directory struct
 
 ```yaml
 existing_check:
-  read: ".idumb/idumb-brain/state.json"
+  read: ".idumb/brain/state.json"
   
   if_exists:
     check: Is already initialized?
@@ -107,7 +107,7 @@ existing_check:
       
   if_force:
     action: Archive existing state
-    backup: ".idumb/idumb-brain/state.json.bak-{timestamp}"
+    backup: ".idumb/brain/state.json.bak-{timestamp}"
     continue: Fresh initialization
 ```
 
@@ -151,21 +151,21 @@ structure_creation:
     
     **Directories to Create:**
     - .idumb/
-    - .idumb/idumb-brain/
-    - .idumb/idumb-brain/context/
-    - .idumb/idumb-brain/history/
-    - .idumb/idumb-brain/governance/
-    - .idumb/idumb-brain/governance/validations/
-    - .idumb/idumb-brain/sessions/
-    - .idumb/idumb-brain/execution/
-    - .idumb/idumb-project-output/
-    - .idumb/idumb-project-output/phases/
-    - .idumb/idumb-project-output/roadmaps/
-    - .idumb/idumb-project-output/research/
+    - .idumb/brain/
+    - .idumb/brain/context/
+    - .idumb/brain/history/
+    - .idumb/brain/governance/
+    - .idumb/brain/governance/validations/
+    - .idumb/brain/sessions/
+    - .idumb/brain/execution/
+    - .idumb/project-output/
+    - .idumb/project-output/phases/
+    - .idumb/project-output/roadmaps/
+    - .idumb/project-output/research/
     
     **Files to Create:**
     
-    1. `.idumb/idumb-brain/state.json`:
+    1. `.idumb/brain/state.json`:
     \`\`\`json
     {
       "version": "0.2.0",
@@ -179,7 +179,7 @@ structure_creation:
     }
     \`\`\`
     
-    2. `.idumb/idumb-brain/config.json`:
+    2. `.idumb/brain/config.json`:
     \`\`\`json
     {
       "version": "0.2.0",
@@ -197,14 +197,14 @@ structure_creation:
       },
       "paths": {
         "state": {
-          "brain": ".idumb/idumb-brain/state.json",
-          "history": ".idumb/idumb-brain/history/",
-          "sessions": ".idumb/idumb-brain/sessions/"
+          "brain": ".idumb/brain/state.json",
+          "history": ".idumb/brain/history/",
+          "sessions": ".idumb/brain/sessions/"
         },
         "output": {
-          "phases": ".idumb/idumb-project-output/phases/",
-          "roadmaps": ".idumb/idumb-project-output/roadmaps/",
-          "research": ".idumb/idumb-project-output/research/"
+          "phases": ".idumb/project-output/phases/",
+          "roadmaps": ".idumb/project-output/roadmaps/",
+          "research": ".idumb/project-output/research/"
         }
       },
       "planning": {
@@ -233,9 +233,9 @@ structure_validation:
     
     **iDumb Structure Checks:**
     - .idumb/ directory exists
-    - .idumb/idumb-brain/state.json exists and valid JSON
-    - .idumb/idumb-brain/config.json exists and valid JSON
-    - .idumb/idumb-brain/governance/ exists
+    - .idumb/brain/state.json exists and valid JSON
+    - .idumb/brain/config.json exists and valid JSON
+    - .idumb/brain/governance/ exists
     
     **Planning Integration Checks (if detected):**
     - .planning/PROJECT.md exists (REQUIRED)
@@ -448,10 +448,10 @@ report:
     **Governance Mode:** hierarchical
     
     ### Structure Created
-    - .idumb/idumb-brain/state.json
-    - .idumb/idumb-brain/config.json
-    - .idumb/idumb-brain/governance/
-    - .idumb/idumb-project-output/
+    - .idumb/brain/state.json
+    - .idumb/brain/config.json
+    - .idumb/brain/governance/
+    - .idumb/project-output/
     
     ### Next Steps
     {Based on project type detection}
@@ -678,10 +678,10 @@ complexity: medium
 version: 0.2.0
 requires: nothing (entry point)
 outputs:
-  - .idumb/idumb-brain/state.json
-  - .idumb/idumb-brain/config.json
-  - .idumb/idumb-brain/governance/
-  - .idumb/idumb-project-output/
+  - .idumb/brain/state.json
+  - .idumb/brain/config.json
+  - .idumb/brain/governance/
+  - .idumb/project-output/
 ```
 </metadata>
 
@@ -825,18 +825,18 @@ Tool: glob
 /Users/apple/Documents/coding-projects/vkode-agent/.idumb/brain/state.json
 /Users/apple/Documents/coding-projects/vkode-agent/.idumb/config.json
 /Users/apple/Documents/coding-projects/vkode-agent/.idumb/governance/plugin.log
-/Users/apple/Documents/coding-projects/vkode-agent/.idumb/idumb-brain/state.json
+/Users/apple/Documents/coding-projects/vkode-agent/.idumb/brain/state.json
 /Users/apple/Documents/coding-projects/vkode-agent/.idumb/brain/execution-metrics.json
 /Users/apple/Documents/coding-projects/vkode-agent/.idumb/sessions/ses_3d57dafa8ffe5Q8CqrRzbigSSX.json
 /Users/apple/Documents/coding-projects/vkode-agent/.idumb/sessions/ses_3d57de371ffeEEglSbmf2DoxbI.json
-/Users/apple/Documents/coding-projects/vkode-agent/.idumb/idumb-brain/config.json
+/Users/apple/Documents/coding-projects/vkode-agent/.idumb/brain/config.json
 /Users/apple/Documents/coding-projects/vkode-agent/.idumb/sessions/ses_3d580f633ffefCP13y1oX9TMmM.json
-/Users/apple/Documents/coding-projects/vkode-agent/.idumb/idumb-project-output/PROJECT.md
-/Users/apple/Documents/coding-projects/vkode-agent/.idumb/idumb-brain/styles/verbose.md
-/Users/apple/Documents/coding-projects/vkode-agent/.idumb/idumb-brain/styles/learning.md
-/Users/apple/Documents/coding-projects/vkode-agent/.idumb/idumb-brain/styles/governance.md
-/Users/apple/Documents/coding-projects/vkode-agent/.idumb/idumb-brain/styles/terse.md
-/Users/apple/Documents/coding-projects/vkode-agent/.idumb/idumb-brain/styles/default.md
+/Users/apple/Documents/coding-projects/vkode-agent/.idumb/project-output/PROJECT.md
+/Users/apple/Documents/coding-projects/vkode-agent/.idumb/brain/styles/verbose.md
+/Users/apple/Documents/coding-projects/vkode-agent/.idumb/brain/styles/learning.md
+/Users/apple/Documents/coding-projects/vkode-agent/.idumb/brain/styles/governance.md
+/Users/apple/Documents/coding-projects/vkode-agent/.idumb/brain/styles/terse.md
+/Users/apple/Documents/coding-projects/vkode-agent/.idumb/brain/styles/default.md
 ```
 ```
 
@@ -866,7 +866,7 @@ Tool: glob
 ```
 **Output:**
 ```
-/Users/apple/Documents/coding-projects/vkode-agent/.idumb/idumb-project-output/PROJECT.md
+/Users/apple/Documents/coding-projects/vkode-agent/.idumb/project-output/PROJECT.md
 /Users/apple/Documents/coding-projects/vkode-agent/idumb-plugin/.plugin-dev/PROJECT.md
 ```
 ```
@@ -897,7 +897,7 @@ Interesting findings:
 1. **iDumb already initialized** - There's an existing `.idumb/` directory with state.json initialized on 2026-02-04T21:06:32.141Z
 2. **No .planning/ directory** - Planning framework not detected
 3. **No _bmad-output/** - No BMAD output directory
-4. **PROJECT.md exists** - But in `.idumb/idumb-project-output/` and `idumb-plugin/.plugin-dev/`, not root
+4. **PROJECT.md exists** - But in `.idumb/project-output/` and `idumb-plugin/.plugin-dev/`, not root
 
 Current state shows:
 - Version: 0.3.0
@@ -939,7 +939,7 @@ Tool: idumb-validate_structure
     {
       "check": "brain_dir",
       "status": "pass",
-      "message": ".idumb/idumb-brain/ exists"
+      "message": ".idumb/brain/ exists"
     },
     {
       "check": "state_file",
@@ -949,7 +949,7 @@ Tool: idumb-validate_structure
     {
       "check": "governance_dir",
       "status": "pass",
-      "message": ".idumb/idumb-brain/governance/ exists"
+      "message": ".idumb/brain/governance/ exists"
     }
   ]
 }
@@ -1001,7 +1001,7 @@ Tool: read
 **Input:**
 ```json
 {
-  "filePath": "/Users/apple/Documents/coding-projects/vkode-agent/.idumb/idumb-brain/state.json"
+  "filePath": "/Users/apple/Documents/coding-projects/vkode-agent/.idumb/brain/state.json"
 }
 ```
 **Output:**
@@ -1083,7 +1083,7 @@ Tool: read
 **Input:**
 ```json
 {
-  "filePath": "/Users/apple/Documents/coding-projects/vkode-agent/.idumb/idumb-brain/config.json"
+  "filePath": "/Users/apple/Documents/coding-projects/vkode-agent/.idumb/brain/config.json"
 }
 ```
 **Output:**
@@ -1127,21 +1127,21 @@ Tool: read
 00036|   },
 00037|   "paths": {
 00038|     "root": ".idumb/",
-00039|     "brain": ".idumb/idumb-brain/",
-00040|     "state": ".idumb/idumb-brain/state.json",
-00041|     "config": ".idumb/idumb-brain/config.json",
-00042|     "sessions": ".idumb/idumb-brain/sessions/",
-00043|     "context": ".idumb/idumb-brain/context/",
-00044|     "governance": ".idumb/idumb-brain/governance/",
-00045|     "drift": ".idumb/idumb-brain/drift/",
-00046|     "metadata": ".idumb/idumb-brain/metadata/",
-00047|     "styles": ".idumb/idumb-brain/styles/",
-00048|     "output": ".idumb/idumb-project-output/",
-00049|     "phases": ".idumb/idumb-project-output/phases/",
-00050|     "roadmaps": ".idumb/idumb-project-output/roadmaps/",
-00051|     "research": ".idumb/idumb-project-output/research/",
-00052|     "validations": ".idumb/idumb-project-output/validations/",
-00053|     "modules": ".idumb/idumb-modules/"
+00039|     "brain": ".idumb/brain/",
+00040|     "state": ".idumb/brain/state.json",
+00041|     "config": ".idumb/brain/config.json",
+00042|     "sessions": ".idumb/brain/sessions/",
+00043|     "context": ".idumb/brain/context/",
+00044|     "governance": ".idumb/brain/governance/",
+00045|     "drift": ".idumb/brain/drift/",
+00046|     "metadata": ".idumb/brain/metadata/",
+00047|     "styles": ".idumb/brain/styles/",
+00048|     "output": ".idumb/project-output/",
+00049|     "phases": ".idumb/project-output/phases/",
+00050|     "roadmaps": ".idumb/project-output/roadmaps/",
+00051|     "research": ".idumb/project-output/research/",
+00052|     "validations": ".idumb/project-output/validations/",
+00053|     "modules": ".idumb/modules/"
 00054|   },
 00055|   "staleness": {
 00056|     "warningHours": 48,
@@ -1184,9 +1184,9 @@ The user is running `/idumb:init` without `--force`. Per the command spec Step 1
 However, I also notice some structure mismatches vs the command spec:
 - Some legacy directories exist (`.idumb/brain/`, `.idumb/anchors/`)
 - The required structure per command includes directories like:
-  - `.idumb/idumb-brain/execution/` - may be missing
-  - `.idumb/idumb-brain/history/` - may be missing
-  - `.idumb/idumb-brain/context/` - need to check
+  - `.idumb/brain/execution/` - may be missing
+  - `.idumb/brain/history/` - may be missing
+  - `.idumb/brain/context/` - need to check
 
 Let me verify if the full structure matches the command spec before deciding whether to recommend reinitialization.
 
@@ -1575,7 +1575,7 @@ Tool: task
 {
   "subagent_type": "idumb-codebase-mapper",
   "description": "Map existing codebase structure",
-  "prompt": "Khám phá và phân tích codebase hiện tại tại /Users/apple/Documents/coding-projects/vkode-agent.\n\n**YÊU CẦU:**\n1. Phân tích cấu trúc thư mục chi tiết\n2. Xác định tech stack (Next.js, TypeScript, React, v.v.)\n3. Tìm patterns và anti-patterns\n4. Đánh giá quality và complexity\n5. Tạo structured analysis document\n\n**ĐỊNH DẠNG KẾT QUẢ:**\n- File: .idumb/idumb-project-output/research/CODEBASE-MAPPING.md\n- Format: Markdown với sections rõ ràng\n- Include: file tree, tech stack, patterns, recommendations\n\n**LƯU Ý:**\n- Đọc AGENTS.md để hiểu project identity\n- Sử dụng grep/glob để tìm files\n- Report findings in Vietnamese\n- Focus on 341 files detected"
+  "prompt": "Khám phá và phân tích codebase hiện tại tại /Users/apple/Documents/coding-projects/vkode-agent.\n\n**YÊU CẦU:**\n1. Phân tích cấu trúc thư mục chi tiết\n2. Xác định tech stack (Next.js, TypeScript, React, v.v.)\n3. Tìm patterns và anti-patterns\n4. Đánh giá quality và complexity\n5. Tạo structured analysis document\n\n**ĐỊNH DẠNG KẾT QUẢ:**\n- File: .idumb/project-output/research/CODEBASE-MAPPING.md\n- Format: Markdown với sections rõ ràng\n- Include: file tree, tech stack, patterns, recommendations\n\n**LƯU Ý:**\n- Đọc AGENTS.md để hiểu project identity\n- Sử dụng grep/glob để tìm files\n- Report findings in Vietnamese\n- Focus on 341 files detected"
 }
 ```
 **Error:**

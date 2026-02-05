@@ -384,5 +384,5 @@ See **`scripts/validate-module.js`** for implementation.
 
 Usage:
 ```bash
-node scripts/validate-module.js .idumb/idumb-modules/my-module-2026-02-04.md
+node scripts/validate-module.js .idumb/modules/my-module-2026-02-04.md
 ```

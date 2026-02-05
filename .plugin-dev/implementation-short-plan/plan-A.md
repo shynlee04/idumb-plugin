@@ -116,7 +116,7 @@ Modify: `src/plugins/idumb-core.ts` → `buildGovernancePrefix()` function
 
 #### Enhanced Anchor Types
 
-Extend existing anchor system in `.idumb/idumb-brain/state.json`:
+Extend existing anchor system in `.idumb/brain/state.json`:
 
 ```json
 {
@@ -128,7 +128,7 @@ Extend existing anchor system in `.idumb/idumb-brain/state.json`:
         "hierarchy": ["supreme-coord", "high-gov", "builder"],
         "workflow": "phase-2-execution",
         "fileTree": ["src/plugins/idumb-core.ts", "src/tools/idumb-state.ts"],
-        "artifacts": [".idumb/idumb-project-output/phases/phase-2/plan.md"]
+        "artifacts": [".idumb/project-output/phases/phase-2/plan.md"]
       },
       "priority": "critical"
     },
@@ -156,7 +156,7 @@ Modify: `src/lib/state.ts` → Add new anchor types and handlers
 
 Create a plugin hook that reads from a configuration file:
 
-#### [NEW] `.idumb/idumb-brain/system-prompt-append.md`
+#### [NEW] `.idumb/brain/system-prompt-append.md`
 
 ```markdown
 # Appended System Prompt
@@ -178,7 +178,7 @@ This content is injected into the system prompt for all iDumb agents.
 // In idumb-core.ts
 "experimental.chat.system.transform": async (input, output) => {
   try {
-    const appendPath = join(directory, '.idumb/idumb-brain/system-prompt-append.md')
+    const appendPath = join(directory, '.idumb/brain/system-prompt-append.md')
     if (existsSync(appendPath)) {
       const content = readFileSync(appendPath, 'utf-8')
       const state = readState(directory)
@@ -397,7 +397,7 @@ Add `output-style` section to YAML frontmatter for key agents:
 
 ---
 
-### [NEW] `.idumb/idumb-brain/system-prompt-append.md`
+### [NEW] `.idumb/brain/system-prompt-append.md`
 
 Template file for system prompt appending (equivalent to `--append-system-prompt`).
 

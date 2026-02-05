@@ -397,7 +397,7 @@ You are operating in **Governance Mode**. Additional behaviors:
 ```
 
 #### 1.3 State Extension
-Add to `.idumb/idumb-brain/state.json`:
+Add to `.idumb/brain/state.json`:
 ```json
 {
   "activeStyle": "default",
@@ -564,7 +564,7 @@ export interface StyleContent extends StyleConfig {
 }
 
 export function getStylesDir(directory: string): string {
-  return join(directory, '.idumb/idumb-brain/styles')
+  return join(directory, '.idumb/brain/styles')
 }
 
 export function loadActiveStyle(directory: string): string | null {
@@ -742,7 +742,7 @@ src/
 └── agents/
     └── [existing agents]       # OPTIONAL: Add style injection points
 
-.idumb/idumb-brain/
+.idumb/brain/
 ├── state.json                  # MODIFY: Add activeStyle field
 ├── config.json                 # OPTIONAL: Add style preferences
 └── styles/                     # NEW: Style storage directory
@@ -762,8 +762,8 @@ src/
 | `src/tools/idumb-style.ts` | Create new file | ~60 |
 | `src/commands/idumb/style.md` | Create new file | ~40 |
 | `src/types/styles.ts` | Create new file | ~20 |
-| `.idumb/idumb-brain/state.json` | Add activeStyle field | 2 |
-| `.idumb/idumb-brain/styles/*.md` | Create 5 style files | ~200 |
+| `.idumb/brain/state.json` | Add activeStyle field | 2 |
+| `.idumb/brain/styles/*.md` | Create 5 style files | ~200 |
 
 **Total Estimated Changes**: ~500 lines across 12 files
 
@@ -840,7 +840,7 @@ if (input.command === 'idumb:style') {
 
 2. **Verify style files exist**
    ```bash
-   ls -la .idumb/idumb-brain/styles/
+   ls -la .idumb/brain/styles/
    ```
 
 3. **Test style switching**
@@ -894,7 +894,7 @@ if (input.command === 'idumb:style') {
 #### Error Recovery Test
 ```bash
 # Corrupt a style file
-echo "invalid" > .idumb/idumb-brain/styles/verbose.md
+echo "invalid" > .idumb/brain/styles/verbose.md
 # Set that style
 /idumb:style verbose
 # Verify fallback to default, no crash
@@ -902,7 +902,7 @@ echo "invalid" > .idumb/idumb-brain/styles/verbose.md
 
 ### Verification Checklist
 
-- [ ] Style files created in `.idumb/idumb-brain/styles/`
+- [ ] Style files created in `.idumb/brain/styles/`
 - [ ] `state.json` has `activeStyle` field
 - [ ] `/idumb:style` command lists all styles
 - [ ] Style switching changes agent behavior immediately

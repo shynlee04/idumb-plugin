@@ -17,7 +17,7 @@ This plan consolidates the best aspects of both previous plans:
 
 | Layer | Mechanism | Source |
 |-------|-----------|--------|
-| **Global Styles** | `.idumb/idumb-brain/styles/*.md` files | Plan B |
+| **Global Styles** | `.idumb/brain/styles/*.md` files | Plan B |
 | **Agent Overrides** | `output-style:` in agent YAML frontmatter | Plan A |
 | **Runtime Injection** | `experimental.chat.system.transform` hook | Both |
 | **Session Anchoring** | New anchor types for style + flow | Plan A |
@@ -220,7 +220,7 @@ export interface StyleContent extends StyleConfig {
 ---
 
 #### Task 1.2: Create Default Style Files
-**Location:** `.idumb/idumb-brain/styles/` (NEW directory)  
+**Location:** `.idumb/brain/styles/` (NEW directory)  
 **Files:** 5 markdown files  
 **Lines:** ~200 total
 
@@ -260,7 +260,7 @@ You are operating in **Governance Mode**. Follow these guidelines:
 ---
 
 #### Task 1.3: Extend State Schema
-**File:** `.idumb/idumb-brain/state.json` (MODIFY)  
+**File:** `.idumb/brain/state.json` (MODIFY)  
 **Lines:** +3
 
 **Add to schema:**
@@ -463,7 +463,7 @@ mode: all
 ## Workflow
 
 1. When user runs `/idumb:style`:
-   - Read all `.md` files from `.idumb/idumb-brain/styles/`
+   - Read all `.md` files from `.idumb/brain/styles/`
    - Parse each file's frontmatter for name and description
    - Display list with current style highlighted
 
@@ -763,11 +763,11 @@ Please structure your response accordingly.
 | `src/lib/styles.ts` | ~120 | Style management utilities |
 | `src/tools/idumb-style.ts` | ~80 | Style management tool |
 | `src/commands/idumb/style.md` | ~50 | Style command |
-| `.idumb/idumb-brain/styles/default.md` | ~10 | Default style (minimal) |
-| `.idumb/idumb-brain/styles/governance.md` | ~50 | Governance style |
-| `.idumb/idumb-brain/styles/verbose.md` | ~50 | Verbose style |
-| `.idumb/idumb-brain/styles/terse.md` | ~30 | Terse style |
-| `.idumb/idumb-brain/styles/learning.md` | ~50 | Learning style |
+| `.idumb/brain/styles/default.md` | ~10 | Default style (minimal) |
+| `.idumb/brain/styles/governance.md` | ~50 | Governance style |
+| `.idumb/brain/styles/verbose.md` | ~50 | Verbose style |
+| `.idumb/brain/styles/terse.md` | ~30 | Terse style |
+| `.idumb/brain/styles/learning.md` | ~50 | Learning style |
 | `.agents/skills/output-style-enforcement/SKILL.md` | ~80 | Enforcement skill |
 
 ### Modified Files (6)
@@ -777,7 +777,7 @@ Please structure your response accordingly.
 | `src/plugins/idumb-core.ts` | +80 | Add system.transform hook, extend session tracker |
 | `src/lib/state.ts` | +60 | Add anchor handlers, extend schema |
 | `src/lib/types.ts` | +20 | Add anchor types |
-| `.idumb/idumb-brain/state.json` | +5 | Add activeStyle, styleHistory |
+| `.idumb/brain/state.json` | +5 | Add activeStyle, styleHistory |
 | Agent files (6) | +60 | Add output-style YAML sections |
 
 **Total Estimated Changes:** ~700 lines across 15 files

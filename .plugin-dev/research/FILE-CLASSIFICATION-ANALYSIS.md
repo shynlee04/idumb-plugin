@@ -32,11 +32,11 @@ These are created **WHEN USING THE PLUGIN ON A PROJECT**:
 | Current Path | Status | Correct Location | Notes |
 |--------------|--------|------------------|-------|
 | `.idumb/` | ✅ CORRECT | `.idumb/` | Runtime state directory |
-| `.idumb/idumb-brain/` | ✅ CORRECT | `.idumb/idumb-brain/` | Session state |
-| `.idumb/idumb-brain/sessions/` | ✅ CORRECT | `.idumb/idumb-brain/sessions/` | Session metadata |
-| `.idumb/idumb-brain/execution/` | ✅ CORRECT | `.idumb/idumb-brain/execution/` | Execution metrics |
-| `.idumb/idumb-brain/governance/` | ✅ CORRECT | `.idumb/idumb-brain/governance/` | Validation logs |
-| `.idumb/idumb-brain/config.json` | ✅ CORRECT | `.idumb/idumb-brain/config.json` | User configuration |
+| `.idumb/brain/` | ✅ CORRECT | `.idumb/brain/` | Session state |
+| `.idumb/brain/sessions/` | ✅ CORRECT | `.idumb/brain/sessions/` | Session metadata |
+| `.idumb/brain/execution/` | ✅ CORRECT | `.idumb/brain/execution/` | Execution metrics |
+| `.idumb/brain/governance/` | ✅ CORRECT | `.idumb/brain/governance/` | Validation logs |
+| `.idumb/brain/config.json` | ✅ CORRECT | `.idumb/brain/config.json` | User configuration |
 | `.planning/` | ❌ WRONG | Should be read-only external | This is the iDumb REPO's planning |
 | `docs/` | ⚠️ MIXED | See below | Contains both |
 | `documents/` | ❌ WRONG | Archive or delete | Old planning artifacts |
@@ -173,13 +173,13 @@ bin/                           # CLI scripts (npm packaged)
 
 | Command/Workflow | Generates To | Correct? |
 |------------------|--------------|----------|
-| `/idumb:init` | `.idumb/idumb-brain/config.json` | ✅ YES |
+| `/idumb:init` | `.idumb/brain/config.json` | ✅ YES |
 | `/idumb:new-project` | `.planning/PROJECT.md` | ✅ YES |
-| `/idumb:roadmap` | `.idumb/idumb-brain/governance/roadmap.md` OR `.planning/ROADMAP.md` | ✅ YES |
-| `/idumb:research` | `.idumb/idumb-brain/governance/research/` | ✅ YES |
-| `/idumb:plan-phase` | `.idumb/idumb-brain/governance/plans/` | ✅ YES |
-| `/idumb:discuss-phase` | `.idumb/idumb-brain/governance/phases/` | ✅ YES |
-| Plugin hooks | `.idumb/idumb-brain/sessions/`, `.idumb/idumb-brain/` | ✅ YES |
+| `/idumb:roadmap` | `.idumb/brain/governance/roadmap.md` OR `.planning/ROADMAP.md` | ✅ YES |
+| `/idumb:research` | `.idumb/brain/governance/research/` | ✅ YES |
+| `/idumb:plan-phase` | `.idumb/brain/governance/plans/` | ✅ YES |
+| `/idumb:discuss-phase` | `.idumb/brain/governance/phases/` | ✅ YES |
+| Plugin hooks | `.idumb/brain/sessions/`, `.idumb/brain/` | ✅ YES |
 | iDumb development | `.planning/` | ❌ SHOULD BE `.plugin-dev/` |
 
 ---

@@ -130,7 +130,7 @@ ${menu ? menu.map(item => {
 
 This agent integrates with iDumb state management:
 
-- **Read State**: Before operations, read current state from `.idumb/idumb-brain/state.json`
+- **Read State**: Before operations, read current state from `.idumb/brain/state.json`
 - **Update State**: After operations, update phase, validation count, or history
 - **Create Anchors**: For critical decisions, create context anchors
 - **Record History**: Log all actions to governance history

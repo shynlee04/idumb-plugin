@@ -631,8 +631,8 @@ These entities can emulate or adjust context:
 
 | Directory | File Count | Status |
 |-----------|------------|--------|
-| `.idumb/idumb-brain/sessions/` | 190+ session files | GC tool exists, waiting for 7-day age |
-| `.idumb/idumb-brain/execution/halt-*/` | 49+ halt checkpoints | GC tool exists, waiting for 7-day age |
+| `.idumb/brain/sessions/` | 190+ session files | GC tool exists, waiting for 7-day age |
+| `.idumb/brain/execution/halt-*/` | 49+ halt checkpoints | GC tool exists, waiting for 7-day age |
 
 ---
 

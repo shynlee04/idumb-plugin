@@ -3,6 +3,7 @@
 
 # NON-NEGOTIABLE RULES
 - All agents must work by gathering context first, knowing which workflow **MUST FIND SKILL** to adapt the best selection for Complex, multi-step, recurring, or, domain-specific tasks. There is **NO TOLERANCE** for agents that start execute tasks without proper context gathering, and planning.
+- **ANTI-REPETITION PROTOCOL**: Never create duplicate files/documentation unless explicitly requested. Always check existing content first. Prefer editing existing files over creating new ones. See GOVERNANCE_CHECKLIST.md for detailed protocol.
 - Update this AGENTS.md iteratively, and be the single-source-of-truth, at all time for all agents.
 
 ## Project Overview
@@ -229,10 +230,10 @@ User settings and governance configuration. Contains:
 
 **SITE-WIDE GOVERNANCE AWARENESS UPDATE (2026-02-05)**:
 All iDumb components now reference the standardized path structure:
-- `.idumb/brain/` (was `.idumb/idumb-brain/`) - Core governance state
+- `.idumb/brain/` (was `.idumb/brain/`) - Core governance state
 - `.idumb/sessions/` (moved out of brain) - Session tracking
-- `.idumb/project-output/` (was `.idumb/idumb-project-output/`) - Phase deliverables
-- `.idumb/modules/` (was `.idumb/idumb-modules/`) - Extendable components
+- `.idumb/project-output/` (was `.idumb/project-output/`) - Phase deliverables
+- `.idumb/modules/` (was `.idumb/modules/`) - Extendable components
 - `.idumb/project-core/` (NEW) - Project single source of truth
 - `.governance/` (NEW root only, subdirs deferred) - Unified governance framework
 
@@ -338,7 +339,7 @@ When resuming work on iDumb itself, check `.idumb/sessions/SESSION-HANDOFF-*.md`
 ## Current Status (as of 2026-02-05)
 
 ### Path Structure Standardization Complete
-- **Standardized paths**: All components now reference `.idumb/brain/` instead of `.idumb/idumb-brain/`
+- **Standardized paths**: All components now reference `.idumb/brain/` instead of `.idumb/brain/`
 - **Directory reorganization**: Sessions moved out of brain, new project-core directory
 - **Governance framework**: New `.governance/` root directory established
 - **Documentation sync**: All README and documentation files updated to reflect new structure

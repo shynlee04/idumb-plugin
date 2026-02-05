@@ -18,7 +18,7 @@ Khám phá và phân tích codebase hiện tại tại /Users/apple/Documents/co
 5. Tạo structured analysis document
 
 **ĐỊNH DẠNG KẾT QUẢ:**
-- File: .idumb/idumb-project-output/research/CODEBASE-MAPPING.md
+- File: .idumb/project-output/research/CODEBASE-MAPPING.md
 - Format: Markdown với sections rõ ràng
 - Include: file tree, tech stack, patterns, recommendations
 
@@ -566,7 +566,7 @@ Tool: filesystem_read_file
 
 ## **YÊU CẦU TIẾP THEO:**
 
-**File cần tạo:** `.idumb/idumb-project-output/research/CODEBASE-MAPPING.md`
+**File cần tạo:** `.idumb/project-output/research/CODEBASE-MAPPING.md`
 **Format:** Markdown với các section:
 - File tree chi tiết
 - Tech stack analysis
@@ -798,7 +798,7 @@ Tool: bash
 ## **REQUIREMENTS:**
 - **Language:** Vietnamese (absolutely required)
 - **Protocol:** iDumb Plan-Before-Action
-- **Output:** Document at `.idumb/idumb-project-output/research/CODEBASE-MAPPING.md`
+- **Output:** Document at `.idumb/project-output/research/CODEBASE-MAPPING.md`
 
 ---
 
@@ -1021,7 +1021,7 @@ src/app/api/projects/[id]/route.ts:export const runtime = 'nodejs';
    - Payload CMS 3.x
    - PostgreSQL + Drizzle ORM
    - TypeScript 5.7
-4. **Created document mapping** in `.idumb/idumb-project-output/research/CODEBASE-MAPPING.md`
+4. **Created document mapping** in `.idumb/project-output/research/CODEBASE-MAPPING.md`
 
 ### **✅ Session 3: Deep Codebase Analysis (COMPLETED)**
 **Just executed commands:**
@@ -1102,7 +1102,7 @@ src/
 ### **⚠️ PERSISTING REQUIREMENTS:**
 - **Language:** VIETNAMESE (NO EXCEPTIONS)
 - **Framework:** iDumb Plan-Before-Action
-- **Output Location:** `.idumb/idumb-project-output/research/CODEBASE-MAPPING.md`
+- **Output Location:** `.idumb/project-output/research/CODEBASE-MAPPING.md`
 - **Protocol:** Document-first approach
 - **Session Continuity:** Must preserve context across sessions
 
@@ -1136,7 +1136,7 @@ QUAN TRỌNG: Phiên mới này KHÔNG CÓ access conversations cũ.
 - Read files: src/payload/collections/*.ts
 - Read files: src/lib/webcontainers/*.ts
 - Read files: src/lib/db/schema.ts
-- Update: .idumb/idumb-project-output/research/CODEBASE-MAPPING.md
+- Update: .idumb/project-output/research/CODEBASE-MAPPING.md
 
 **Remember:** VIETNAMESE ONLY. Document everything.
 ```
@@ -2124,7 +2124,7 @@ Tool: read
 - **Codebase location:** `/Users/apple/Documents/coding-projects/vkode-agent`
 - **Tech stack identified:** Next.js 15, Payload CMS 3.x, PostgreSQL + Drizzle ORM, TypeScript 5.7, WebContainers
 - **Total files:** 74 files in `src/`
-- **Created:** `.idumb/idumb-project-output/research/CODEBASE-MAPPING.md`
+- **Created:** `.idumb/project-output/research/CODEBASE-MAPPING.md`
 
 **Session 3: Đọc files chi tiết (COMPLETED)**
 - **Đã đọc 7 files cốt lõi:**
@@ -2249,7 +2249,7 @@ Tool: read
 ### **PERSISTING REQUIREMENTS:**
 - **Language:** VIETNAMESE (NO EXCEPTIONS)
 - **Framework:** iDumb Plan-Before-Action
-- **Output Location:** `.idumb/idumb-project-output/research/CODEBASE-MAPPING.md`
+- **Output Location:** `.idumb/project-output/research/CODEBASE-MAPPING.md`
 - **Protocol:** Document-first approach
 - **Session Continuity:** Template-based context preservation
 
@@ -2378,7 +2378,7 @@ rg "rate.*limit|middleware" src/ -A 5 -B 5
 ```
 
 **Step 4:** Update document
-- Append findings to `.idumb/idumb-project-output/research/CODEBASE-MAPPING.md`
+- Append findings to `.idumb/project-output/research/CODEBASE-MAPPING.md`
 - Focus on: Security, Auth Flow, Ownership, Rate Limiting
 
 **Remember:** VIETNAMESE ONLY. Document everything.
@@ -2986,7 +2986,7 @@ export async function spawnValidated(
 - **Codebase location:** `/Users/apple/Documents/coding-projects/vkode-agent`
 - **Tech stack identified:** Next.js 15, Payload CMS 3.x, PostgreSQL + Drizzle ORM, TypeScript 5.7, WebContainers
 - **Total files:** 74 files in `src/`
-- **Created:** `.idumb/idumb-project-output/research/CODEBASE-MAPPING.md`
+- **Created:** `.idumb/project-output/research/CODEBASE-MAPPING.md`
 
 **Session 3: Đọc files chi tiết (COMPLETED)**
 - **Đã đọc 10 files chi tiết:**
@@ -3108,7 +3108,7 @@ rg "hooks" src/payload/ -A 10
 ### **PERSISTING REQUIREMENTS:**
 - **Language:** VIETNAMESE (NO EXCEPTIONS)
 - **Framework:** iDumb Plan-Before-Action
-- **Output Location:** `.idumb/idumb-project-output/research/CODEBASE-MAPPING.md`
+- **Output Location:** `.idumb/project-output/research/CODEBASE-MAPPING.md`
 - **Protocol:** Document-first approach
 - **Session Continuity:** Template-based context preservation
 
@@ -3197,7 +3197,7 @@ Tiếp tục analyze codebase vkode-agent theo iDumb protocol.
 **📌 NEXT STEPS (From Previous Session):**
 
 **Priority 1 - Document Security & Commands:**
-Update `.idumb/idumb-project-output/research/CODEBASE-MAPPING.md` with:
+Update `.idumb/project-output/research/CODEBASE-MAPPING.md` with:
 - Command validation system (commands.ts)
 - Encryption layer (encryption.ts)
 - Access control (userOwned.ts)
@@ -3301,12 +3301,12 @@ Tool: filesystem_read_file
 **Input:**
 ```json
 {
-  "path": "/Users/apple/Documents/coding-projects/vkode-agent/.idumb/idumb-project-output/research/CODEBASE-MAPPING.md"
+  "path": "/Users/apple/Documents/coding-projects/vkode-agent/.idumb/project-output/research/CODEBASE-MAPPING.md"
 }
 ```
 **Output:**
 ```
-ENOENT: no such file or directory, open '/Users/apple/Documents/coding-projects/vkode-agent/.idumb/idumb-project-output/research/CODEBASE-MAPPING.md'
+ENOENT: no such file or directory, open '/Users/apple/Documents/coding-projects/vkode-agent/.idumb/project-output/research/CODEBASE-MAPPING.md'
 ```
 ```
 
@@ -3330,7 +3330,7 @@ ENOENT: no such file or directory, open '/Users/apple/Documents/coding-projects/
 - **Codebase location:** `/Users/apple/Documents/coding-projects/vkode-agent`
 - **Tech stack identified:** Next.js 15, Payload CMS 3.x, PostgreSQL + Drizzle ORM, TypeScript 5.7, WebContainers
 - **Total files:** 74 files in `src/`
-- **Created:** `.idumb/idumb-project-output/research/CODEBASE-MAPPING.md`
+- **Created:** `.idumb/project-output/research/CODEBASE-MAPPING.md`
 
 **Session 3: Đọc files chi tiết (COMPLETED)**
 - **Đã đọc 10 files chi tiết:**
@@ -3477,7 +3477,7 @@ rg "WebContainer|webcontainer" src/ --type ts -A 3
 ### **PERSISTING REQUIREMENTS:**
 - **Language:** VIETNAMESE (NO EXCEPTIONS)
 - **Framework:** iDumb Plan-Before-Action
-- **Output Location:** `.idumb/idumb-project-output/research/CODEBASE-MAPPING.md`
+- **Output Location:** `.idumb/project-output/research/CODEBASE-MAPPING.md`
 - **Protocol:** Document-first approach
 - **Session Continuity:** Template-based context preservation
 
@@ -3937,7 +3937,7 @@ export const POST = withRateLimit(
 - **Codebase location:** `/Users/apple/Documents/coding-projects/vkode-agent`
 - **Tech stack identified:** Next.js 15, Payload CMS 3.x, PostgreSQL + Drizzle ORM, TypeScript 5.7, WebContainers
 - **Total files:** 74 files in `src/`
-- **Created:** `.idumb/idumb-project-output/research/CODEBASE-MAPPING.md`
+- **Created:** `.idumb/project-output/research/CODEBASE-MAPPING.md`
 
 **Session 3: Đọc files chi tiết (COMPLETED)**
 - **Đã đọc 10 files chi tiết:**
@@ -4073,7 +4073,7 @@ rg "middleware|rate.*limit" src/ --type ts -A 3 -B 2
 ### **PERSISTING REQUIREMENTS:**
 - **Language:** VIETNAMESE (NO EXCEPTIONS)
 - **Framework:** iDumb Plan-Before-Action
-- **Output Location:** `.idumb/idumb-project-output/research/CODEBASE-MAPPING.md`
+- **Output Location:** `.idumb/project-output/research/CODEBASE-MAPPING.md`
 - **Protocol:** Document-first approach
 - **Session Continuity:** Template-based context preservation
 

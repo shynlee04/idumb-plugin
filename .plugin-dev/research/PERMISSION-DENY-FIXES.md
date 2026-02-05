@@ -979,7 +979,7 @@ Use `idumb-high-governance`, `idumb-executor`, and `idumb-verifier` as reference
 
 ## Sources
 
-1. [Session Handoff: Permission Manipulation Mastery](/Users/apple/Documents/coding-projects/idumb/.idumb/idumb-brain/SESSION-HANDOFF-2026-02-03-PERMISSION-MANIPULATION.md) - Task 4 requirements
+1. [Session Handoff: Permission Manipulation Mastery](/Users/apple/Documents/coding-projects/idumb/.idumb/brain/SESSION-HANDOFF-2026-02-03-PERMISSION-MANIPULATION.md) - Task 4 requirements
 2. [iDumb Core Plugin](/Users/apple/Documents/coding-projects/idumb/template/plugins/idumb-core.ts) - Tool permission tiers
 3. [AGENTS.md](/Users/apple/Documents/coding-projects/idumb/AGENTS.md) - Agent hierarchy documentation
 4. All 15 agent profiles in `/Users/apple/Documents/coding-projects/idumb/template/agents/`

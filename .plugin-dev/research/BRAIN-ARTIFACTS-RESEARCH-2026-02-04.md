@@ -58,15 +58,15 @@ The `.idumb/` directory is the **runtime brain** of the iDumb governance framewo
 
 | Artifact | Generator | Trigger | Location |
 |----------|-----------|---------|----------|
-| **config.json** | `ensureIdumbConfig()` | session.created hook | `.idumb/idumb-brain/config.json` |
-| **state.json** | `ensureIdumbConfig()`, `writeState()` | session.created, state changes | `.idumb/idumb-brain/state.json` |
-| **todos.json** | `idumb-todo.ts` tool | todo_create, todo_complete | `.idumb/idumb-brain/todos.json` |
-| **execution-metrics.json** | `initializeExecutionMetrics()` | session.created | `.idumb/idumb-brain/execution-metrics.json` |
-| **sessions/*.json** | `storeSessionMetadata()` | session.created | `.idumb/idumb-brain/sessions/` |
-| **halt-*/halt-context.json** | `triggerEmergencyHalt()` | MAX_DELEGATION_DEPTH, MAX_ITERATIONS | `.idumb/idumb-brain/execution/halt-{timestamp}/` |
+| **config.json** | `ensureIdumbConfig()` | session.created hook | `.idumb/brain/config.json` |
+| **state.json** | `ensureIdumbConfig()`, `writeState()` | session.created, state changes | `.idumb/brain/state.json` |
+| **todos.json** | `idumb-todo.ts` tool | todo_create, todo_complete | `.idumb/brain/todos.json` |
+| **execution-metrics.json** | `initializeExecutionMetrics()` | session.created | `.idumb/brain/execution-metrics.json` |
+| **sessions/*.json** | `storeSessionMetadata()` | session.created | `.idumb/brain/sessions/` |
+| **halt-*/halt-context.json** | `triggerEmergencyHalt()` | MAX_DELEGATION_DEPTH, MAX_ITERATIONS | `.idumb/brain/execution/halt-{timestamp}/` |
 | **timestamps/*.json** | `storeTimestamp()` | file modifications | `.idumb/timestamps/` |
-| **plugin.log** | `log()` function | all plugin activity | `.idumb/idumb-brain/governance/plugin.log` |
-| **validations/*.json** | Manual validation runs | /idumb:validate, agent checks | `.idumb/idumb-brain/governance/validations/` |
+| **plugin.log** | `log()` function | all plugin activity | `.idumb/brain/governance/plugin.log` |
+| **validations/*.json** | Manual validation runs | /idumb:validate, agent checks | `.idumb/brain/governance/validations/` |
 | **SYSTEM-MANIFEST.yaml** | idumb-builder (manual) | framework updates | `.idumb/SYSTEM-MANIFEST.yaml` |
 | **config.backup.*.json** | `ensureIdumbConfig()` | config corruption detected | `.idumb/` |
 
@@ -85,7 +85,7 @@ function ensureIdumbConfig(directory: string): InlineIdumbConfig {
 
 // Session metadata - lines 1812-1851
 function storeSessionMetadata(directory: string, sessionId: string): void {
-  // Creates: .idumb/idumb-brain/sessions/{sessionId}.json
+  // Creates: .idumb/brain/sessions/{sessionId}.json
 }
 
 // State management - lines 1744-1783
@@ -95,11 +95,11 @@ function addHistoryEntry(directory: string, action, agent, result): void
 
 // Execution metrics - lines ~2621-2623
 function initializeExecutionMetrics(sessionId: string, directory: string): void
-  // Creates: .idumb/idumb-brain/execution-metrics.json
+  // Creates: .idumb/brain/execution-metrics.json
 
 // Emergency halt - stores halt context
 function triggerEmergencyHalt(reason, context, directory): void
-  // Creates: .idumb/idumb-brain/execution/halt-{timestamp}/halt-context.json
+  // Creates: .idumb/brain/execution/halt-{timestamp}/halt-context.json
 
 // Timestamp tracking - lines 2047-2100
 function storeTimestamp(directory, path, created, modified): void
@@ -147,8 +147,8 @@ function buildResumeContext(sessionId, directory): string
 
 | Schema File | Target | Status |
 |-------------|--------|--------|
-| `brain-state-schema.json` | `.idumb/idumb-brain/state.json` | ✅ Defined |
-| `checkpoint-schema.json` | `.idumb/idumb-brain/execution/*/halt-context.json` | ✅ Defined |
+| `brain-state-schema.json` | `.idumb/brain/state.json` | ✅ Defined |
+| `checkpoint-schema.json` | `.idumb/brain/execution/*/halt-context.json` | ✅ Defined |
 | `completion-definitions.yaml` | Phase completion criteria | ✅ Defined |
 | `deny-rules.yaml` | Permission deny rules | ✅ Defined |
 
@@ -213,12 +213,12 @@ function buildResumeContext(sessionId, directory): string
 ```yaml
 garbage_collection:
   auto_delete:
-    - pattern: ".idumb/idumb-brain/sessions/*.json"
+    - pattern: ".idumb/brain/sessions/*.json"
       condition: "Older than 7 days"
       action: DELETE
       
     - pattern: "*.log"
-      location: ".idumb/idumb-brain/governance/"
+      location: ".idumb/brain/governance/"
       condition: "Older than 48 hours"
       action: ROTATE
 ```
@@ -456,11 +456,11 @@ The SYSTEM-MANIFEST.yaml (Section 10) documents garbage collection that must be 
 # Currently documented but NOT implemented:
 garbage_collection:
   auto_delete:
-    - pattern: ".idumb/idumb-brain/sessions/*.json"
+    - pattern: ".idumb/brain/sessions/*.json"
       condition: "Older than 7 days"
       
     - pattern: "*.log"
-      location: ".idumb/idumb-brain/governance/"
+      location: ".idumb/brain/governance/"
       condition: "Older than 48 hours"
       
   validation_rule: "Any tool output with no documented consumer = DELETE"

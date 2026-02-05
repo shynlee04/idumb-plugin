@@ -15,7 +15,7 @@ delegation_depth: 0
 session_state: "Active (idle 15 minutes)"
 
 position_assessment:
-  state_read: ".idumb/idumb-brain/state.json"
+  state_read: ".idumb/brain/state.json"
   current_phase: "Phase 3 - Implementation"
   governance_level: "standard"
   active_anchors: 3 critical, 2 high

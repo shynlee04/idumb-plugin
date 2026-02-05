@@ -103,7 +103,7 @@ import type { Plugin } from "@opencode-ai/plugin"
 // CRITICAL: NO console.log - pollutes TUI background
 // Use file logging or client.app.log() instead
 function log(directory: string, message: string): void {
-  // Write to .idumb/idumb-brain/governance/plugin.log
+  // Write to .idumb/brain/governance/plugin.log
 }
 
 // INTERFACES: Define all types explicitly
@@ -294,7 +294,7 @@ These agents perform the actual work:
 
 **MUST-BEFORE Rules:**
 ```
-/idumb:* → requires .idumb/idumb-brain/state.json (except init, help)
+/idumb:* → requires .idumb/brain/state.json (except init, help)
 /idumb:roadmap → requires .planning/PROJECT.md
 /idumb:execute-phase → requires .planning/phases/{N}/*PLAN.md
 /idumb:verify-work → requires execution evidence

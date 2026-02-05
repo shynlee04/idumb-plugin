@@ -1,6 +1,6 @@
 ---
 name: idumb-meta-builder
-description: Meta-skill for idumb-builder agent to transform confusing specifications into structured iDumb workflow modules with checkpoints, validation, and integration points. Use when creating reusable workflows, handling overlapping specs, or generating governance modules under .idumb/idumb-modules/. This skill enforces the iDumb vision: spec-driven development, context-first validation, drift detection, and hierarchical coordination.
+description: Meta-skill for idumb-builder agent to transform confusing specifications into structured iDumb workflow modules with checkpoints, validation, and integration points. Use when creating reusable workflows, handling overlapping specs, or generating governance modules under .idumb/modules/. This skill enforces the iDumb vision: spec-driven development, context-first validation, drift detection, and hierarchical coordination.
 version: 1.0.0
 license: MIT
 metadata:
@@ -46,7 +46,7 @@ entry_protocol:
   2_generate_draft:
     action: "Create structured module from classification"
     uses: "references/module-schema.md"
-    output: ".idumb/idumb-modules/{name}-{date}.md"
+    output: ".idumb/modules/{name}-{date}.md"
 
   3_validate:
     action: "Run validation against draft"
@@ -108,8 +108,8 @@ gap_detection:
 input:
   spec: "User-provided text (markdown, plain text, or mixed)"
   context:
-    - current_phase: "from .idumb/idumb-brain/state.json"
-    - existing_modules: "from .idumb/idumb-modules/"
+    - current_phase: "from .idumb/brain/state.json"
+    - existing_modules: "from .idumb/modules/"
     - agent_permissions: "from src/agents/"
 ```
 
@@ -135,7 +135,7 @@ classification:
 
 ```yaml
 module_template: "references/module-schema.md"
-output_location: ".idumb/idumb-modules/{name}-{YYYY-MM-DD}.md"
+output_location: ".idumb/modules/{name}-{YYYY-MM-DD}.md"
 
 naming_convention:
   format: "{action}-{entity}-{version}"
@@ -212,17 +212,17 @@ commands_required: []
 | Source | Purpose |
 |--------|---------|
 | User input | Raw specification to structure |
-| `.idumb/idumb-brain/state.json` | Current phase, context |
-| `.idumb/idumb-modules/` | Existing modules for composition |
+| `.idumb/brain/state.json` | Current phase, context |
+| `.idumb/modules/` | Existing modules for composition |
 | `src/agents/` | Agent permission validation |
 
 ### Produces To
 
 | Output | Location | Format |
 |--------|----------|--------|
-| Workflow modules | `.idumb/idumb-modules/` | Markdown with YAML |
-| Validation reports | `.idumb/idumb-brain/governance/validations/` | JSON |
-| Module index | `.idumb/idumb-modules/INDEX.md` | Markdown |
+| Workflow modules | `.idumb/modules/` | Markdown with YAML |
+| Validation reports | `.idumb/brain/governance/validations/` | JSON |
+| Module index | `.idumb/modules/INDEX.md` | Markdown |
 
 ### Delegates To
 
@@ -243,7 +243,7 @@ delegation_patterns:
   write_files:
     # idumb-builder writes directly (leaf node for META paths)
     agent: "self"
-    reason: "Builder writes module files to .idumb/idumb-modules/"
+    reason: "Builder writes module files to .idumb/modules/"
 ```
 
 ## Additional Resources
@@ -275,13 +275,13 @@ delegation_patterns:
 
 ```yaml
 pre_generation:
-  - [ ] Read current state from .idumb/idumb-brain/state.json
+  - [ ] Read current state from .idumb/brain/state.json
   - [ ] Check for conflicting existing modules
   - [ ] Identify all agents, tools, commands referenced
   - [ ] Classify workflow type and complexity
 
 post_generation:
-  - [ ] Module file created at .idumb/idumb-modules/
+  - [ ] Module file created at .idumb/modules/
   - [ ] YAML frontmatter valid against schema
   - [ ] All workflow steps have agent bindings
   - [ ] Checkpoints defined at minimum granularity

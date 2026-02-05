@@ -74,7 +74,7 @@ block_message: |
 
 ```yaml
 on_block:
-  log_violation: ".idumb/idumb-brain/governance/chain.log"
+  log_violation: ".idumb/brain/governance/chain.log"
   entry:
     timestamp: "2026-02-04T14:30:00Z"
     rule: "PHASE-01"

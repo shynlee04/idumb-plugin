@@ -764,7 +764,7 @@ CHAIN RULES (8 rules)
 
 4. **Add Chain Rule Visualization**: Create a visual representation of chain dependencies to help users understand why operations are blocked.
 
-5. **Implement Permission Auditing**: Log all permission decisions to `.idumb/idumb-brain/governance/audit.log` for compliance and debugging.
+5. **Implement Permission Auditing**: Log all permission decisions to `.idumb/brain/governance/audit.log` for compliance and debugging.
 
 6. **Create Agent Capability Matrix**: A user-facing document showing what each agent can and cannot do.
 

@@ -808,9 +808,9 @@ export const validateStructure = tool({
     
     // Check required files exist
     const requiredFiles = [
-      ".idumb/idumb-brain/state.json",
-      ".idumb/idumb-brain/config.json",
-      ".idumb/idumb-brain/governance/"
+      ".idumb/brain/state.json",
+      ".idumb/brain/config.json",
+      ".idumb/brain/governance/"
     ]
     
     for (const file of requiredFiles) {
@@ -1983,8 +1983,8 @@ You are initializing iDumb governance for this project.
 
 1. **Check for existing setup**
    - Use `glob` to check for `.idumb/` directory
-   - Read `.idumb/idumb-brain/state.json` if exists
-   - Read `.idumb/idumb-brain/config.json` if exists
+   - Read `.idumb/brain/state.json` if exists
+   - Read `.idumb/brain/config.json` if exists
 
 2. **Detect project context**
    - Check for `.planning/` directory (planning indicator)
@@ -1996,17 +1996,17 @@ You are initializing iDumb governance for this project.
 
 3. **Create iDumb governance structure**
    **DELEGATE TO @idumb-builder** to create:
-   - `.idumb/idumb-brain/`
-   - `.idumb/idumb-brain/history/`
-   - `.idumb/idumb-brain/context/`
-   - `.idumb/idumb-brain/governance/`
-   - `.idumb/idumb-brain/governance/validations/`
-   - `.idumb/idumb-brain/anchors/`
-   - `.idumb/idumb-brain/sessions/`
+   - `.idumb/brain/`
+   - `.idumb/brain/history/`
+   - `.idumb/brain/context/`
+   - `.idumb/brain/governance/`
+   - `.idumb/brain/governance/validations/`
+   - `.idumb/brain/anchors/`
+   - `.idumb/brain/sessions/`
 
 4. **Initialize state files**
    **DELEGATE TO @idumb-builder** to create:
-   - `.idumb/idumb-brain/state.json` with template:
+   - `.idumb/brain/state.json` with template:
      ```json
      {
        "version": "0.2.0",
@@ -2019,7 +2019,7 @@ You are initializing iDumb governance for this project.
        "history": []
      }
      ```
-   - `.idumb/idumb-brain/config.json` with template:
+   - `.idumb/brain/config.json` with template:
      ```json
      {
        "version": "0.2.0",
@@ -2036,14 +2036,14 @@ You are initializing iDumb governance for this project.
          "autoValidation": true
        },
        "paths": {
-         "state": ".idumb/idumb-brain/state.json",
-         "brain": ".idumb/idumb-brain/",
-         "history": ".idumb/idumb-brain/history/",
-         "context": ".idumb/idumb-brain/context/",
-         "governance": ".idumb/idumb-brain/governance/",
-         "validations": ".idumb/idumb-brain/governance/validations/",
-         "anchors": ".idumb/idumb-brain/anchors/",
-         "sessions": ".idumb/idumb-brain/sessions/",
+         "state": ".idumb/brain/state.json",
+         "brain": ".idumb/brain/",
+         "history": ".idumb/brain/history/",
+         "context": ".idumb/brain/context/",
+         "governance": ".idumb/brain/governance/",
+         "validations": ".idumb/brain/governance/validations/",
+         "anchors": ".idumb/brain/anchors/",
+         "sessions": ".idumb/brain/sessions/",
          "planning": ".planning/",
          "roadmap": ".planning/ROADMAP.md",
          "planningState": ".planning/STATE.md"
@@ -2054,8 +2054,8 @@ You are initializing iDumb governance for this project.
 5. **Validate structure AND planning completeness**
    **DELEGATE TO @idumb-low-validator** to verify:
    - `.idumb/` directory exists
-   - `.idumb/idumb-brain/state.json` exists AND is valid JSON
-   - `.idumb/idumb-brain/config.json` exists AND is valid JSON
+   - `.idumb/brain/state.json` exists AND is valid JSON
+   - `.idumb/brain/config.json` exists AND is valid JSON
    - At least 1 anchor exists
    - History has at least 1 entry
    - IF planning detected: Check required planning files exist
@@ -2118,7 +2118,7 @@ else
 1. **NEVER create files directly** - You have write: false, edit: false. You MUST delegate all file operations to @idumb-builder.
 2. **ALWAYS delegate validation to @idumb-low-validator** - Validation work requires read-only access.
 3. **ALWAYS track delegations** - Know who did what, when.
-4. **ALWAYS read state first** - Check .idumb/idumb-brain/state.json before acting.
+4. **ALWAYS read state first** - Check .idumb/brain/state.json before acting.
 5. **ALWAYS use todoread first** - Check TODOs before any action.
 ```
 

@@ -116,7 +116,7 @@ classification_result:
 
 ```yaml
 module_draft:
-  file: ".idumb/idumb-modules/governance-core-init-2026-02-04.md"
+  file: ".idumb/modules/governance-core-init-2026-02-04.md"
   frontmatter:
     type: module
     name: governance-core-init
@@ -174,8 +174,8 @@ module_draft:
 - Governance level: {strict|standard|minimal}
 
 **Output:**
-- `.idumb/idumb-brain/config.json` - User and governance configuration
-- `.idumb/idumb-brain/state.json` - Initial governance state
+- `.idumb/brain/config.json` - User and governance configuration
+- `.idumb/brain/state.json` - Initial governance state
 
 **Validation:**
 - [ ] Configuration file created with valid JSON
@@ -199,7 +199,7 @@ module_draft:
 
 **Output:**
 - `.idumb/context/` - Context artifact directory
-- `.idumb/idumb-brain/anchors/` - Decision anchor storage
+- `.idumb/brain/anchors/` - Decision anchor storage
 - Hierarchy mapping document
 
 **Validation:**
@@ -223,7 +223,7 @@ module_draft:
 - Watch patterns from configuration
 
 **Output:**
-- `.idumb/idumb-brain/governance/validations/` - Validation report storage
+- `.idumb/brain/governance/validations/` - Validation report storage
 - Drift detection rules
 - Manifest watch configuration
 
@@ -381,7 +381,7 @@ rollback_defined: true
 
 ### Drift Detection
 ```yaml
-drift_check_method: "Compare .idumb/idumb-brain/state.json with expected"
+drift_check_method: "Compare .idumb/brain/state.json with expected"
 drift_threshold: "Any change to version or framework field"
 drift_recovery: "Re-run module or investigate manual changes"
 ```
@@ -474,7 +474,7 @@ validation_result:
 
 The final module is saved to:
 ```
-.idumb/idumb-modules/governance-core-init-2026-02-04.md
+.idumb/modules/governance-core-init-2026-02-04.md
 ```
 
 And added to the module index:

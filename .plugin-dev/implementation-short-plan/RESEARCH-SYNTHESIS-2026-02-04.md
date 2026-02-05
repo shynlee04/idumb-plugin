@@ -231,7 +231,7 @@ export function createStyleFile(directory: string, name: string, config: StyleCo
 ```
 
 #### Task 1.2: Create Default Style Files
-**Location:** `.idumb/idumb-brain/styles/` (NEW directory)
+**Location:** `.idumb/brain/styles/` (NEW directory)
 **Files:** 5 markdown files
 
 | File | Description |
@@ -465,7 +465,7 @@ Phase 0 ──► Phase 1.1 ──► Phase 1.3 ──► Phase 2.1 ──► Ph
 ### Phase 1 Verification
 - [ ] `styles.ts` loads without console.log
 - [ ] `parseStyleFile()` handles malformed YAML
-- [ ] `.idumb/idumb-brain/styles/` created by installer
+- [ ] `.idumb/brain/styles/` created by installer
 
 ### Phase 2 Verification
 - [ ] Style injected in system prompt (check logs)

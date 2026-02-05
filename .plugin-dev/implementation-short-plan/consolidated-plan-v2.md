@@ -24,7 +24,7 @@ This corrected plan incorporates findings from comprehensive research by 4 speci
 
 | Layer | Mechanism | Status |
 |-------|-----------|--------|
-| **Global Styles** | `.idumb/idumb-brain/styles/*.md` files | ✅ Validated |
+| **Global Styles** | `.idumb/brain/styles/*.md` files | ✅ Validated |
 | **Agent Overrides** | `output-style:` in agent YAML frontmatter | ✅ Validated |
 | **Runtime Injection** | `experimental.chat.system.transform` hook | ✅ Hook exists |
 | **Session Anchoring** | Anchor types with JSON-serialized content | ⚠️ Corrected |
@@ -339,7 +339,7 @@ export function loadActiveStyle(directory: string, state: any): StyleContent | n
 
 ### Task 1.2: Create Default Style Files
 
-**Location:** `.idumb/idumb-brain/styles/` (NEW directory)  
+**Location:** `.idumb/brain/styles/` (NEW directory)  
 **Files:** 5 markdown files
 
 #### default.md (~10 lines)
@@ -794,7 +794,7 @@ Manage output styles that control how iDumb agents format their responses.
 </execution_context>
 
 <context>
-Output styles modify how agents structure and format their responses without changing their core behavior. Styles are defined as markdown files in `.idumb/idumb-brain/styles/`.
+Output styles modify how agents structure and format their responses without changing their core behavior. Styles are defined as markdown files in `.idumb/brain/styles/`.
 
 Available actions:
 - (no args): List all styles, highlight current
@@ -816,7 +816,7 @@ Extract action from user input:
 ## Step 2: Execute Action
 
 ### LIST Action
-1. Read `.idumb/idumb-brain/styles/` directory
+1. Read `.idumb/brain/styles/` directory
 2. Parse each `.md` file's frontmatter for name/description
 3. Read current style from `state.json.activeStyle`
 4. Display formatted list with current highlighted
@@ -1474,7 +1474,7 @@ Please include these sections in your response.
 
 ## Configuration
 
-Style enforcement can be configured in `.idumb/idumb-brain/config.json`:
+Style enforcement can be configured in `.idumb/brain/config.json`:
 
 ```json
 {

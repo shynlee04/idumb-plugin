@@ -68,8 +68,8 @@ Phase 6: AGENT PROFILES (P3) → Final polish for workflow managers
 
 | Metric | Current | Target | Measurement |
 |--------|---------|--------|-------------|
-| Session files | 180+ | <20 (7-day rolling) | `ls .idumb/idumb-brain/sessions/ | wc -l` |
-| Halt checkpoints | 35+ | ≤5 | `ls .idumb/idumb-brain/execution/ | grep halt | wc -l` |
+| Session files | 180+ | <20 (7-day rolling) | `ls .idumb/brain/sessions/ | wc -l` |
+| Halt checkpoints | 35+ | ≤5 | `ls .idumb/brain/execution/ | grep halt | wc -l` |
 | Delegation depth accuracy | ❌ Always grows | ✅ Accurate push/pop | Test spawn→complete cycle |
 | `"*": deny` patterns | ~8 agents | 0 agents | `grep -r '"*": deny' template/agents/` |
 | Schema validation | Not implemented | All Tier 1 artifacts | Runtime validation logs |
@@ -143,7 +143,7 @@ if (toolName === "task") {
 
 ### BUG-002: Session File Explosion (P0-CRITICAL)
 
-**Location:** `.idumb/idumb-brain/sessions/`
+**Location:** `.idumb/brain/sessions/`
 
 **Problem:**
 - 180+ session files accumulated
@@ -195,17 +195,17 @@ function cleanupOldSessions(directory: string, retentionDays: number = 7): numbe
 **Validation:**
 ```bash
 # Before fix:
-ls .idumb/idumb-brain/sessions/ | wc -l  # 180+
+ls .idumb/brain/sessions/ | wc -l  # 180+
 
 # After fix (run, wait, create new session):
-ls .idumb/idumb-brain/sessions/ | wc -l  # <20 (files older than 7 days deleted)
+ls .idumb/brain/sessions/ | wc -l  # <20 (files older than 7 days deleted)
 ```
 
 ---
 
 ### BUG-003: Halt Checkpoint Accumulation (P0-CRITICAL)
 
-**Location:** `.idumb/idumb-brain/execution/halt-*/`
+**Location:** `.idumb/brain/execution/halt-*/`
 
 **Problem:**
 - 35+ halt checkpoint directories
@@ -251,10 +251,10 @@ function cleanupHaltCheckpoints(directory: string, keepCount: number = 5): numbe
 **Validation:**
 ```bash
 # Before:
-ls .idumb/idumb-brain/execution/ | grep halt | wc -l  # 35+
+ls .idumb/brain/execution/ | grep halt | wc -l  # 35+
 
 # After:
-ls .idumb/idumb-brain/execution/ | grep halt | wc -l  # ≤5
+ls .idumb/brain/execution/ | grep halt | wc -l  # ≤5
 ```
 
 ---
@@ -792,7 +792,7 @@ function calculateMessageScore(message: any): number {
 ### Primary Workflow: [Name]
 ```sequence
 TRIGGER: [When this workflow starts]
-1. READ governance state → .idumb/idumb-brain/state.json
+1. READ governance state → .idumb/brain/state.json
 2. VALIDATE current context → check freshness, conflicts
 3. DELEGATE to appropriate agent → /task agent [description]
 4. WAIT for result → accumulate output
@@ -948,8 +948,8 @@ Phase 6 → Needs Phase 2 + Phase 3
    npm run install:local
 
 5. Clear runtime state:
-   rm -rf .idumb/idumb-brain/sessions/*.json
-   rm -rf .idumb/idumb-brain/execution/halt-*
+   rm -rf .idumb/brain/sessions/*.json
+   rm -rf .idumb/brain/execution/halt-*
 ```
 
 ### Feature Flags
@@ -1031,8 +1031,8 @@ Day 5 (8 hours):
 
 | Metric | Threshold | Measurement |
 |--------|-----------|-------------|
-| Session file count | <20 at any time | `ls .idumb/idumb-brain/sessions/ | wc -l` |
-| Halt checkpoint count | ≤5 at any time | `ls .idumb/idumb-brain/execution/ | grep halt | wc -l` |
+| Session file count | <20 at any time | `ls .idumb/brain/sessions/ | wc -l` |
+| Halt checkpoint count | ≤5 at any time | `ls .idumb/brain/execution/ | grep halt | wc -l` |
 | Delegation depth accuracy | 100% accurate | Test: spawn→complete→verify=0 |
 | Permission enforcement | 100% of agents | `grep -r '"*": deny'` = 0 |
 | Schema validation | All Tier 1 artifacts | Corrupt → error logged |

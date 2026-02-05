@@ -164,7 +164,7 @@ const isComplete = hasEvidence &&
 
 **What's Stored:**
 ```
-.idumb/idumb-brain/
+.idumb/brain/
 ├── sessions/          # Session metadata and hierarchy
 ├── anchors/           # Context anchors (checkpoint, decision, context)
 ├── governance/         # Validation results, history, actions
@@ -268,20 +268,20 @@ export const toolName = tool({
 | Command | Purpose | Trigger | Required Context |
 |----------|---------|----------|------------------|
 | `/idumb:init` | Initialize governance | First-time setup | None |
-| `/idumb:status` | Show current state | Check progress | `.idumb/idumb-brain/state.json` |
-| `/idumb:config` | View/edit config | Settings management | `.idumb/idumb-brain/config.json` |
+| `/idumb:status` | Show current state | Check progress | `.idumb/brain/state.json` |
+| `/idumb:config` | View/edit config | Settings management | `.idumb/brain/config.json` |
 | `/idumb:validate` | Run validation checks | Quality assurance | Project structure |
 | `/idumb:help` | Show documentation | Help | None |
 
 **Command Hooks:**
 ```yaml
 pre_check:
-  - exists: ".idumb/idumb-brain/state.json"
+  - exists: ".idumb/brain/state.json"
   - loaded: "governance state"
   
 post_execute:
-  - log_to: ".idumb/idumb-brain/governance/plugin.log"
-  - record_in: ".idumb/idumb-brain/history/"
+  - log_to: ".idumb/brain/governance/plugin.log"
+  - record_in: ".idumb/brain/history/"
 ```
 
 ### 4. Event System
@@ -482,7 +482,7 @@ graph LR
 
 ### Master Configuration
 
-**Location:** `.idumb/idumb-brain/config.json`
+**Location:** `.idumb/brain/config.json`
 **Status:** SINGLE SOURCE OF TRUTH
 
 **Structure:**
@@ -517,10 +517,10 @@ graph LR
       }
     },
     "paths": {
-      "config": ".idumb/idumb-brain/config.json",
-      "state": ".idumb/idumb-brain/state.json",
-      "brain": ".idumb/idumb-brain/",
-      "governance": ".idumb/idumb-brain/governance/"
+      "config": ".idumb/brain/config.json",
+      "state": ".idumb/brain/state.json",
+      "brain": ".idumb/brain/",
+      "governance": ".idumb/brain/governance/"
     }
   }
 }

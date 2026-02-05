@@ -427,7 +427,7 @@ transform:
 
 validate:
   command: "node scripts/validate-transformation.js <output-path>"
-  output: ".idumb/idumb-brain/governance/validations/{report}.json"
+  output: ".idumb/brain/governance/validations/{report}.json"
 
 integrate:
   command: "node scripts/ingest-framework.js integrate <framework>"

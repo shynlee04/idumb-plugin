@@ -479,9 +479,9 @@ Full structure plus:
 
 ```
 OLD                              NEW
-.idumb/idumb-brain/         →   .idumb/brain/
-.idumb/idumb-project-output/ →   .idumb/project-output/
-.idumb/idumb-modules/       →   .idumb/modules/
+.idumb/brain/         →   .idumb/brain/
+.idumb/project-output/ →   .idumb/project-output/
+.idumb/modules/       →   .idumb/modules/
 (new)                        →   .idumb/project-core/
 (new)                        →   .idumb/sessions/
 (new)                        →   .governance/
