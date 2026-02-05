@@ -104,7 +104,12 @@ import {
   // Style management
   loadStyle,
   type StyleContent,
-  cleanupStaleSessions
+  cleanupStaleSessions,
+
+  // Frontmatter auto-generation
+  shouldAutoFrontmatter,
+  injectFrontmatter,
+  validateIdumbFrontmatter
 } from "./lib"
 
 // Part type for command hook output
@@ -847,6 +852,41 @@ export const IdumbCorePlugin: Plugin = async ({ directory, client }) => {
           //   log(directory, `[FILE] Timestamp recorded: ${filePath}`)
           // }
           log(directory, `[FILE] Timestamp tracking skipped (not implemented): ${filePath}`)
+
+          // ==========================================
+          // FRONTMATTER AUTO-GENERATION
+          // ==========================================
+
+          if (filePath && shouldAutoFrontmatter(filePath)) {
+            const content = output.args?.content || ''
+
+            // Only process markdown files
+            if (filePath.endsWith('.md')) {
+              try {
+                log(directory, `[FRONTMATTER] Auto-generating for: ${filePath}`)
+
+                // Inject frontmatter
+                const enhancedContent = injectFrontmatter(
+                  filePath,
+                  content,
+                  agentRole || 'unknown',
+                  sessionId
+                )
+
+                // Modify the args in-place (before tool executes)
+                if (output.args) {
+                  output.args.content = enhancedContent
+                }
+
+                log(directory, `[FRONTMATTER] Injected for: ${filePath}`)
+              } catch (frontmatterError) {
+                // Don't break the tool if frontmatter fails
+                log(directory, `[FRONTMATTER] ERROR: ${frontmatterError instanceof Error ? frontmatterError.message : String(frontmatterError)}`)
+              }
+            }
+          } else if (filePath) {
+            log(directory, `[FRONTMATTER] Skipped (outside managed paths): ${filePath}`)
+          }
         }
 
       } catch (error) {

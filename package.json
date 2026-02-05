@@ -16,7 +16,10 @@
   "scripts": {
     "install:local": "node bin/install.js --local",
     "install:global": "node bin/install.js --global",
-    "uninstall": "node bin/install.js --uninstall"
+    "uninstall": "node bin/install.js --uninstall",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "migrate": "node bin/migrate-paths.js"
   },
   "repository": {
     "type": "git",
@@ -44,6 +47,11 @@
     "node": ">=18.0.0"
   },
   "devDependencies": {
-    "@types/node": "^25.2.0"
+    "@types/node": "^25.2.0",
+    "vitest": "^4.0.18"
+  },
+  "dependencies": {
+    "gray-matter": "^4.0.3",
+    "uuid": "^13.0.0"
   }
 }

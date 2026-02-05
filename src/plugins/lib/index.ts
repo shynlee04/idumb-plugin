@@ -128,3 +128,33 @@ export {
   type StyleContent
 } from "./styles"
 
+// Frontmatter auto-generation
+export {
+  shouldAutoFrontmatter,
+  detectDocumentType,
+  generateIdumbFrontmatter,
+  extractTitle,
+  extractTitleFromPath,
+  injectFrontmatter,
+  validateIdumbFrontmatter,
+  type IdumbFrontmatter
+} from "./frontmatter"
+
+// Message scoring and purification
+export {
+  countWords,
+  containsFileContext,
+  isOtherToolMessage,
+  buildFlowIndicator,
+  loadScore,
+  saveScore,
+  decayScore,
+  updateAccumulatedScore,
+  resetScore,
+  buildPurificationContext,
+  type AccumulatedScore,
+  type ScoreEvent,
+  type ThresholdLevel,
+  type ScoreResult
+} from "./message-scoring"
+
