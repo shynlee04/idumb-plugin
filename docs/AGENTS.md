@@ -10,7 +10,7 @@
 
 ```
 1. READ your agent profile:     template/agents/{your-agent}.md
-2. READ governance state:       .idumb/idumb-brain/state.json  
+2. READ governance state:       .idumb/brain/state.json  
 3. READ current phase:          .planning/ROADMAP.md (find active phase)
 4. READ chain rules:            template/router/chain-enforcement.md
 5. ONLY THEN consider user request
@@ -49,7 +49,7 @@ plan_requirements:
 
 ```
 1. STOP all execution immediately
-2. LOG the issue to .idumb/idumb-brain/state.json history
+2. LOG the issue to .idumb/brain/state.json history
 3. IDENTIFY the root cause
 4. BOUNCE BACK to the appropriate level:
    - Task issue → bounce to plan level

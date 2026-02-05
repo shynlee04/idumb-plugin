@@ -9,7 +9,7 @@
 
 iDumb (Intelligent Delegation Using Managed Boundaries) is a hierarchical AI governance framework for OpenCode that ensures safe, controlled code development through agent delegation and permission management. It is distributed as an installable plugin that creates a local "brain" under `.idumb/` for durable governance state.
 
-**Version:** 0.2.0 | **Last Updated:** 2026-02-04
+**Version:** 0.3.0 | **Last Updated:** 2026-02-05
 
 ## Commands
 
@@ -86,7 +86,7 @@ Milestone → Phase → Plan → Task
 coordinator → governance → validator → builder
 ```
 
-**Critical Rule**: Coordinators delegate, validators validate, only builders write files. Every action is traceable through `.idumb/idumb-brain/state.json` history.
+**Critical Rule**: Coordinators delegate, validators validate, only builders write files. Every action is traceable through `.idumb/brain/state.json` history.
 
 ### Plugin Structure
 
@@ -227,9 +227,19 @@ User settings and governance configuration. Contains:
 
 ## Path Conventions
 
+**SITE-WIDE GOVERNANCE AWARENESS UPDATE (2026-02-05)**:
+All iDumb components now reference the standardized path structure:
+- `.idumb/brain/` (was `.idumb/idumb-brain/`) - Core governance state
+- `.idumb/sessions/` (moved out of brain) - Session tracking
+- `.idumb/project-output/` (was `.idumb/idumb-project-output/`) - Phase deliverables
+- `.idumb/modules/` (was `.idumb/idumb-modules/`) - Extendable components
+- `.idumb/project-core/` (NEW) - Project single source of truth
+- `.governance/` (NEW root only, subdirs deferred) - Unified governance framework
+
 ```
 .idumb/                      # Root iDumb directory
-├── brain/                   # Runtime governance state
+├── config.json              # Master configuration (SINGLE SOURCE OF TRUTH)
+├── brain/                   # Runtime governance state (was idumb-brain/)
 │   ├── state.json           # Governance state (SINGLE SOURCE OF TRUTH)
 │   ├── config.json          # User settings and governance config
 │   ├── context/             # Preserved context artifacts
@@ -239,17 +249,17 @@ User settings and governance configuration. Contains:
 │   ├── drift/               # Drift detection artifacts
 │   └── metadata/            # Metadata storage
 ├── sessions/                # Session tracking (moved out of brain)
-├── project-output/          # Phase-based deliverables
+├── project-output/          # Phase-based deliverables (was idumb-project-output/)
 │   ├── phases/              # Phase outputs
 │   ├── roadmaps/            # Project roadmaps
 │   ├── research/            # Research outputs
 │   └── validations/         # Validation outputs
-├── modules/                 # User-extendable components
+├── modules/                 # User-extendable components (was idumb-modules/)
 ├── project-core/            # Single source of truth (NEW)
 │   └── PROJECT.md           # Project overview
-└── (future: execution/)     # Checkpoints per phase
+└── (future: execution/)     # Checkpoints per phase (deferred)
 
-.governance/                 # Unified governance framework (NEW)
+.governance/                 # Unified governance framework (NEW - root only, subdirs deferred)
 ├── schemas/                 # Relational metadata definitions
 ├── hooks/                   # Event-triggered actions
 ├── entities/                # Knowledge graph nodes
@@ -319,13 +329,19 @@ See `SECURITY_FIXES_SUMMARY.md` for complete security documentation.
 
 ## Session Handoff
 
-When resuming work on iDumb itself, check `.idumb/idumb-brain/SESSION-HANDOFF-*.md` files for:
+When resuming work on iDumb itself, check `.idumb/sessions/SESSION-HANDOFF-*.md` files for:
 - What was completed in previous sessions
 - Current known issues and their fixes
 - Remaining work by priority phase
 - Context anchors that survived compaction
 
-## Current Status (as of 2026-02-04)
+## Current Status (as of 2026-02-05)
+
+### Path Structure Standardization Complete
+- **Standardized paths**: All components now reference `.idumb/brain/` instead of `.idumb/idumb-brain/`
+- **Directory reorganization**: Sessions moved out of brain, new project-core directory
+- **Governance framework**: New `.governance/` root directory established
+- **Documentation sync**: All README and documentation files updated to reflect new structure
 
 ### GSD Transformation Complete
 - **46 files transformed** (~28,000 lines total)
@@ -339,11 +355,13 @@ When resuming work on iDumb itself, check `.idumb/idumb-brain/SESSION-HANDOFF-*.
 - Brain State System (session status hierarchy)
 - Agent Concept Fix (meta vs project agents naming)
 - Permission Refinement (selective blocking)
+- **Path Standardization** (Completed 2026-02-05)
 
 ### Recent Additions
 - OpenCode integration skills (conflict prevention, compliance)
 - Security hardening and input validation
 - Skill validation tools and pre-write gates
 - Comprehensive plugin development documentation
+- **Path structure standardization and governance awareness update**
 
 See `.plugin-dev/ROADMAP.md` for full roadmap and phase definitions.

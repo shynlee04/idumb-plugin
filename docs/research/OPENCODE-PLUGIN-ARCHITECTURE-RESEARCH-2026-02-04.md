@@ -540,10 +540,10 @@ function writeState(directory: string, config: Config): void {
 ```
 
 **Directory Paths for State:**
-- `.idumb/idumb-brain/state.json` - Governance state
-- `.idumb/idumb-brain/config.json` - Configuration
-- `.idumb/idumb-brain/governance/` - Validation reports
-- `.idumb/idumb-brain/anchors/` - Persistent context
+- `.idumb/brain/state.json` - Governance state
+- `.idumb/brain/config.json` - Configuration
+- `.idumb/brain/governance/` - Validation reports
+- `.idumb/brain/anchors/` - Persistent context
 
 ### 5.2 Context Sharing Across Agents
 

@@ -87,11 +87,11 @@ Plugin uses valid OpenCode hook signatures:
 - `skills/` → `.opencode/skills/`
 
 Creates `.idumb/` structure:
-- `.idumb/idumb-brain/state.json`
-- `.idumb/idumb-brain/config.json`
-- `.idumb/idumb-brain/governance/`
-- `.idumb/idumb-brain/anchors/`
-- `.idumb/idumb-brain/sessions/`
+- `.idumb/brain/state.json`
+- `.idumb/brain/config.json`
+- `.idumb/brain/governance/`
+- `.idumb/brain/anchors/`
+- `.idumb/brain/sessions/`
 
 ---
 
