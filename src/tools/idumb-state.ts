@@ -9,6 +9,7 @@
 import { tool } from "@opencode-ai/plugin"
 import { existsSync, readFileSync, writeFileSync, mkdirSync, readdirSync, statSync, unlinkSync, rmdirSync } from "fs"
 import { join } from "path"
+import { smartDelegate, enhanceDelegation } from "../lib/smart-delegate"
 
 interface IdumbState {
   version: string
