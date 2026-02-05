@@ -272,9 +272,9 @@ created: 2026-01-01T00:00:00.000Z
       // Parse the result
       const parsed = matter(result)
 
-      // ID should be updated (regenerated)
+      // ID should be preserved (Phase 7: maintain document identity)
       expect(parsed.data.id).toBeDefined()
-      expect(parsed.data.id).not.toBe('old-id')
+      expect(parsed.data.id).toBe('old-id')
 
       // Title should be extracted from content
       expect(parsed.data.title).toBe('New Title')

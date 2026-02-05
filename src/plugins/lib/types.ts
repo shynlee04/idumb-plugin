@@ -221,6 +221,13 @@ export interface SessionTracker {
     startTime?: Date
     activeStyle?: string
     styleCache?: any  // Will be StyleContent when styles.ts is created
+
+    // Phase 6b: Message interception fields
+    accumulatedScore?: number      // Current toxicity score
+    messageCount?: number          // Total messages in session
+    lastScoreUpdate?: string       // ISO timestamp of last score change
+    purificationTriggered?: boolean // Whether purification was triggered
+    history?: HistoryEntry[]       // Recent action history for flow indicators
 }
 
 // ============================================================================

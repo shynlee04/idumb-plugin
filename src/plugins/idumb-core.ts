@@ -109,7 +109,17 @@ import {
   // Frontmatter auto-generation
   shouldAutoFrontmatter,
   injectFrontmatter,
-  validateIdumbFrontmatter
+  validateIdumbFrontmatter,
+
+  // Message scoring and purification
+  countWords,
+  containsFileContext,
+  isOtherToolMessage,
+  buildFlowIndicator,
+  updateAccumulatedScore,
+  resetScore,
+  buildPurificationContext,
+  type ScoreResult
 } from "./lib"
 
 // Part type for command hook output
@@ -641,6 +651,79 @@ export const IdumbCorePlugin: Plugin = async ({ directory, client }) => {
               'plugin',
               'pass'
             )
+          }
+        }
+
+        // ==========================================
+        // MESSAGE INTERCEPTION (Phase 6b Implementation)
+        // ==========================================
+
+        // Get current state for flow indicators and purification
+        const currentState = readState(directory)
+
+        // Scenario 4: Early return for other tool messages
+        if (isOtherToolMessage(output.messages)) {
+          log(directory, 'Skipping message transformation (other tool detected)')
+          return { messages: output.messages }
+        }
+
+        // Scenario 2: Short message flow indicator injection
+        // Check if this is a short message without file context
+        const lastMessage = output.messages[output.messages.length - 1]
+        if (lastMessage && lastMessage.parts) {
+          const messageText = lastMessage.parts
+            .filter((p: any) => p.type === 'text')
+            .map((p: any) => p.text)
+            .join(' ')
+
+          const wordCount = countWords(messageText)
+          const hasFileContext = containsFileContext(messageText)
+
+          if (wordCount < 20 && !hasFileContext && tracker.history) {
+            const flowIndicator = buildFlowIndicator(tracker.history, currentState)
+
+            if (flowIndicator) {
+              lastMessage.parts.push({
+                type: 'text',
+                text: `\n\n[CONTEXT FLOW]\n${flowIndicator}`
+              })
+
+              log(directory, 'Injected flow indicator for short message')
+            }
+          }
+        }
+
+        // Scenario 3: Accumulated toxicity scoring
+        const scoreResult: ScoreResult = updateAccumulatedScore(
+          directory,
+          sessionId,
+          lastMessage
+        )
+
+        // Update session tracker with scoring data
+        tracker.accumulatedScore = scoreResult.score
+        tracker.messageCount = (tracker.messageCount || 0) + 1
+        tracker.lastScoreUpdate = new Date().toISOString()
+
+        // Check thresholds and trigger purification if needed
+        if (scoreResult.level === 'purify' || scoreResult.level === 'emergency') {
+          const purificationContext = buildPurificationContext(
+            directory,
+            sessionId,
+            currentState
+          )
+
+          lastMessage.parts.push({
+            type: 'text',
+            text: `\n\n[CONTEXT PURIFICATION REQUIRED - Level: ${scoreResult.level.toUpperCase()}]\n${purificationContext}`
+          })
+
+          log(directory, `Purification triggered: ${scoreResult.level} (score: ${scoreResult.score})`)
+
+          // Reset after emergency trigger
+          if (scoreResult.level === 'emergency') {
+            resetScore(directory, sessionId)
+            tracker.purificationTriggered = true
           }
         }
 

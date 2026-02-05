@@ -1,8 +1,72 @@
 # iDumb Skill Architecture Summary
 
-**Date**: 2026-02-04
-**Version**: 1.0.0
+**Date**: 2026-02-05
+**Version**: 1.1.0
 **Status**: Active
+
+---
+
+## Critical: Commands vs Workflows vs Skills
+
+Understanding the distinction between these three layers is essential for proper iDumb development.
+
+### The Three-Layer Architecture
+
+```
+COMMAND (Entry Point)
+    ↓ triggers
+WORKFLOW (Execution Logic)
+    ↓ loads dynamically
+SKILL (Domain Expertise)
+```
+
+### What Each Layer Does
+
+| Layer | Purpose | Location | Examples |
+|-------|---------|----------|----------|
+| **COMMAND** | User-facing entry point, flags, routing | `src/commands/idumb/*.md` | `/idumb:brainstorm`, `/idumb:research` |
+| **WORKFLOW** | Step-by-step execution logic, state transitions | `src/workflows/*.md` | `brainstorm.md`, `research.md` |
+| **SKILL** | Domain expertise, specialized knowledge | `src/skills/*/SKILL.md` | `frontend-design`, `api-design`, `mcp-builder` |
+
+### Key Principle: Skills Are NOT Workflows
+
+**WRONG:** Creating a "brainstorm-skill" or "research-skill"
+- Brainstorm and research are ACTIVITIES (commands + workflows)
+- They are not domain-specific expertise
+
+**CORRECT:** Commands trigger workflows, which load domain skills dynamically
+
+```
+/idumb:brainstorm "build a dashboard"
+    ↓
+brainstorm workflow detects sector: web-fe
+    ↓
+loads skill: frontend-design
+    ↓
+skill provides domain expertise for UI ideation
+```
+
+### Skill Discovery Flow
+
+When a workflow needs domain expertise:
+
+1. **Detect sector** from codebase, keywords, or user flags
+2. **Map sector to skill** using sector-to-skill mapping
+3. **Check local skills** in `.claude/skills/`
+4. **Discover if missing** via `find-skills` pattern
+5. **Load skill context** for domain-specific guidance
+
+### Sector-to-Skill Mapping
+
+| Sector | Skill to Load | Expertise Provided |
+|--------|---------------|-------------------|
+| `web-fe` | `frontend-design` | UI patterns, components, styling |
+| `web-be` | `api-design` | API patterns, architecture |
+| `fullstack` | `frontend-design` + `api-design` | Full stack patterns |
+| `aiml` | `mcp-builder` | AI/ML agent patterns |
+| `cli` | `cli-patterns` | CLI UX patterns |
+| `mobile` | `mobile-design` | Mobile app patterns |
+| `unknown` | `find-skills` | Discover appropriate skill |
 
 ---
 

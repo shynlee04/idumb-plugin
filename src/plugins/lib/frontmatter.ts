@@ -38,6 +38,8 @@ const AUTO_FRONTMATTER_PATHS = [
 
 /**
  * iDumb frontmatter schema
+ *
+ * Phase 7 Enhanced: Extended with relationship tracking and decision trail fields
  */
 export interface IdumbFrontmatter {
   /** UUID v7 identifier (time-ordered, sortable) */
@@ -66,6 +68,36 @@ export interface IdumbFrontmatter {
   milestone?: string
   /** Dependency IDs */
   dependencies?: string[]
+
+  // ===== PHASE 7: ENHANCED RELATIONSHIP TRACKING FIELDS =====
+  /** IDs of child documents (reverse lookup cache, auto-maintained) */
+  child_ids?: string[]
+  /** IDs of loosely referenced documents (non-dependencies) */
+  references?: string[]
+  /**
+   * Schema type for validation
+   * Auto-detected from document type (e.g., "phase-v1", "decision-v1")
+   */
+  schema_type?: string
+  /**
+   * Rationale for why this document exists
+   * Particularly important for decision documents
+   */
+  decision_reason?: string
+  /**
+   * Post-mortem analysis of what went wrong
+   * Used for learning from failures
+   */
+  failure_analysis?: string
+  /** Linked requirement or milestone IDs */
+  requirement_ids?: string[]
+  /** Associated validation report IDs */
+  validation_ids?: string[]
+  /**
+   * Extension point for user-defined metadata
+   * Allows arbitrary custom fields while maintaining schema validation
+   */
+  custom?: Record<string, any>
 }
 
 // ============================================================================
@@ -140,6 +172,24 @@ export function detectDocumentType(filePath: string): string {
  * @param sessionId - Optional session ID for parent tracking
  * @returns Complete frontmatter object
  */
+/**
+ * Maps document type to schema version
+ * @param docType - Document type string
+ * @returns Schema version string (e.g., "phase-v1", "base-v1")
+ */
+function mapTypeToSchema(docType: string): string {
+  const schemaMap: Record<string, string> = {
+    'phase': 'phase-v1',
+    'task': 'task-v1',
+    'research': 'research-v1',
+    'decision': 'decision-v1',
+    'validation': 'base-v1',
+    'session': 'base-v1',
+    'checkpoint': 'base-v1',
+  }
+  return schemaMap[docType] || 'base-v1'
+}
+
 export function generateIdumbFrontmatter(
   filePath: string,
   content: string,
@@ -152,14 +202,18 @@ export function generateIdumbFrontmatter(
     ? (extractTitle(content) || extractTitleFromPath(filePath))
     : 'Untitled'
 
+  const docType = detectDocumentType(filePath) as IdumbFrontmatter['type']
+
   return {
     id: uuidv7(),
     title,
-    type: detectDocumentType(filePath) as IdumbFrontmatter['type'],
+    type: docType,
     created: new Date().toISOString(),
     parent_id: sessionId,
     source_agent: agentRole,
     status: 'active',
+    // Phase 7: Auto-detect schema type from document type
+    schema_type: mapTypeToSchema(docType),
   }
 }
 
@@ -223,14 +277,27 @@ export function injectFrontmatter(
   let mergedData: Record<string, any>
 
   if (hasIdumbFrontmatter) {
-    // Updating existing iDumb frontmatter: preserve type and created, update everything else
+    // Updating existing iDumb frontmatter: preserve critical fields, update others
     mergedData = {
       ...frontmatter,
+      id: parsed.data.id, // Preserve original ID
       type: parsed.data.type, // Preserve original type
       created: parsed.data.created instanceof Date
         ? parsed.data.created.toISOString()
         : parsed.data.created, // Preserve original created timestamp as ISO string
       updated: new Date().toISOString(),
+      // Phase 7: Preserve relationship tracking fields
+      child_ids: parsed.data.child_ids,
+      references: parsed.data.references,
+      decision_reason: parsed.data.decision_reason,
+      failure_analysis: parsed.data.failure_analysis,
+      requirement_ids: parsed.data.requirement_ids,
+      validation_ids: parsed.data.validation_ids,
+      // Merge custom fields (new custom takes precedence for conflicts)
+      custom: {
+        ...(parsed.data.custom || {}),
+        ...(frontmatter.custom || {}),
+      },
     }
   } else {
     // New document: merge non-iDumb fields with new iDumb frontmatter
