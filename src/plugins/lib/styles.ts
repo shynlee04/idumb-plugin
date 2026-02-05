@@ -31,7 +31,7 @@ export interface StyleContent extends StyleConfig {
 // ========================================================================
 
 export function getStylesDir(directory: string): string {
-  return join(directory, ".idumb", "idumb-brain", "styles")
+  return join(directory, ".idumb", "brain", "styles")
 }
 
 export function ensureStylesDir(directory: string): string {

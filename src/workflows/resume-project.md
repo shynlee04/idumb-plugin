@@ -34,7 +34,7 @@ Core principles that guide my execution:
 
 ```bash
 # Check if iDumb is initialized
-if [ ! -d ".idumb/idumb-brain" ]; then
+if [ ! -d ".idumb/brain" ]; then
   echo "ERROR: iDumb not initialized"
   echo "This workflow requires an existing iDumb project."
   echo "Run /idumb:init to initialize, or /idumb:new-project to start fresh."
@@ -42,7 +42,7 @@ if [ ! -d ".idumb/idumb-brain" ]; then
 fi
 
 # Check for state.json (minimum requirement)
-if [ ! -f ".idumb/idumb-brain/state.json" ]; then
+if [ ! -f ".idumb/brain/state.json" ]; then
   echo "ERROR: No state.json found"
   echo "The iDumb brain directory exists but state.json is missing."
   echo "This may indicate corrupted installation."
@@ -54,12 +54,12 @@ if [ ! -f ".idumb/idumb-brain/state.json" ]; then
 fi
 
 # Validate state.json is valid JSON
-if ! jq empty .idumb/idumb-brain/state.json 2>/dev/null; then
+if ! jq empty .idumb/brain/state.json 2>/dev/null; then
   echo "ERROR: state.json is corrupted (invalid JSON)"
   echo "Attempting recovery from backup..."
   
-  if [ -f ".idumb/idumb-brain/state.json.backup" ]; then
-    cp .idumb/idumb-brain/state.json.backup .idumb/idumb-brain/state.json
+  if [ -f ".idumb/brain/state.json.backup" ]; then
+    cp .idumb/brain/state.json.backup .idumb/brain/state.json
     echo "Restored from backup. Continuing..."
   else
     echo "No backup found. Manual recovery needed."
@@ -85,7 +85,7 @@ echo "Entry check passed. State file valid."
 **Commands:**
 ```bash
 # Load state
-STATE=$(cat .idumb/idumb-brain/state.json)
+STATE=$(cat .idumb/brain/state.json)
 
 # Extract key fields
 FRAMEWORK=$(echo "$STATE" | jq -r '.framework // "unknown"')
@@ -116,7 +116,7 @@ echo "History Entries: $HISTORY_COUNT"
 **Commands:**
 ```bash
 # Extract all anchors
-ANCHORS=$(jq '.anchors // []' .idumb/idumb-brain/state.json)
+ANCHORS=$(jq '.anchors // []' .idumb/brain/state.json)
 
 # Count by priority
 CRITICAL=$(echo "$ANCHORS" | jq '[.[] | select(.priority == "critical")] | length')
@@ -147,7 +147,7 @@ echo "$ANCHORS" | jq -r '.[] | select(.priority == "critical") | "  - [\(.type)]
 **Commands:**
 ```bash
 # Check state file age
-STATE_MODIFIED=$(stat -f %m .idumb/idumb-brain/state.json 2>/dev/null || stat -c %Y .idumb/idumb-brain/state.json 2>/dev/null)
+STATE_MODIFIED=$(stat -f %m .idumb/brain/state.json 2>/dev/null || stat -c %Y .idumb/brain/state.json 2>/dev/null)
 NOW=$(date +%s)
 AGE_HOURS=$(( (NOW - STATE_MODIFIED) / 3600 ))
 
@@ -167,7 +167,7 @@ fi
 
 # Check for external planning changes
 if [ -d ".planning" ]; then
-  PLANNING_MODIFIED=$(find .planning -type f -name "*.md" -newer .idumb/idumb-brain/state.json 2>/dev/null | wc -l | tr -d ' ')
+  PLANNING_MODIFIED=$(find .planning -type f -name "*.md" -newer .idumb/brain/state.json 2>/dev/null | wc -l | tr -d ' ')
   if [ "$PLANNING_MODIFIED" -gt 0 ]; then
     echo "WARNING: $PLANNING_MODIFIED planning files modified since last session"
     FRESHNESS="conflicted"
@@ -175,7 +175,7 @@ if [ -d ".planning" ]; then
 fi
 
 # Check last validation timestamp
-LAST_VAL=$(jq -r '.lastValidation // ""' .idumb/idumb-brain/state.json)
+LAST_VAL=$(jq -r '.lastValidation // ""' .idumb/brain/state.json)
 if [ -n "$LAST_VAL" ] && [ "$LAST_VAL" != "null" ]; then
   LAST_VAL_TS=$(date -jf "%Y-%m-%dT%H:%M:%S" "${LAST_VAL%.*}" +%s 2>/dev/null || echo "0")
   VAL_AGE_HOURS=$(( (NOW - LAST_VAL_TS) / 3600 ))
@@ -229,8 +229,8 @@ if [ -d ".planning/phases" ]; then
     fi
     
     # Check for in-progress execution
-    if [ -f ".idumb/idumb-brain/execution/$N/progress.json" ]; then
-      IN_PROGRESS=$(jq -r '.tasks[]? | select(.status == "in_progress") | .id' ".idumb/idumb-brain/execution/$N/progress.json" 2>/dev/null | head -1)
+    if [ -f ".idumb/brain/execution/$N/progress.json" ]; then
+      IN_PROGRESS=$(jq -r '.tasks[]? | select(.status == "in_progress") | .id' ".idumb/brain/execution/$N/progress.json" 2>/dev/null | head -1)
       if [ -n "$IN_PROGRESS" ]; then
         RESUME_POINT="execute-phase"
         PHASE_NUMBER="$N"
@@ -291,7 +291,7 @@ echo "PHASE_NUMBER: $PHASE_NUMBER"
 # Find all progress.json files
 INCOMPLETE_TASKS=""
 
-for progress in .idumb/idumb-brain/execution/*/progress.json; do
+for progress in .idumb/brain/execution/*/progress.json; do
   [ -f "$progress" ] || continue
   
   PHASE_DIR=$(dirname "$progress")
@@ -310,7 +310,7 @@ for progress in .idumb/idumb-brain/execution/*/progress.json; do
 done
 
 # Check for checkpoint
-LATEST_CHECKPOINT=$(ls -t .idumb/idumb-brain/execution/*/checkpoint-*.json 2>/dev/null | head -1)
+LATEST_CHECKPOINT=$(ls -t .idumb/brain/execution/*/checkpoint-*.json 2>/dev/null | head -1)
 if [ -n "$LATEST_CHECKPOINT" ]; then
   CHECKPOINT_TIME=$(jq -r '.timestamp // "unknown"' "$LATEST_CHECKPOINT" 2>/dev/null)
   echo "Latest checkpoint: $CHECKPOINT_TIME"
@@ -438,7 +438,7 @@ esac
 TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 
 # Read current state
-STATE=$(cat .idumb/idumb-brain/state.json)
+STATE=$(cat .idumb/brain/state.json)
 
 # Add history entry
 STATE=$(echo "$STATE" | jq --arg ts "$TIMESTAMP" --arg rp "$RESUME_POINT" \
@@ -448,10 +448,10 @@ STATE=$(echo "$STATE" | jq --arg ts "$TIMESTAMP" --arg rp "$RESUME_POINT" \
 STATE=$(echo "$STATE" | jq --arg ts "$TIMESTAMP" '.lastResume = $ts')
 
 # Write back
-echo "$STATE" | jq '.' > .idumb/idumb-brain/state.json
+echo "$STATE" | jq '.' > .idumb/brain/state.json
 
 # Append to session log
-echo "$TIMESTAMP|resume|$RESUME_POINT|$ANCHOR_COUNT" >> .idumb/idumb-brain/sessions.log
+echo "$TIMESTAMP|resume|$RESUME_POINT|$ANCHOR_COUNT" >> .idumb/brain/sessions.log
 
 echo "State updated. Session logged."
 ```
@@ -501,9 +501,9 @@ Before injection, validate anchor freshness:
 
 ```bash
 # Check if anchor references still valid
-for anchor in $(jq -r '.anchors[]? | select(.type == "context") | .id' .idumb/idumb-brain/state.json); do
+for anchor in $(jq -r '.anchors[]? | select(.type == "context") | .id' .idumb/brain/state.json); do
   # If anchor references a file, check it exists
-  REF=$(jq -r --arg id "$anchor" '.anchors[] | select(.id == $id) | .reference // ""' .idumb/idumb-brain/state.json)
+  REF=$(jq -r --arg id "$anchor" '.anchors[] | select(.id == $id) | .reference // ""' .idumb/brain/state.json)
   if [ -n "$REF" ] && [ ! -f "$REF" ]; then
     echo "WARNING: Anchor $anchor references missing file: $REF"
   fi
@@ -526,9 +526,9 @@ done
 **Recovery Steps:**
 ```bash
 # Check for backup
-if [ -f ".idumb/idumb-brain/state.json.backup" ]; then
+if [ -f ".idumb/brain/state.json.backup" ]; then
   echo "Restoring from backup..."
-  cp .idumb/idumb-brain/state.json.backup .idumb/idumb-brain/state.json
+  cp .idumb/brain/state.json.backup .idumb/brain/state.json
   echo "Restored. Continuing with backup state."
 else
   echo "No backup available. Rebuilding from artifacts..."
@@ -536,7 +536,7 @@ else
   # Rebuild minimal state from .planning/
   PHASE=$(ls -1 .planning/phases/ 2>/dev/null | sort -n | tail -1 || echo "1")
   
-  cat > .idumb/idumb-brain/state.json << EOF
+  cat > .idumb/brain/state.json << EOF
 {
   "version": "0.2.0",
   "initialized": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
@@ -588,7 +588,7 @@ echo "Select (1/2/3): "
 **Resume Flow:**
 ```bash
 # Load last checkpoint
-CHECKPOINT=$(ls -t .idumb/idumb-brain/execution/$PHASE_NUMBER/checkpoint-*.json 2>/dev/null | head -1)
+CHECKPOINT=$(ls -t .idumb/brain/execution/$PHASE_NUMBER/checkpoint-*.json 2>/dev/null | head -1)
 if [ -n "$CHECKPOINT" ]; then
   CHECKPOINT_HASH=$(jq -r '.gitHash // ""' "$CHECKPOINT")
   CURRENT_HASH=$(git rev-parse HEAD 2>/dev/null)
@@ -617,7 +617,7 @@ fi
 echo "⚠️ External Modifications Detected"
 echo ""
 echo "The following planning files were modified outside iDumb:"
-find .planning -type f -name "*.md" -newer .idumb/idumb-brain/state.json 2>/dev/null | while read f; do
+find .planning -type f -name "*.md" -newer .idumb/brain/state.json 2>/dev/null | while read f; do
   MOD_TIME=$(stat -f %Sm "$f" 2>/dev/null || stat -c %y "$f" 2>/dev/null)
   echo "  - $f (modified: $MOD_TIME)"
 done
@@ -640,8 +640,8 @@ echo "Syncing iDumb state with planning artifacts..."
 
 # Update state
 jq --arg phase "$DETECTED_PHASE" '.phase = $phase | .synced = true' \
-  .idumb/idumb-brain/state.json > .idumb/idumb-brain/state.json.tmp
-mv .idumb/idumb-brain/state.json.tmp .idumb/idumb-brain/state.json
+  .idumb/brain/state.json > .idumb/brain/state.json.tmp
+mv .idumb/brain/state.json.tmp .idumb/brain/state.json
 
 echo "Sync complete."
 ```
@@ -650,7 +650,7 @@ echo "Sync complete."
 <output_artifact>
 ## Artifact: Session Log
 
-**Path:** `.idumb/idumb-brain/sessions.log`
+**Path:** `.idumb/brain/sessions.log`
 
 **Format:** `{timestamp}|{action}|{resume_point}|{anchor_count}`
 
@@ -665,7 +665,7 @@ echo "Sync complete."
 
 ## Artifact: Recovery Report (Conditional)
 
-**Path:** `.idumb/idumb-brain/recovery-{timestamp}.json`
+**Path:** `.idumb/brain/recovery-{timestamp}.json`
 
 **Condition:** Only created if recovery was performed
 
@@ -764,29 +764,29 @@ esac
 ## System Integration
 
 ### Trigger Conditions
-- Session start with existing `.idumb/idumb-brain/state.json`
+- Session start with existing `.idumb/brain/state.json`
 - Explicit `/idumb:resume` command
 - Plugin hook detection (prompt intercept)
 
 ### Reads From
 | Path | Purpose |
 |------|---------|
-| `.idumb/idumb-brain/state.json` | Primary governance state |
-| `.idumb/idumb-brain/execution/*/progress.json` | Task progress |
-| `.idumb/idumb-brain/execution/*/checkpoint-*.json` | Execution checkpoints |
+| `.idumb/brain/state.json` | Primary governance state |
+| `.idumb/brain/execution/*/progress.json` | Task progress |
+| `.idumb/brain/execution/*/checkpoint-*.json` | Execution checkpoints |
 | `.planning/**/*.md` | Planning artifacts (read-only) |
-| `.idumb/idumb-brain/config.json` | User configuration |
+| `.idumb/brain/config.json` | User configuration |
 
 ### Writes To
 | Path | Purpose |
 |------|---------|
-| `.idumb/idumb-brain/state.json` | Update lastResume, history |
-| `.idumb/idumb-brain/sessions.log` | Append session entry |
-| `.idumb/idumb-brain/recovery-*.json` | Recovery reports (if needed) |
+| `.idumb/brain/state.json` | Update lastResume, history |
+| `.idumb/brain/sessions.log` | Append session entry |
+| `.idumb/brain/recovery-*.json` | Recovery reports (if needed) |
 
 ### Never Modifies
 - `.planning/*` - Planning owns these files
-- `.idumb/idumb-project-output/*` - Output artifacts
+- `.idumb/project-output/*` - Output artifacts
 - Any source code files
 </integration_points>
 
@@ -794,7 +794,7 @@ esac
 ## Verification Checkboxes
 
 ### Pre-execution
-- [ ] `.idumb/idumb-brain/state.json` exists and valid JSON
+- [ ] `.idumb/brain/state.json` exists and valid JSON
 - [ ] Entry check passed without errors
 
 ### State Loading

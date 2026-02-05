@@ -1000,7 +1000,7 @@ async function main() {
         const overwritePrompt = getLocale() === 'vi'
             ? '⚠ Đã phát hiện cài đặt iDumb trước đó. Ghi đè? [y/n]: '
             : '⚠ Existing iDumb installation detected. Overwrite? [y/n]: ';
-const answer = await prompt(overwritePrompt, 'y');
+        const answer = await prompt(overwritePrompt, 'y');
         if (answer !== 'y' && answer !== 'yes') {
             print(getLocale() === 'vi' ? 'Đã hủy cài đặt.' : 'Installation cancelled.');
             return;

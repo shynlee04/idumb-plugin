@@ -37,7 +37,7 @@ export function getChainRules(): ChainRule[] {
         {
             id: "INIT-01",
             command: "idumb:*",
-            mustBefore: [{ type: "exists", path: ".idumb/idumb-brain/state.json" }],
+            mustBefore: [{ type: "exists", path: ".idumb/brain/state.json" }],
             except: ["/idumb:init", "/idumb:help"],
             onViolation: {
                 action: "redirect",

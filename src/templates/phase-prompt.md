@@ -570,7 +570,7 @@ Task completion ≠ Goal achievement. A task "create chat component" can complet
 
 **State tracking:**
 
-Plans are tracked in `.idumb/idumb-brain/state.json`:
+Plans are tracked in `.idumb/brain/state.json`:
 - Current phase and plan
 - Checkpoint anchors (persisted between sessions)
 - History of executed tasks

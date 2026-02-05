@@ -1,7 +1,7 @@
 /**
  * iDumb State Management Tool
  * 
- * Read and write the governance state stored in .idumb/idumb-brain/state.json
+ * Read and write the governance state stored in .idumb/brain/state.json
  * 
  * IMPORTANT: No console.log - would pollute TUI
  */
@@ -48,11 +48,11 @@ const DEFAULT_STATE: IdumbState = {
 }
 
 function getStatePath(directory: string): string {
-  return join(directory, ".idumb", "idumb-brain", "state.json")
+  return join(directory, ".idumb", "brain", "state.json")
 }
 
 function ensureDirectory(directory: string): void {
-  const brainDir = join(directory, ".idumb", "idumb-brain")
+  const brainDir = join(directory, ".idumb", "brain")
   if (!existsSync(brainDir)) {
     mkdirSync(brainDir, { recursive: true })
   }
@@ -79,7 +79,7 @@ function writeState(directory: string, state: IdumbState): void {
 
 // Read state
 export const read = tool({
-  description: "Read current iDumb governance state from .idumb/idumb-brain/state.json",
+  description: "Read current iDumb governance state from .idumb/brain/state.json",
   args: {},
   async execute(args, context) {
     const state = readState(context.directory)

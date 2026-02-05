@@ -58,14 +58,14 @@ if [ ! -d ".idumb" ]; then
 fi
 
 # Check for state file
-STATE_FILE=".idumb/idumb-brain/state.json"
+STATE_FILE=".idumb/brain/state.json"
 if [ ! -f "$STATE_FILE" ]; then
   echo "WARNING: state.json missing"
   NEEDS_REPAIR=true
 fi
 
 # Check for config file
-CONFIG_FILE=".idumb/idumb-brain/config.json"
+CONFIG_FILE=".idumb/brain/config.json"
 if [ ! -f "$CONFIG_FILE" ]; then
   echo "WARNING: config.json missing"
   NEEDS_REPAIR=true
@@ -110,23 +110,23 @@ Return: pass/fail with specific issues
 ```yaml
 checks:
   state_file:
-    path: .idumb/idumb-brain/state.json
+    path: .idumb/brain/state.json
     criteria: exists, valid_json, has_required_fields
     
   config_file:
-    path: .idumb/idumb-brain/config.json
+    path: .idumb/brain/config.json
     criteria: exists, valid_json, has_required_fields
     
   brain_directory:
-    path: .idumb/idumb-brain/
+    path: .idumb/brain/
     criteria: exists, has_subdirectories
     
   governance_directory:
-    path: .idumb/idumb-brain/governance/
+    path: .idumb/brain/governance/
     criteria: exists
     
   output_directory:
-    path: .idumb/idumb-project-output/
+    path: .idumb/project-output/
     criteria: exists
 ```
 
@@ -136,11 +136,11 @@ Identify stale files older than 48 hours.
 
 ```bash
 # Find files older than 48 hours in context directories
-find .idumb/idumb-brain/context -type f -mtime +2 2>/dev/null | while read file; do
+find .idumb/brain/context -type f -mtime +2 2>/dev/null | while read file; do
   echo "STALE: $file"
 done
 
-find .idumb/idumb-brain/governance -type f -mtime +2 2>/dev/null | while read file; do
+find .idumb/brain/governance -type f -mtime +2 2>/dev/null | while read file; do
   echo "STALE: $file"
 done
 ```
@@ -358,9 +358,9 @@ recommendations:
 
 ```bash
 # Manual verification
-cat .idumb/idumb-brain/state.json | jq .
-cat .idumb/idumb-brain/config.json | jq .
-ls -la .idumb/idumb-brain/
+cat .idumb/brain/state.json | jq .
+cat .idumb/brain/config.json | jq .
+ls -la .idumb/brain/
 ```
 
 </success_criteria>

@@ -109,7 +109,7 @@ No step is skipped. No shortcuts.
 
 ## Guardian of State
 
-The governance state (`.idumb/idumb-brain/state.json`) is the single source of truth. I:
+The governance state (`.idumb/brain/state.json`) is the single source of truth. I:
 - Read state before any action
 - Update state after changes
 - Create anchors for critical decisions
@@ -677,8 +677,8 @@ Use format from `<structured_returns>` section.
 
 ### Consumes From
 - **@idumb-supreme-coordinator**: All meta-level work requests
-- **State**: .idumb/idumb-brain/state.json
-- **Config**: .idumb/idumb-brain/config.json
+- **State**: .idumb/brain/state.json
+- **Config**: .idumb/brain/config.json
 - **Planning**: .planning/ artifacts (read-only)
 
 ### Delivers To

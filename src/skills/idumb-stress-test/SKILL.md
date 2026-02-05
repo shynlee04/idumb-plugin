@@ -308,7 +308,7 @@ checks:
       
   - state_json:
       schema: "src/schemas/state.json"
-      file: ".idumb/idumb-brain/state.json"
+      file: ".idumb/brain/state.json"
 
 pass_criteria:
   - all_files_valid: true

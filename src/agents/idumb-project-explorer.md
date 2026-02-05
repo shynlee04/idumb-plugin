@@ -15,9 +15,9 @@ permission:
     tree: allow
     "wc*": allow
   edit:
-    ".idumb/idumb-project-output/exploration/**/*.md": allow
+    ".idumb/project-output/exploration/**/*.md": allow
   write:
-    ".idumb/idumb-project-output/exploration/**/*.md": allow
+    ".idumb/project-output/exploration/**/*.md": allow
 tools:
   task: true
   todoread: true

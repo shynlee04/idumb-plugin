@@ -42,9 +42,9 @@ permission:
     "tail *": allow
     # Other commands implicitly denied - no wildcard ask
   edit:
-    ".idumb/idumb-project-output/**/*.md": allow
+    ".idumb/project-output/**/*.md": allow
   write:
-    ".idumb/idumb-project-output/**/*.md": allow
+    ".idumb/project-output/**/*.md": allow
 tools:
   task: true              # Primary tool - delegation
   todoread: true
@@ -776,7 +776,7 @@ After coordination completes, compile governance report:
 
 ### Consumes From
 - **@idumb-high-governance**: Project-level work requests and phase execution
-- **State**: .idumb/idumb-brain/state.json for current project context
+- **State**: .idumb/brain/state.json for current project context
 - **Planning**: .planning/ for phase plans and objectives
 
 ### Delivers To

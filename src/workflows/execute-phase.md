@@ -48,7 +48,7 @@ PLAN_PATH=$(ls .planning/phases/${N}/*PLAN.md 2>/dev/null | head -1)
 test -n "$PLAN_PATH" || { echo "ERROR: No plan found at .planning/phases/${N}/*PLAN.md"; echo "ACTION: Run /idumb:plan-phase ${N} first"; exit 1; }
 
 # 2. Verify state is initialized
-STATE_FILE=".idumb/idumb-brain/state.json"
+STATE_FILE=".idumb/brain/state.json"
 test -f "$STATE_FILE" || { echo "ERROR: iDumb not initialized"; echo "ACTION: Run /idumb:init first"; exit 1; }
 
 # 3. Check phase status allows execution
@@ -56,11 +56,11 @@ PHASE_STATUS=$(cat "$STATE_FILE" | grep -o '"phase"[[:space:]]*:[[:space:]]*"[^"
 echo "Current phase status: $PHASE_STATUS"
 
 # 4. Create execution directory if needed
-mkdir -p ".idumb/idumb-brain/execution/${N}"
-echo "Execution directory ready: .idumb/idumb-brain/execution/${N}/"
+mkdir -p ".idumb/brain/execution/${N}"
+echo "Execution directory ready: .idumb/brain/execution/${N}/"
 
 # 5. Check for existing progress (resume scenario)
-PROGRESS_FILE=".idumb/idumb-brain/execution/${N}/progress.json"
+PROGRESS_FILE=".idumb/brain/execution/${N}/progress.json"
 if [ -f "$PROGRESS_FILE" ]; then
     COMPLETED=$(cat "$PROGRESS_FILE" | grep -o '"completed"' | wc -l)
     echo "RESUME DETECTED: Found progress file with previous completed tasks"
@@ -105,7 +105,7 @@ echo "Found approximately $TASK_COUNT tasks in plan"
 
 **Commands:**
 ```bash
-PROGRESS_FILE=".idumb/idumb-brain/execution/${N}/progress.json"
+PROGRESS_FILE=".idumb/brain/execution/${N}/progress.json"
 
 if [ -f "$PROGRESS_FILE" ]; then
     echo "=== RESUME MODE ==="
@@ -253,7 +253,7 @@ else:
 ### Step 4e: Create Checkpoint
 ```bash
 # After each task completion
-CHECKPOINT_FILE=".idumb/idumb-brain/execution/${N}/checkpoint-${TASK_ID}.json"
+CHECKPOINT_FILE=".idumb/brain/execution/${N}/checkpoint-${TASK_ID}.json"
 
 cat > "$CHECKPOINT_FILE" << EOF
 {
@@ -290,7 +290,7 @@ FAILED_COUNT=$(grep -c '"failed"' "$PROGRESS_FILE" || echo 0)
 BLOCKED_COUNT=$(grep -c '"blocked"' "$PROGRESS_FILE" || echo 0)
 
 # Get all files modified during this phase
-FILES_MODIFIED=$(find ".idumb/idumb-brain/execution/${N}" -name "checkpoint-*.json" -exec grep -h "files_modified" {} \; | sort -u)
+FILES_MODIFIED=$(find ".idumb/brain/execution/${N}" -name "checkpoint-*.json" -exec grep -h "files_modified" {} \; | sort -u)
 
 echo "Summary: $COMPLETED_COUNT completed, $FAILED_COUNT failed, $BLOCKED_COUNT blocked"
 ```
@@ -340,7 +340,7 @@ Execution of phase {N} completed at {timestamp}.
 **Commands:**
 ```bash
 # Update state.json
-STATE_FILE=".idumb/idumb-brain/state.json"
+STATE_FILE=".idumb/brain/state.json"
 
 # Read current state
 CURRENT_STATE=$(cat "$STATE_FILE")
@@ -419,7 +419,7 @@ USE: idumb-state_history
 ### Resume Protocol
 ```bash
 # 1. Load latest progress
-PROGRESS=$(cat ".idumb/idumb-brain/execution/${N}/progress.json")
+PROGRESS=$(cat ".idumb/brain/execution/${N}/progress.json")
 
 # 2. Verify git consistency
 SAVED_HASH=$(echo "$PROGRESS" | grep -o '"git_hash"[^,]*' | cut -d'"' -f4)
@@ -430,7 +430,7 @@ if [ "$SAVED_HASH" != "$CURRENT_HASH" ]; then
     echo "Options:"
     echo "  1. Continue anyway (may cause conflicts)"
     echo "  2. Reset to checkpoint hash: git checkout $SAVED_HASH"
-    echo "  3. Start fresh: rm -rf .idumb/idumb-brain/execution/${N}/"
+    echo "  3. Start fresh: rm -rf .idumb/brain/execution/${N}/"
 fi
 
 # 3. Rebuild task queue excluding completed
@@ -450,7 +450,7 @@ echo "Resuming execution..."
 **Rollback Steps:**
 ```bash
 # 1. Identify last good checkpoint
-LAST_GOOD=$(ls -t .idumb/idumb-brain/execution/${N}/checkpoint-*.json | head -1)
+LAST_GOOD=$(ls -t .idumb/brain/execution/${N}/checkpoint-*.json | head -1)
 GOOD_HASH=$(grep -o '"git_hash"[^,]*' "$LAST_GOOD" | cut -d'"' -f4)
 
 # 2. Present options
@@ -648,7 +648,7 @@ EXECUTION HALTED: Critical task {task_id} failed after {attempts} attempts.
 
 Error: {error_message}
 
-Checkpoint saved at: .idumb/idumb-brain/execution/{N}/checkpoint-{task_id}.json
+Checkpoint saved at: .idumb/brain/execution/{N}/checkpoint-{task_id}.json
 
 Recommended action: /idumb:debug --task {task_id}
 ```
@@ -701,17 +701,17 @@ Recommended action: /idumb:debug --task {task_id}
 | Path | Purpose | Required |
 |------|---------|----------|
 | `.planning/phases/{N}/*PLAN.md` | Task definitions | Yes |
-| `.idumb/idumb-brain/execution/{N}/progress.json` | Resume state | No |
-| `.idumb/idumb-brain/state.json` | Governance state | Yes |
+| `.idumb/brain/execution/{N}/progress.json` | Resume state | No |
+| `.idumb/brain/state.json` | Governance state | Yes |
 | `.planning/ROADMAP.md` | Phase context | No |
 
 ### Writes To
 | Path | Purpose | Created By |
 |------|---------|------------|
 | `.planning/phases/{N}/*SUMMARY.md` | Execution summary | This workflow |
-| `.idumb/idumb-brain/execution/{N}/progress.json` | Task progress | This workflow |
-| `.idumb/idumb-brain/execution/{N}/checkpoint-*.json` | Task checkpoints | This workflow |
-| `.idumb/idumb-brain/state.json` | State updates | Via idumb-state tool |
+| `.idumb/brain/execution/{N}/progress.json` | Task progress | This workflow |
+| `.idumb/brain/execution/{N}/checkpoint-*.json` | Task checkpoints | This workflow |
+| `.idumb/brain/state.json` | State updates | Via idumb-state tool |
 
 ### Git Interaction
 - **Read:** Current commit hash for checkpoints

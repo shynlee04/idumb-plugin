@@ -27,7 +27,7 @@ Complete protocols for operating within the iDumb hierarchical governance system
 
 Before ANY action:
 
-1. Read `.idumb/idumb-brain/state.json`
+1. Read `.idumb/brain/state.json`
 2. Check current phase
 3. Identify stale context (>48h old)
 4. Anchor decisions that must survive compaction
@@ -224,7 +224,7 @@ anchor:
 After planning operations:
 
 1. Read `PROJECT.md` for current phase
-2. Update `.idumb/idumb-brain/state.json` phase
+2. Update `.idumb/brain/state.json` phase
 3. Log sync in governance history
 
 ---

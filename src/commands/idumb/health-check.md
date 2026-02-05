@@ -13,13 +13,13 @@ Execute a comprehensive health check on the project's governance state. Calculat
 <execution_context>
 ## Reference Files
 - Skill: `src/skills/idumb-project-validation/SKILL.md`
-- State: `.idumb/idumb-brain/state.json`
-- Config: `.idumb/idumb-brain/config.json`
+- State: `.idumb/brain/state.json`
+- Config: `.idumb/brain/config.json`
 - Validation: Previous validation reports
 
 ## Integration Points
 - Reads: All governance files, project structure, git state
-- Writes: `.idumb/idumb-brain/governance/health-check-{timestamp}.json`
+- Writes: `.idumb/brain/governance/health-check-{timestamp}.json`
 - Triggers: Can trigger self-healing if issues found
 </execution_context>
 
@@ -111,7 +111,7 @@ GOVERNANCE_SCORE=0
 GOVERNANCE_MAX=100
 
 # Check 1: State file valid (25 points)
-if jq . .idumb/idumb-brain/state.json > /dev/null 2>&1; then
+if jq . .idumb/brain/state.json > /dev/null 2>&1; then
   echo "✓ state.json valid"
   GOVERNANCE_SCORE=$((GOVERNANCE_SCORE + 25))
 else
@@ -119,7 +119,7 @@ else
 fi
 
 # Check 2: Config file valid (25 points)
-if jq . .idumb/idumb-brain/config.json > /dev/null 2>&1; then
+if jq . .idumb/brain/config.json > /dev/null 2>&1; then
   echo "✓ config.json valid"
   GOVERNANCE_SCORE=$((GOVERNANCE_SCORE + 25))
 else
@@ -127,7 +127,7 @@ else
 fi
 
 # Check 3: State freshness (25 points)
-LAST_VALIDATION=$(jq -r '.lastValidation // "1970-01-01T00:00:00Z"' .idumb/idumb-brain/state.json || echo "1970-01-01T00:00:00Z")
+LAST_VALIDATION=$(jq -r '.lastValidation // "1970-01-01T00:00:00Z"' .idumb/brain/state.json || echo "1970-01-01T00:00:00Z")
 HOURS_OLD=$(calculate_hours_old "$LAST_VALIDATION")
 if [ "$HOURS_OLD" -lt 48 ]; then
   echo "✓ State is fresh ($HOURS_OLD hours old)"
@@ -350,7 +350,7 @@ validate_timestamp "$TIMESTAMP"
 
 # Security: Sanitize timestamp in filename
 SAFE_TIMESTAMP=$(echo "$TIMESTAMP" | tr -d ':')
-REPORT_DIR=".idumb/idumb-brain/governance"
+REPORT_DIR=".idumb/brain/governance"
 safe_mkdir "$REPORT_DIR"
 REPORT_FILE="$REPORT_DIR/health-check-${SAFE_TIMESTAMP}.json"
 

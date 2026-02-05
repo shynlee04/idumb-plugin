@@ -14,9 +14,9 @@ permission:
     "cat*": allow
     "grep*": allow
   edit:
-    ".idumb/idumb-project-output/challenges/**/*.md": allow
+    ".idumb/project-output/challenges/**/*.md": allow
   write:
-    ".idumb/idumb-project-output/challenges/**/*.md": allow
+    ".idumb/project-output/challenges/**/*.md": allow
 tools:
   task: true
   todoread: true

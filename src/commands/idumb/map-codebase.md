@@ -67,7 +67,7 @@ The map-codebase command forces specific flows through skill activations:
    - Prevents context overflow from scanning entire codebase
 
 2. **Research Artifact Writing** (`idumb-research-writer`)
-   - Writes structured artifacts to `.idumb/idumb-project-output/codebase/`
+   - Writes structured artifacts to `.idumb/project-output/codebase/`
    - Enables persistent codebase analysis results
 
 </skills>
@@ -88,7 +88,7 @@ if [ ! -d ".idumb" ]; then
 fi
 
 # Check output directory
-mkdir -p .idumb/idumb-project-output/codebase
+mkdir -p .idumb/project-output/codebase
 
 # Verify templates (optional)
 [ -d ".opencode/templates" ] && HAS_TEMPLATES=true
@@ -110,7 +110,7 @@ parallel_scanners:
       - Dependencies (package.json, Cargo.toml, go.mod, etc.)
       - Build tools and configuration
       - Runtime requirements
-    output: .idumb/idumb-project-output/codebase/tech-stack.json
+    output: .idumb/project-output/codebase/tech-stack.json
 
   arch_scanner:
     agent: @idumb-codebase-mapper
@@ -122,7 +122,7 @@ parallel_scanners:
       - Module boundaries
       - Entry points
       - Dependency flow direction
-    output: .idumb/idumb-project-output/codebase/architecture.json
+    output: .idumb/project-output/codebase/architecture.json
 
   quality_scanner:
     agent: @idumb-codebase-mapper
@@ -134,7 +134,7 @@ parallel_scanners:
       - Linting configuration
       - Type safety (TypeScript strict, etc.)
       - Documentation coverage
-    output: .idumb/idumb-project-output/codebase/quality.json
+    output: .idumb/project-output/codebase/quality.json
 
   concerns_scanner:
     agent: @idumb-codebase-mapper
@@ -147,7 +147,7 @@ parallel_scanners:
       - Circular dependencies
       - Security anti-patterns
       - Outdated dependencies
-    output: .idumb/idumb-project-output/codebase/concerns.json
+    output: .idumb/project-output/codebase/concerns.json
 ```
 
 **Scanner Execution:**
@@ -168,7 +168,7 @@ Wait for all scanners to complete and validate outputs.
 ```bash
 # Verify all outputs exist
 for focus in tech arch quality concerns; do
-  file=".idumb/idumb-project-output/codebase/${focus}.json"
+  file=".idumb/project-output/codebase/${focus}.json"
   if [ ! -f "$file" ]; then
     echo "WARNING: Scanner output missing: $file"
   fi
@@ -256,11 +256,11 @@ Task: Generate codebase documentation
 Template: (if available) .opencode/templates/codebase-docs.md
 
 Generate:
-  - .idumb/idumb-project-output/codebase/README.md (overview)
-  - .idumb/idumb-project-output/codebase/tech-stack.md
-  - .idumb/idumb-project-output/codebase/architecture.md
-  - .idumb/idumb-project-output/codebase/quality-report.md
-  - .idumb/idumb-project-output/codebase/concerns-report.md
+  - .idumb/project-output/codebase/README.md (overview)
+  - .idumb/project-output/codebase/tech-stack.md
+  - .idumb/project-output/codebase/architecture.md
+  - .idumb/project-output/codebase/quality-report.md
+  - .idumb/project-output/codebase/concerns-report.md
 ```
 
 ## Step 7: Create Anchors for Critical Findings
@@ -293,7 +293,7 @@ result: "pass"
 
 ## Codebase Map JSON Structure
 
-**Path:** `.idumb/idumb-project-output/codebase/codebase-map.json`
+**Path:** `.idumb/project-output/codebase/codebase-map.json`
 
 ```json
 {
@@ -387,12 +387,12 @@ result: "pass"
   └── Low: 12 (style issues)
 
   Output:
-  ├── .idumb/idumb-project-output/codebase/codebase-map.json
-  ├── .idumb/idumb-project-output/codebase/README.md
-  ├── .idumb/idumb-project-output/codebase/tech-stack.md
-  ├── .idumb/idumb-project-output/codebase/architecture.md
-  ├── .idumb/idumb-project-output/codebase/quality-report.md
-  └── .idumb/idumb-project-output/codebase/concerns-report.md
+  ├── .idumb/project-output/codebase/codebase-map.json
+  ├── .idumb/project-output/codebase/README.md
+  ├── .idumb/project-output/codebase/tech-stack.md
+  ├── .idumb/project-output/codebase/architecture.md
+  ├── .idumb/project-output/codebase/quality-report.md
+  └── .idumb/project-output/codebase/concerns-report.md
 
   Next:
   1. /idumb:research - Research specific concerns
@@ -439,13 +439,13 @@ result: "pass"
 
 ```bash
 # Verify outputs exist
-ls -la .idumb/idumb-project-output/codebase/
+ls -la .idumb/project-output/codebase/
 
 # Validate JSON syntax
-cat .idumb/idumb-project-output/codebase/codebase-map.json | jq .
+cat .idumb/project-output/codebase/codebase-map.json | jq .
 
 # Check summary
-head -50 .idumb/idumb-project-output/codebase/README.md
+head -50 .idumb/project-output/codebase/README.md
 ```
 
 </success_criteria>

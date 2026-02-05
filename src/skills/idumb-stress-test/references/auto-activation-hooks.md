@@ -69,7 +69,7 @@ phase_hooks:
     mode: "batch"
     blocking: true
     conditions:
-      - phase_complete: "jq '.phase' .idumb/idumb-brain/state.json"
+      - phase_complete: "jq '.phase' .idumb/brain/state.json"
     purpose: "Ensure clean transition between phases"
     
   on_milestone_complete:
@@ -173,7 +173,7 @@ coordinator_decision:
 hooks: {
   sessionStart: async (session) => {
     // Run pre-flight if iDumb initialized
-    if (existsSync('.idumb/idumb-brain/state.json')) {
+    if (existsSync('.idumb/brain/state.json')) {
       await runMicroValidation('session_start');
     }
   },

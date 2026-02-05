@@ -82,7 +82,7 @@ validation_execution:
 ```yaml
 gap_resolution:
   add_reads_from:
-    - source: ".idumb/idumb-brain/state.json"
+    - source: ".idumb/brain/state.json"
       purpose: "Check current phase"
 
     - source: "todoread"

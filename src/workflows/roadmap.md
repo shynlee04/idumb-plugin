@@ -30,7 +30,7 @@ Core principles guiding roadmap creation:
 # These checks MUST pass before roadmap creation
 
 # Check 1: iDumb initialized
-test -f ".idumb/idumb-brain/state.json" || {
+test -f ".idumb/brain/state.json" || {
   echo "WARNING: iDumb not initialized"
   echo "Roadmap can proceed but state won't be tracked"
 }
@@ -602,7 +602,7 @@ test -f ".planning/ROADMAP.md" && \
 **Commands:**
 ```bash
 # Update state
-STATE_FILE=".idumb/idumb-brain/state.json"
+STATE_FILE=".idumb/brain/state.json"
 
 if [ -f "${STATE_FILE}" ]; then
   CURRENT=$(cat "${STATE_FILE}")
@@ -767,7 +767,7 @@ Continue: /idumb:roadmap --continue
 ```bash
 # Save draft as backup
 cp .planning/.phases-draft.tmp .planning/ROADMAP-draft.md 2>/dev/null
-echo "[${TIMESTAMP}] roadmap:failed - ${ERROR}" >> .idumb/idumb-brain/history/errors.log
+echo "[${TIMESTAMP}] roadmap:failed - ${ERROR}" >> .idumb/brain/history/errors.log
 ```
 
 **Prompt:**
@@ -830,12 +830,12 @@ Options:
 - `.planning/PROJECT.md` - Project definition (REQUIRED)
 - `.planning/REQUIREMENTS.md` - Requirements (optional)
 - `.planning/research/*.md` - Research findings (optional)
-- `.idumb/idumb-brain/state.json` - Current state
+- `.idumb/brain/state.json` - Current state
 
 ### Writes To
 - `.planning/ROADMAP.md` - Main output
 - `.planning/phases/{N}/` - Phase directories
-- `.idumb/idumb-brain/state.json` - State update
+- `.idumb/brain/state.json` - State update
 
 ### Never Modifies
 - `.planning/PROJECT.md` - Read only

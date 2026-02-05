@@ -65,7 +65,7 @@ if [ "$PASS_RATE" -lt 80 ]; then
 fi
 
 # Check iDumb state indicates verified
-PHASE_STATUS=$(jq -r '.phase // ""' .idumb/idumb-brain/state.json 2>/dev/null)
+PHASE_STATUS=$(jq -r '.phase // ""' .idumb/brain/state.json 2>/dev/null)
 echo "iDumb phase status: $PHASE_STATUS"
 
 # Check for blocked items
@@ -148,7 +148,7 @@ fi
 **Commands:**
 ```bash
 # Create archive directory
-ARCHIVE_DIR=".idumb/idumb-brain/archive/phases/$PHASE_NUM"
+ARCHIVE_DIR=".idumb/brain/archive/phases/$PHASE_NUM"
 mkdir -p "$ARCHIVE_DIR"
 
 # Archive planning artifacts (copy, don't move)
@@ -160,17 +160,17 @@ ARCHIVED_MD=$(ls "$ARCHIVE_DIR"/*.md 2>/dev/null | wc -l | tr -d ' ')
 echo "  Archived $ARCHIVED_MD markdown files"
 
 # Archive execution artifacts
-if [ -d ".idumb/idumb-brain/execution/$PHASE_NUM" ]; then
+if [ -d ".idumb/brain/execution/$PHASE_NUM" ]; then
   echo "Archiving execution artifacts..."
-  cp -r .idumb/idumb-brain/execution/$PHASE_NUM/* "$ARCHIVE_DIR/" 2>/dev/null || true
+  cp -r .idumb/brain/execution/$PHASE_NUM/* "$ARCHIVE_DIR/" 2>/dev/null || true
   
   # Count checkpoints
   CHECKPOINTS=$(ls "$ARCHIVE_DIR"/checkpoint-*.json 2>/dev/null | wc -l | tr -d ' ')
   echo "  Archived $CHECKPOINTS checkpoints"
   
   # Archive progress
-  if [ -f ".idumb/idumb-brain/execution/$PHASE_NUM/progress.json" ]; then
-    cp .idumb/idumb-brain/execution/$PHASE_NUM/progress.json "$ARCHIVE_DIR/final-progress.json"
+  if [ -f ".idumb/brain/execution/$PHASE_NUM/progress.json" ]; then
+    cp .idumb/brain/execution/$PHASE_NUM/progress.json "$ARCHIVE_DIR/final-progress.json"
     echo "  Archived final progress state"
   fi
 fi
@@ -205,7 +205,7 @@ echo "Archive complete: $ARCHIVE_DIR"
 **Commands:**
 ```bash
 # Shadow tracking file
-ROADMAP_STATUS=".idumb/idumb-brain/roadmap-status.json"
+ROADMAP_STATUS=".idumb/brain/roadmap-status.json"
 
 # Initialize if doesn't exist
 if [ ! -f "$ROADMAP_STATUS" ]; then
@@ -218,13 +218,13 @@ TIMESTAMP=$(date -u +%Y-%m-%dT%H:%M:%SZ)
 # Count tasks from progress
 TASKS_TOTAL=0
 TASKS_COMPLETED=0
-if [ -f ".idumb/idumb-brain/execution/$PHASE_NUM/progress.json" ]; then
-  TASKS_TOTAL=$(jq '.tasks | length' ".idumb/idumb-brain/execution/$PHASE_NUM/progress.json" 2>/dev/null || echo "0")
-  TASKS_COMPLETED=$(jq '[.tasks[] | select(.status == "complete")] | length' ".idumb/idumb-brain/execution/$PHASE_NUM/progress.json" 2>/dev/null || echo "0")
+if [ -f ".idumb/brain/execution/$PHASE_NUM/progress.json" ]; then
+  TASKS_TOTAL=$(jq '.tasks | length' ".idumb/brain/execution/$PHASE_NUM/progress.json" 2>/dev/null || echo "0")
+  TASKS_COMPLETED=$(jq '[.tasks[] | select(.status == "complete")] | length' ".idumb/brain/execution/$PHASE_NUM/progress.json" 2>/dev/null || echo "0")
 fi
 
 # Get phase start time (from first checkpoint or state)
-START_TIME=$(jq -r '.timestamp // ""' ".idumb/idumb-brain/execution/$PHASE_NUM/checkpoint-"*.json 2>/dev/null | head -1 || echo "unknown")
+START_TIME=$(jq -r '.timestamp // ""' ".idumb/brain/execution/$PHASE_NUM/checkpoint-"*.json 2>/dev/null | head -1 || echo "unknown")
 
 # Update shadow tracking
 jq --arg phase "$PHASE_NUM" \
@@ -324,7 +324,7 @@ fi
 if [ "$IS_MILESTONE_COMPLETE" = true ]; then
   echo "Processing milestone completion..."
   
-  MILESTONE_DIR=".idumb/idumb-brain/archive/milestones/M$CURRENT_MILESTONE"
+  MILESTONE_DIR=".idumb/brain/archive/milestones/M$CURRENT_MILESTONE"
   mkdir -p "$MILESTONE_DIR"
   
   # Create milestone summary
@@ -365,7 +365,7 @@ EOF
   
   # Link phase archives to milestone
   for p in $(seq $((CURRENT_MILESTONE - 1) * 5 + 1) $PHASE_NUM); do
-    if [ -d ".idumb/idumb-brain/archive/phases/$p" ]; then
+    if [ -d ".idumb/brain/archive/phases/$p" ]; then
       ln -sf "../../phases/$p" "$MILESTONE_DIR/phase-$p" 2>/dev/null || true
     fi
   done
@@ -394,7 +394,7 @@ fi
 **Commands:**
 ```bash
 if [ "$IS_LAST_PHASE" = false ]; then
-  PREP_FILE=".idumb/idumb-brain/phase-${NEXT_PHASE}-prep.json"
+  PREP_FILE=".idumb/brain/phase-${NEXT_PHASE}-prep.json"
   
   # Extract learnings from completed phase
   LEARNINGS=$(grep -h "Learning\|learned\|insight\|discovered" "$VERIFICATION_FILE" 2>/dev/null | head -5 | jq -R -s -c 'split("\n") | map(select(length > 0))')
@@ -448,7 +448,7 @@ fi
 TIMESTAMP=$(date -u +%Y-%m-%dT%H:%M:%SZ)
 
 # Read current state
-STATE=$(cat .idumb/idumb-brain/state.json)
+STATE=$(cat .idumb/brain/state.json)
 
 # Determine new phase value
 if [ "$IS_LAST_PHASE" = true ]; then
@@ -480,7 +480,7 @@ STATE=$(echo "$STATE" | jq \
   ')
 
 # Write updated state
-echo "$STATE" | jq '.' > .idumb/idumb-brain/state.json
+echo "$STATE" | jq '.' > .idumb/brain/state.json
 
 echo "State updated:"
 echo "  Phase: $NEW_PHASE"
@@ -509,12 +509,12 @@ echo "  Completed phases: $(echo "$STATE" | jq '.completedPhases')"
 ### Archived Artifacts
 - Planning documents: {ARCHIVED_MD} files
 - Execution checkpoints: {CHECKPOINTS} files
-- Archive location: `.idumb/idumb-brain/archive/phases/{PHASE_NUM}/`
+- Archive location: `.idumb/brain/archive/phases/{PHASE_NUM}/`
 
 {if IS_MILESTONE_COMPLETE}
 ### Milestone {CURRENT_MILESTONE} Complete!
 Congratulations on completing Milestone {CURRENT_MILESTONE}!
-Summary available at: `.idumb/idumb-brain/archive/milestones/M{CURRENT_MILESTONE}/SUMMARY.md`
+Summary available at: `.idumb/brain/archive/milestones/M{CURRENT_MILESTONE}/SUMMARY.md`
 {end}
 
 {if IS_LAST_PHASE}
@@ -529,7 +529,7 @@ Ready to start Phase {NEXT_PHASE}?
 **Recommended:** `/idumb:discuss-phase {NEXT_PHASE}`
 **Skip discussion:** `/idumb:plan-phase {NEXT_PHASE}`
 
-Preparation context saved to: `.idumb/idumb-brain/phase-{NEXT_PHASE}-prep.json`
+Preparation context saved to: `.idumb/brain/phase-{NEXT_PHASE}-prep.json`
 {end}
 ```
 
@@ -549,7 +549,7 @@ Preparation context saved to: `.idumb/idumb-brain/phase-{NEXT_PHASE}-prep.json`
 
 1. **Create Milestone Archive**
    ```bash
-   MILESTONE_DIR=".idumb/idumb-brain/archive/milestones/M{N}"
+   MILESTONE_DIR=".idumb/brain/archive/milestones/M{N}"
    mkdir -p "$MILESTONE_DIR"
    ```
 
@@ -576,7 +576,7 @@ Preparation context saved to: `.idumb/idumb-brain/phase-{NEXT_PHASE}-prep.json`
 <output_artifact>
 ## Artifact: Roadmap Status
 
-**Path:** `.idumb/idumb-brain/roadmap-status.json`
+**Path:** `.idumb/brain/roadmap-status.json`
 
 **Schema:**
 ```json
@@ -623,7 +623,7 @@ Preparation context saved to: `.idumb/idumb-brain/phase-{NEXT_PHASE}-prep.json`
 
 ## Artifact: Phase Archive
 
-**Path:** `.idumb/idumb-brain/archive/phases/{N}/`
+**Path:** `.idumb/brain/archive/phases/{N}/`
 
 **Contents:**
 | File | Description |
@@ -640,7 +640,7 @@ Preparation context saved to: `.idumb/idumb-brain/phase-{NEXT_PHASE}-prep.json`
 
 ## Artifact: Transition Log
 
-**Path:** `.idumb/idumb-brain/transitions.log`
+**Path:** `.idumb/brain/transitions.log`
 
 **Format:** `{timestamp}|{from_phase}|{to_phase}|{pass_rate}|{status}`
 
@@ -677,7 +677,7 @@ echo "  /idumb:status                      - View current state"
 ```bash
 echo "Milestone $CURRENT_MILESTONE complete!"
 echo ""
-echo "View summary: cat .idumb/idumb-brain/archive/milestones/M$CURRENT_MILESTONE/SUMMARY.md"
+echo "View summary: cat .idumb/brain/archive/milestones/M$CURRENT_MILESTONE/SUMMARY.md"
 echo ""
 echo "Ready for next milestone?"
 ```
@@ -693,7 +693,7 @@ echo ""
 echo "All $TOTAL_PHASES phases verified and archived."
 echo ""
 echo "View project summary: /idumb:summary"
-echo "Archive location: .idumb/idumb-brain/archive/"
+echo "Archive location: .idumb/brain/archive/"
 ```
 
 ## On Transition Failure
@@ -727,18 +727,18 @@ echo "Archive location: .idumb/idumb-brain/archive/"
 | `.planning/phases/{N}/*VERIFICATION.md` | Verification results |
 | `.planning/phases/{N}/*.md` | Phase artifacts to archive |
 | `.planning/ROADMAP.md` | Total phase count, phase names |
-| `.idumb/idumb-brain/state.json` | Current governance state |
-| `.idumb/idumb-brain/execution/{N}/*.json` | Execution artifacts |
+| `.idumb/brain/state.json` | Current governance state |
+| `.idumb/brain/execution/{N}/*.json` | Execution artifacts |
 
 ### Writes To
 | Path | Purpose |
 |------|---------|
-| `.idumb/idumb-brain/archive/phases/{N}/` | Phase archive |
-| `.idumb/idumb-brain/archive/milestones/M{N}/` | Milestone archive |
-| `.idumb/idumb-brain/roadmap-status.json` | Shadow tracking |
-| `.idumb/idumb-brain/phase-{N+1}-prep.json` | Next phase prep |
-| `.idumb/idumb-brain/state.json` | Updated state |
-| `.idumb/idumb-brain/transitions.log` | Transition history |
+| `.idumb/brain/archive/phases/{N}/` | Phase archive |
+| `.idumb/brain/archive/milestones/M{N}/` | Milestone archive |
+| `.idumb/brain/roadmap-status.json` | Shadow tracking |
+| `.idumb/brain/phase-{N+1}-prep.json` | Next phase prep |
+| `.idumb/brain/state.json` | Updated state |
+| `.idumb/brain/transitions.log` | Transition history |
 | `.idumb/planning-sync.log` | Planning sync log |
 
 ### Never Modifies

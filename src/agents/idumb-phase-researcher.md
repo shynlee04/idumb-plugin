@@ -15,10 +15,10 @@ permission:
     "git check-ignore*": allow
   edit:
     ".planning/phases/**/*-RESEARCH.md": allow
-    ".idumb/idumb-project-output/research/**/*.md": allow
+    ".idumb/project-output/research/**/*.md": allow
   write:
     ".planning/phases/**/*-RESEARCH.md": allow
-    ".idumb/idumb-project-output/research/**/*.md": allow
+    ".idumb/project-output/research/**/*.md": allow
 tools:
   task: true
   read: true

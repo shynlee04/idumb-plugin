@@ -16,7 +16,7 @@ permission:
     "git diff *": allow
     # Directory operations (META paths only)
     "mkdir -p .idumb/*": allow
-    "mkdir -p .idumb/idumb-modules/*": allow
+    "mkdir -p .idumb/modules/*": allow
     "mkdir -p src/templates/*": allow
     "mkdir -p src/config/*": allow
     "mkdir -p src/schemas/*": allow
@@ -40,7 +40,7 @@ permission:
     ".plugin-dev/**": allow
   write:
     ".idumb/**": allow
-    ".idumb/idumb-modules/**": allow
+    ".idumb/modules/**": allow
     "src/templates/**": allow
     "src/config/**": allow
     "src/schemas/**": allow
@@ -204,7 +204,7 @@ Never write META files blind:
 
 ```
 .idumb/**                 # Governance state, brain, config, modules
-.idumb/idumb-modules/**   # Generated workflow modules
+.idumb/modules/**   # Generated workflow modules
 src/agents/**            # Agent profile definitions
 src/workflows/**         # Workflow definitions
 src/commands/**          # Command definitions
@@ -531,11 +531,11 @@ agent_types:
    - Coverage >= 80%
 
 7. **Write module file**
-   - Path: `.idumb/idumb-modules/{name}-{YYYY-MM-DD}.md`
+   - Path: `.idumb/modules/{name}-{YYYY-MM-DD}.md`
    - Verify file written correctly
 
 8. **Update module index**
-   - Path: `.idumb/idumb-modules/INDEX.md`
+   - Path: `.idumb/modules/INDEX.md`
    - Add entry for new module
 
 9. **Return builder_return evidence**
@@ -650,7 +650,7 @@ agent_types:
 
 ## What NOT to Commit for META
 
-- `.idumb/idumb-brain/` - Runtime state
+- `.idumb/brain/` - Runtime state
 - `*.env` files - Environment secrets
 - Intermediate META artifacts (commit with completion)
 - "Fixed typo" micro-commits (batch with meaningful work)
@@ -1003,7 +1003,7 @@ Write to src/commands/idumb/{name}.md
 **Build Module:**
 ```
 Follow build_module protocol
-Write to .idumb/idumb-modules/{name}-{YYYY-MM-DD}.md
+Write to .idumb/modules/{name}-{YYYY-MM-DD}.md
 Update INDEX.md
 ```
 
@@ -1344,7 +1344,7 @@ git log -1 --oneline
 3. Generate frontmatter and body
 4. Calculate coverage score
 5. Validate against module quality gates
-6. Write to `.idumb/idumb-modules/{name}-{YYYY-MM-DD}.md`
+6. Write to `.idumb/modules/{name}-{YYYY-MM-DD}.md`
 7. Update INDEX.md
 8. Stage and commit
 9. Return ENTITY BUILT evidence with coverage_score
@@ -1391,7 +1391,7 @@ git log -1 --oneline
 
 ### Delivers To (META PATHS ONLY)
 - `.idumb/**` - Governance state, brain artifacts, config
-- `.idumb/idumb-modules/**` - Generated workflow modules
+- `.idumb/modules/**` - Generated workflow modules
 - `src/agents/**` - Agent profiles (with 4-field persona)
 - `src/workflows/**` - Workflows (with tri-modal support)
 - `src/commands/**` - Commands (with chain enforcement)

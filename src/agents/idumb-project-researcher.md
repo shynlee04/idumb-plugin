@@ -14,9 +14,9 @@ permission:
   bash:
     "ls*": allow
   edit:
-    ".idumb/idumb-project-output/research/**/*.md": allow
+    ".idumb/project-output/research/**/*.md": allow
   write:
-    ".idumb/idumb-project-output/research/**/*.md": allow
+    ".idumb/project-output/research/**/*.md": allow
 tools:
   task: true
   read: true
@@ -55,7 +55,7 @@ Your job: Answer "What does this domain ecosystem look like?" Produce research f
 - Document architecture patterns and anti-patterns
 - Analyze market landscape and competitive positioning
 - Catalog domain-specific pitfalls
-- Write research files to `.idumb/idumb-project-output/research/`
+- Write research files to `.idumb/project-output/research/`
 - Return structured result to orchestrator
 </role>
 
@@ -541,7 +541,7 @@ Assign overall confidence and per-area confidence:
 </step>
 
 <step name="write_research_files">
-Create files in `.idumb/idumb-project-output/research/`:
+Create files in `.idumb/project-output/research/`:
 
 1. **PROJECT-RESEARCH.md** - Executive summary with roadmap implications
 2. **STACK.md** - Technology recommendations
@@ -661,12 +661,12 @@ When research finishes successfully:
 
 | File | Purpose |
 |------|---------|
-| .idumb/idumb-project-output/research/PROJECT-RESEARCH.md | Executive summary |
-| .idumb/idumb-project-output/research/STACK.md | Technology recommendations |
-| .idumb/idumb-project-output/research/FEATURES.md | Feature landscape |
-| .idumb/idumb-project-output/research/ARCHITECTURE.md | Architecture patterns |
-| .idumb/idumb-project-output/research/PITFALLS.md | Domain pitfalls |
-| .idumb/idumb-project-output/research/MARKET.md | Competitive analysis |
+| .idumb/project-output/research/PROJECT-RESEARCH.md | Executive summary |
+| .idumb/project-output/research/STACK.md | Technology recommendations |
+| .idumb/project-output/research/FEATURES.md | Feature landscape |
+| .idumb/project-output/research/ARCHITECTURE.md | Architecture patterns |
+| .idumb/project-output/research/PITFALLS.md | Domain pitfalls |
+| .idumb/project-output/research/MARKET.md | Competitive analysis |
 
 ### Confidence Assessment
 
@@ -730,7 +730,7 @@ When research cannot proceed:
 - [ ] Architecture patterns documented
 - [ ] Domain pitfalls catalogued
 - [ ] Market analysis completed (if applicable)
-- [ ] Output files created in `.idumb/idumb-project-output/research/`
+- [ ] Output files created in `.idumb/project-output/research/`
 - [ ] PROJECT-RESEARCH.md includes roadmap implications
 - [ ] Files written (DO NOT commit - orchestrator handles)
 - [ ] Structured return provided to orchestrator
@@ -768,7 +768,7 @@ When research cannot proceed:
 - **@idumb-roadmapper**: Research for roadmap creation
 - **@idumb-planner**: Research for planning decisions
 - **@idumb-skeptic-validator**: Research for validation
-- **.idumb/idumb-project-output/research/**: Research documents
+- **.idumb/project-output/research/**: Research documents
 
 ### Reports To
 - **Parent Agent**: Research completion and findings

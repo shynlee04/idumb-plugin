@@ -33,7 +33,7 @@ Flags:
 
 @.planning/STATE.md
 @.planning/ROADMAP.md
-@.idumb/idumb-brain/state.json
+@.idumb/brain/state.json
 </context>
 
 <process>

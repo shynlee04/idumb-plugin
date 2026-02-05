@@ -110,7 +110,7 @@ Please include these sections in your response.
 
 ## Configuration
 
-Style enforcement can be configured in `.idumb/idumb-brain/config.json`:
+Style enforcement can be configured in `.idumb/brain/config.json`:
 
 ```json
 {

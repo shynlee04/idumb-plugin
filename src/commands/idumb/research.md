@@ -16,11 +16,11 @@ Conduct thorough domain-specific or phase-specific research by orchestrating spe
 <execution_context>
 
 ## Reference Files (Read Before Execution)
-- `.idumb/idumb-brain/state.json` - Current governance state
-- `.idumb/idumb-brain/config.json` - User settings and research preferences
+- `.idumb/brain/state.json` - Current governance state
+- `.idumb/brain/config.json` - User settings and research preferences
 - `.planning/PROJECT.md` - Project definition (if exists)
 - `.planning/ROADMAP.md` - Current roadmap for phase context
-- `.idumb/idumb-brain/governance/research/*.md` - Previous research outputs
+- `.idumb/brain/governance/research/*.md` - Previous research outputs
 
 ## Agents Involved
 | Agent | Role | Mode |
@@ -50,7 +50,7 @@ The research command forces specific flows through skill activations:
 
 1. **Research Output Mode** (`idumb-research-writer`)
    - When research produces findings > 10KB context
-   - Automatically writes to `.idumb/idumb-project-output/research/`
+   - Automatically writes to `.idumb/project-output/research/`
    - Enables intermediate artifact saving for context management
 
 2. **Codebase Chunking** (`idumb-codebase-chunker`)
@@ -280,7 +280,7 @@ synthesis:
 ```yaml
 storage:
   delegate_to: "@idumb-builder"
-  path: ".idumb/idumb-project-output/research/{YYYY-MM-DD}-{topic-slug}.md"
+  path: ".idumb/project-output/research/{YYYY-MM-DD}-{topic-slug}.md"
   also_copy_to: ".planning/research/{topic-slug}.md" (if planning framework)
   
 state_update:
@@ -401,7 +401,7 @@ report:
 
 ## Stored At
 
-- Primary: `.idumb/idumb-project-output/research/{date}-{topic}.md`
+- Primary: `.idumb/project-output/research/{date}-{topic}.md`
 - Planning sync: `.planning/research/{topic}.md` (if applicable)
 
 </completion_format>
@@ -463,6 +463,6 @@ parallel: true
 version: 0.2.0
 requires: governance-initialized
 outputs:
-  - .idumb/idumb-project-output/research/*.md
+  - .idumb/project-output/research/*.md
 ```
 </metadata>

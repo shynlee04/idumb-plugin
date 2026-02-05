@@ -21,9 +21,9 @@ permission:
     "npm run*": allow
     "curl*": allow
   edit:
-    ".idumb/idumb-project-output/debug/**/*.md": allow
+    ".idumb/project-output/debug/**/*.md": allow
   write:
-    ".idumb/idumb-project-output/debug/**/*.md": allow
+    ".idumb/project-output/debug/**/*.md": allow
 tools:
   task: true
   read: true

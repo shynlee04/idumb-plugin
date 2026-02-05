@@ -291,7 +291,7 @@ function checkResourceUsage(directory: string): { metrics: ResourceMetrics; issu
     issues.push({
       type: "memory-leak",
       severity: "medium",
-      location: ".idumb/idumb-brain/governance/",
+      location: ".idumb/brain/governance/",
       description: `${reportCount} report files accumulated`,
       suggestion: "Run cleanup: /idumb:cleanup or implement automatic cleanup policy"
     })

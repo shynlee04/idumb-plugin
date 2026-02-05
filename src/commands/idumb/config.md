@@ -89,7 +89,7 @@ Display all sections:
 **Display Format:**
 ```yaml
 # iDumb Configuration
-# Path: .idumb/idumb-brain/config.json
+# Path: .idumb/brain/config.json
 
 user:
   name: "Developer"

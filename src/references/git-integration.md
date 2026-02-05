@@ -34,10 +34,10 @@ If NO_GIT: Run `git init` silently. iDumb projects get version control.
 **iDumb-specific paths:**
 ```bash
 # .idumb/ is typically gitignored (runtime state)
-echo ".idumb/idumb-brain/" >> .gitignore
+echo ".idumb/brain/" >> .gitignore
 
 # But project outputs can be committed
-# .idumb/idumb-project-output/ can be tracked if desired
+# .idumb/project-output/ can be tracked if desired
 ```
 
 </git_check>
@@ -62,7 +62,7 @@ What to commit:
 
 ```bash
 git add .planning/
-git add .idumb/idumb-project-output/  # if tracking outputs
+git add .idumb/project-output/  # if tracking outputs
 git commit
 ```
 
@@ -203,7 +203,7 @@ Each plan produces 2-4 commits (tasks + metadata). Clear, granular, bisectable.
 - PLAN.md creation (commit with plan completion)
 - RESEARCH.md (intermediate)
 - Minor planning tweaks
-- `.idumb/idumb-brain/` changes (runtime state)
+- `.idumb/brain/` changes (runtime state)
 - "Fixed typo in roadmap"
 
 **Do commit (outcomes):**
@@ -223,7 +223,7 @@ Each plan produces 2-4 commits (tasks + metadata). Clear, granular, bisectable.
 **Executor responsibility:**
 - `@idumb-executor` creates commits after each task completion
 - Uses `@idumb-builder` for actual git operations
-- Records commit hashes in `.idumb/idumb-brain/state.json` history
+- Records commit hashes in `.idumb/brain/state.json` history
 
 **Commit workflow:**
 ```yaml
@@ -241,7 +241,7 @@ git reset --hard {last_task_commit_hash}
 ```
 
 **State not committed:**
-- `.idumb/idumb-brain/` is runtime state, not versioned
+- `.idumb/brain/` is runtime state, not versioned
 - Use `.gitignore` to exclude brain directory
 - Session handoffs are temporary
 

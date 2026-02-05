@@ -20,7 +20,7 @@ Execute comprehensive stress testing of the iDumb meta-framework to ensure all a
 
 ## Integration Points
 - Reads: All governance files, state.json, config.json
-- Writes: `.idumb/idumb-brain/governance/stress-test-{timestamp}.json`
+- Writes: `.idumb/brain/governance/stress-test-{timestamp}.json`
 - Triggers: Validation loops, self-healing, certification
 </execution_context>
 
@@ -75,7 +75,7 @@ fi
 # Determine test mode
 if [ "$MODE" == "auto" ]; then
   # Check recent activity
-  LAST_VALIDATION=$(jq -r '.lastValidation' .idumb/idumb-brain/state.json)
+  LAST_VALIDATION=$(jq -r '.lastValidation' .idumb/brain/state.json)
   FILES_CHANGED=$(git status --porcelain | wc -l)
   
   if [ "$FILES_CHANGED" -gt 5 ]; then
@@ -105,7 +105,7 @@ grep -r "write: allow" src/agents/idumb-*coordinator*.md && echo "FAIL: Coordina
 grep -r "task: allow" src/agents/idumb-*builder*.md && echo "FAIL: Builder can delegate" || echo "PASS: Builder isolated"
 
 # Test 3: State consistency
-jq . .idumb/idumb-brain/state.json > /dev/null && echo "PASS: State valid" || echo "FAIL: State invalid"
+jq . .idumb/brain/state.json > /dev/null && echo "PASS: State valid" || echo "FAIL: State invalid"
 
 # Test 4: No circular refs
 # Quick grep for obvious cycles
@@ -263,7 +263,7 @@ if [ "$REPORT" == "true" ]; then
   
   # Security: Sanitize timestamp in filename
   SAFE_TIMESTAMP=$(echo "$TIMESTAMP" | tr -d ':')
-  REPORT_DIR=".idumb/idumb-brain/governance"
+  REPORT_DIR=".idumb/brain/governance"
   mkdir -p "$REPORT_DIR"
   REPORT_FILE="$REPORT_DIR/stress-test-${SAFE_TIMESTAMP}.json"
   

@@ -81,13 +81,13 @@ error_exit() {
 COMMAND_RESULT=$(some_command) || error_exit "some_command failed: $?"
 
 # With jq
-LAST_VALIDATION=$(jq -r '.lastValidation // "1970-01-01T00:00:00Z"' .idumb/idumb-brain/state.json) || {
+LAST_VALIDATION=$(jq -r '.lastValidation // "1970-01-01T00:00:00Z"' .idumb/brain/state.json) || {
     echo "ERROR: Failed to read state.json" >&2
     exit 1
 }
 
 # Directory operations
-mkdir -p .idumb/idumb-brain/governance || error_exit "Cannot create governance directory"
+mkdir -p .idumb/brain/governance || error_exit "Cannot create governance directory"
 ```
 
 #### Validation Checklist
@@ -457,7 +457,7 @@ reads_from:
   - "src/agents/idumb-*.md" (agent documentation)
 
 writes_to:
-  - ".idumb/idumb-brain/governance/quality-reports/"
+  - ".idumb/brain/governance/quality-reports/"
 
 validates_against:
   - "Error handling standards"

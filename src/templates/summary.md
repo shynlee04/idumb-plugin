@@ -300,7 +300,7 @@ None - no external service configuration required.
 
 **After creation:** 
 - STATE.md updated with position, decisions, issues
-- `.idumb/idumb-brain/state.json` history updated
+- `.idumb/brain/state.json` history updated
 
 ---
 
@@ -315,7 +315,7 @@ Creates SUMMARY.md with frontmatter
             ↓
 Updates .planning/STATE.md
             ↓
-Records in .idumb/idumb-brain/state.json history
+Records in .idumb/brain/state.json history
             ↓
 @idumb-verifier uses SUMMARY.md for verification context
 ```

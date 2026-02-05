@@ -34,7 +34,7 @@ Core principles that guide my execution:
 
 ```bash
 # Check iDumb is initialized
-test -d ".idumb/idumb-brain" || { echo "ERROR: iDumb not initialized. Run /idumb:init first"; exit 1; }
+test -d ".idumb/brain" || { echo "ERROR: iDumb not initialized. Run /idumb:init first"; exit 1; }
 
 # Check we're at project root (has package.json, Cargo.toml, or similar)
 PROJ_ROOT=false
@@ -44,11 +44,11 @@ done
 [ "$PROJ_ROOT" = "false" ] && echo "WARNING: May not be at project root - no common project files found"
 
 # Check output directory exists or create it
-mkdir -p .idumb/idumb-project-output/codebase
+mkdir -p .idumb/project-output/codebase
 
 # Check for previous map (for incremental updates)
-if [ -f ".idumb/idumb-project-output/codebase/codebase-map.json" ]; then
-  PREV_MAP_DATE=$(jq -r '.timestamp // "unknown"' .idumb/idumb-project-output/codebase/codebase-map.json 2>/dev/null)
+if [ -f ".idumb/project-output/codebase/codebase-map.json" ]; then
+  PREV_MAP_DATE=$(jq -r '.timestamp // "unknown"' .idumb/project-output/codebase/codebase-map.json 2>/dev/null)
   echo "INFO: Previous map found from $PREV_MAP_DATE - will generate fresh map"
 fi
 
@@ -417,7 +417,7 @@ function calculateHealthScore(map) {
 <output_artifact>
 ## Artifact: codebase-map.json
 
-**Path:** `.idumb/idumb-project-output/codebase/codebase-map.json`
+**Path:** `.idumb/project-output/codebase/codebase-map.json`
 
 ### Complete Structure
 
@@ -542,7 +542,7 @@ function calculateHealthScore(map) {
 ## Generated Documentation
 
 ### Document: stack.md
-**Path:** `.idumb/idumb-project-output/codebase/stack.md`
+**Path:** `.idumb/project-output/codebase/stack.md`
 
 ```markdown
 # Technology Stack
@@ -574,13 +574,13 @@ Health Score: {{HEALTH_SCORE}}/100 ({{HEALTH_GRADE}})
 ```
 
 ### Document: architecture.md
-**Path:** `.idumb/idumb-project-output/codebase/architecture.md`
+**Path:** `.idumb/project-output/codebase/architecture.md`
 
 ### Document: quality.md  
-**Path:** `.idumb/idumb-project-output/codebase/quality.md`
+**Path:** `.idumb/project-output/codebase/quality.md`
 
 ### Document: concerns.md
-**Path:** `.idumb/idumb-project-output/codebase/concerns.md`
+**Path:** `.idumb/project-output/codebase/concerns.md`
 </output_artifact>
 
 <recovery_protocol>
@@ -599,21 +599,21 @@ timeout $SCANNER_TIMEOUT <scanner_command> || {
 ### Corrupted Previous Map
 ```bash
 # Validate JSON before merging
-if ! jq empty .idumb/idumb-project-output/codebase/codebase-map.json 2>/dev/null; then
+if ! jq empty .idumb/project-output/codebase/codebase-map.json 2>/dev/null; then
   echo "WARN: Previous map corrupted, creating fresh"
-  mv .idumb/idumb-project-output/codebase/codebase-map.json \
-     .idumb/idumb-project-output/codebase/codebase-map.json.corrupted.$(date +%s)
+  mv .idumb/project-output/codebase/codebase-map.json \
+     .idumb/project-output/codebase/codebase-map.json.corrupted.$(date +%s)
 fi
 ```
 
 ### Permission Errors
 ```bash
 # Check write permissions
-if ! touch .idumb/idumb-project-output/codebase/.write-test 2>/dev/null; then
+if ! touch .idumb/project-output/codebase/.write-test 2>/dev/null; then
   echo "ERROR: Cannot write to output directory"
   exit 1
 fi
-rm -f .idumb/idumb-project-output/codebase/.write-test
+rm -f .idumb/project-output/codebase/.write-test
 ```
 
 ### Large Codebase Handling
@@ -635,7 +635,7 @@ fi
 
 ```bash
 # After successful mapping
-echo "Codebase map generated: .idumb/idumb-project-output/codebase/codebase-map.json"
+echo "Codebase map generated: .idumb/project-output/codebase/codebase-map.json"
 echo "Health Score: $HEALTH_SCORE/100"
 echo ""
 echo "Next steps:"
@@ -664,7 +664,7 @@ When `.planning/` exists:
 ## Verification Checkboxes
 
 ### Pre-execution
-- [ ] `.idumb/idumb-brain/` directory exists
+- [ ] `.idumb/brain/` directory exists
 - [ ] Project root identified (package.json or equivalent)
 - [ ] Output directory writable
 

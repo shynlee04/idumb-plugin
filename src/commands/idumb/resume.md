@@ -56,8 +56,8 @@ Resume a previously idle iDumb session with full context recovery. Detect sessio
 ## Prerequisites
 
 - `.idumb/` directory exists
-- Session metadata in `.idumb/idumb-brain/sessions/`
-- State file at `.idumb/idumb-brain/state.json`
+- Session metadata in `.idumb/brain/sessions/`
+- State file at `.idumb/brain/state.json`
 
 </context>
 
@@ -69,7 +69,7 @@ Determine if this is a resumed session.
 
 ```bash
 # Check for session files
-SESSION_DIR=".idumb/idumb-brain/sessions"
+SESSION_DIR=".idumb/brain/sessions"
 if [ ! -d "$SESSION_DIR" ]; then
   echo "No session history found"
   FIRST_SESSION=true
@@ -112,7 +112,7 @@ Retrieve session context from storage.
 
 ```bash
 # Load session metadata
-SESSION_FILE=".idumb/idumb-brain/sessions/${SESSION_ID}.json"
+SESSION_FILE=".idumb/brain/sessions/${SESSION_ID}.json"
 ```
 
 ```
@@ -405,13 +405,13 @@ Present context recovery to user.
 
 ```bash
 # Check session files
-ls -la .idumb/idumb-brain/sessions/
+ls -la .idumb/brain/sessions/
 
 # Check current session status
-cat .idumb/idumb-brain/sessions/*.json | jq '.status'
+cat .idumb/brain/sessions/*.json | jq '.status'
 
 # Check anchors
-cat .idumb/idumb-brain/state.json | jq '.anchors'
+cat .idumb/brain/state.json | jq '.anchors'
 ```
 
 </success_criteria>

@@ -29,7 +29,7 @@ Core principles guiding phase discussion:
 # These checks MUST pass before workflow begins
 
 # Check 1: iDumb initialized
-test -f ".idumb/idumb-brain/state.json" || {
+test -f ".idumb/brain/state.json" || {
   echo "ERROR: iDumb not initialized"
   echo "ACTION: Run /idumb:init first"
   exit 1
@@ -302,7 +302,7 @@ test -f "${OUTPUT_PATH}" && grep -q "## Goal" "${OUTPUT_PATH}" && echo "✓ Arti
 **Commands:**
 ```bash
 # Update state.json
-STATE_FILE=".idumb/idumb-brain/state.json"
+STATE_FILE=".idumb/brain/state.json"
 
 # Use idumb-state tool
 # Or manual update:
@@ -487,7 +487,7 @@ fi
 **Action:** Log error, attempt recovery
 ```bash
 # Log to history
-echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] discuss-phase:${PHASE_NUM}:failed - ${ERROR}" >> .idumb/idumb-brain/history/errors.log
+echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] discuss-phase:${PHASE_NUM}:failed - ${ERROR}" >> .idumb/brain/history/errors.log
 
 # Offer manual creation
 echo "ERROR: ${ERROR}"
@@ -535,12 +535,12 @@ echo "Manual option: Create ${PHASE_DIR}/${PHASE_NAME_SLUG}-CONTEXT.md using tem
 - `.planning/ROADMAP.md` - Phase definitions
 - `.planning/PROJECT.md` - Project context (optional)
 - `.planning/REQUIREMENTS.md` - Requirements reference (optional)
-- `.idumb/idumb-brain/state.json` - Current state
+- `.idumb/brain/state.json` - Current state
 
 ### Writes To
 - `.planning/phases/{N}/{phase-name}-CONTEXT.md` - Main output
-- `.idumb/idumb-brain/state.json` - State updates
-- `.idumb/idumb-brain/history/` - History entries (append)
+- `.idumb/brain/state.json` - State updates
+- `.idumb/brain/history/` - History entries (append)
 
 ### Never Modifies
 - `.planning/ROADMAP.md` - Read only

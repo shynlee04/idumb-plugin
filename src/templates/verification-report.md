@@ -218,7 +218,7 @@ If passed: Phase marked complete
 
 **State Tracking:**
 
-Verification updates `.idumb/idumb-brain/state.json`:
+Verification updates `.idumb/brain/state.json`:
 - validationCount incremented
 - lastValidation timestamp updated
 - History entry with verification result

@@ -15,9 +15,9 @@ permission:
     "wc*": allow
     "cat*": allow
   edit:
-    ".idumb/idumb-project-output/codebase/**/*.md": allow
+    ".idumb/project-output/codebase/**/*.md": allow
   write:
-    ".idumb/idumb-project-output/codebase/**/*.md": allow
+    ".idumb/project-output/codebase/**/*.md": allow
 tools:
   task: true
   read: true
@@ -243,7 +243,7 @@ find src/ -name "*.ts" | xargs wc -l 2>/dev/null | sort -rn | head -15
 
 ## Six Documents
 
-All documents written to `.idumb/idumb-project-output/codebase/`
+All documents written to `.idumb/project-output/codebase/`
 
 | Document | Content |
 |----------|---------|
@@ -287,7 +287,7 @@ ls package.json pyproject.toml Cargo.toml go.mod 2>/dev/null
 
 Check for existing mapping (\<48 hours):
 ```bash
-ls .idumb/idumb-project-output/codebase/*.md 2>/dev/null
+ls .idumb/project-output/codebase/*.md 2>/dev/null
 ```
 </step>
 
@@ -360,7 +360,7 @@ Route to @idumb-builder for each document:
 
 ```
 Route to @idumb-builder:
-- Path: .idumb/idumb-project-output/codebase/{DOCUMENT}.md
+- Path: .idumb/project-output/codebase/{DOCUMENT}.md
 - Content: [filled template]
 - Request: Create and confirm
 ```
@@ -389,12 +389,12 @@ Include: paths, line counts, key findings, warnings, next steps.
 
 | Document | Path | Lines |
 |----------|------|-------|
-| Structure | `.idumb/idumb-project-output/codebase/STRUCTURE.md` | {N} |
-| Stack | `.idumb/idumb-project-output/codebase/STACK.md` | {N} |
-| Architecture | `.idumb/idumb-project-output/codebase/ARCHITECTURE.md` | {N} |
-| Conventions | `.idumb/idumb-project-output/codebase/CONVENTIONS.md` | {N} |
-| Concerns | `.idumb/idumb-project-output/codebase/CONCERNS.md` | {N} |
-| Testing | `.idumb/idumb-project-output/codebase/TESTING.md` | {N} |
+| Structure | `.idumb/project-output/codebase/STRUCTURE.md` | {N} |
+| Stack | `.idumb/project-output/codebase/STACK.md` | {N} |
+| Architecture | `.idumb/project-output/codebase/ARCHITECTURE.md` | {N} |
+| Conventions | `.idumb/project-output/codebase/CONVENTIONS.md` | {N} |
+| Concerns | `.idumb/project-output/codebase/CONCERNS.md` | {N} |
+| Testing | `.idumb/project-output/codebase/TESTING.md` | {N} |
 
 ### Key Findings
 
@@ -476,7 +476,7 @@ Include: paths, line counts, key findings, warnings, next steps.
 
 ### Delivers To
 - **@idumb-builder**: Document write requests
-- **.idumb/idumb-project-output/codebase/**: Mapping documents
+- **.idumb/project-output/codebase/**: Mapping documents
 
 ### Reports To
 - **Spawning Agent**: Mapping summary and locations

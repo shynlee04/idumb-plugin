@@ -258,7 +258,7 @@ loop_controller:
 ### With iDumb Framework
 
 - **Reads:** All governance files, state.json, config.json
-- **Writes:** Validation reports in `.idumb/idumb-brain/governance/`
+- **Writes:** Validation reports in `.idumb/brain/governance/`
 - **Triggers:** Commands, workflows, agent spawning
 - **Updates:** state.json history, anchors
 

@@ -285,7 +285,7 @@ idumb-validate_structure
 
 **Checks:**
 - `.idumb/` directory exists
-- `.idumb/idumb-brain/` subdirectory exists
+- `.idumb/brain/` subdirectory exists
 - `state.json` present and valid
 - `config.json` present and valid
 - Required directories exist
@@ -295,9 +295,9 @@ idumb-validate_structure
 structure:
   status: VALID | INVALID
   missing:
-    - ".idumb/idumb-brain/context/"
+    - ".idumb/brain/context/"
   invalid:
-    - path: ".idumb/idumb-brain/state.json"
+    - path: ".idumb/brain/state.json"
       issue: "Invalid JSON"
 ```
 

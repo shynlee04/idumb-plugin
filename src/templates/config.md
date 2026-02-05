@@ -5,12 +5,12 @@ parent: templates
 description: "Template for iDumb configuration schema"
 type: template
 version: 0.1.0
-output_pattern: ".idumb/idumb-brain/config.json"
+output_pattern: ".idumb/brain/config.json"
 ---
 
 # Config Template
 
-Defines the schema for `.idumb/idumb-brain/config.json` - user/project configuration for iDumb.
+Defines the schema for `.idumb/brain/config.json` - user/project configuration for iDumb.
 
 ## JSON Schema
 
@@ -65,7 +65,7 @@ Defines the schema for `.idumb/idumb-brain/config.json` - user/project configura
       "properties": {
         "planning": { "type": "string", "default": ".planning" },
         "idumb": { "type": "string", "default": ".idumb" },
-        "archive": { "type": "string", "default": ".idumb/idumb-brain/archive" }
+        "archive": { "type": "string", "default": ".idumb/brain/archive" }
       }
     },
     "agents": {
@@ -116,7 +116,7 @@ Defines the schema for `.idumb/idumb-brain/config.json` - user/project configura
   "paths": {
     "planning": ".planning",
     "idumb": ".idumb",
-    "archive": ".idumb/idumb-brain/archive"
+    "archive": ".idumb/brain/archive"
   },
   "agents": {
     "defaultTimeout": 300,

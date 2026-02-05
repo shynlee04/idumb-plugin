@@ -158,13 +158,13 @@ Each skill must meet minimum integration point thresholds:
 
 ```yaml
 reads_from:
-  - ".idumb/idumb-brain/state.json" (current state)
+  - ".idumb/brain/state.json" (current state)
   - "src/skills/*/SKILL.md" (skill registry)
   - ".opencode/agents/idumb-*.md" (agent definitions)
 
 writes_to:
-  - ".idumb/idumb-brain/governance/orchestration-reports/"
-  - ".idumb/idumb-brain/governance/validation-queue/"
+  - ".idumb/brain/governance/orchestration-reports/"
+  - ".idumb/brain/governance/validation-queue/"
 
 coordinates:
   - idumb-security

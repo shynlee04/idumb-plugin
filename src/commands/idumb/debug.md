@@ -16,8 +16,8 @@ Apply scientific debugging methodology to systematically diagnose, isolate, and 
 <execution_context>
 
 ## Reference Files (Read Before Execution)
-- `.idumb/idumb-brain/state.json` - Current governance state and history
-- `.idumb/idumb-brain/governance/validations/*.json` - Recent validation reports
+- `.idumb/brain/state.json` - Current governance state and history
+- `.idumb/brain/governance/validations/*.json` - Recent validation reports
 - Git history: `git log -10 --oneline` - Recent changes
 - Error logs: Application logs, test output, stack traces
 - `.planning/phases/*/PLAN.md` - Current phase context
@@ -56,7 +56,7 @@ The debug command forces specific flows through skill activations:
 
 2. **Validation Reporting** (`idumb-validation-reporter`)
    - All debug scopes use standardized report format
-   - Generates `.idumb/idumb-project-output/debug/REPORT-YYYY-MM-DD.md`
+   - Generates `.idumb/project-output/debug/REPORT-YYYY-MM-DD.md`
 
 3. **Domain Isolation** (`idumb-codebase-chunker`)
    - When issue spans multiple domains, chunks codebase
@@ -558,6 +558,6 @@ requires: governance-initialized
 outputs:
   - Debug report in conversation
   - Fixes via @idumb-builder (if approved)
-  - .idumb/idumb-brain/history/ (debug session record)
+  - .idumb/brain/history/ (debug session record)
 ```
 </metadata>

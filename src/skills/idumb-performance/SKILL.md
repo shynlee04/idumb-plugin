@@ -138,7 +138,7 @@ memory_leak_patterns:
 # Cleanup old validation records
 
 cleanup_old_records() {
-    local records_dir=".idumb/idumb-brain/governance/validations"
+    local records_dir=".idumb/brain/governance/validations"
     local max_age_days=7
     local max_records=100
 
@@ -154,7 +154,7 @@ cleanup_old_records() {
 
 # Run cleanup periodically
 cleanup_if_needed() {
-    local last_cleanup_file=".idumb/idumb-brain/.last-cleanup"
+    local last_cleanup_file=".idumb/brain/.last-cleanup"
     local cleanup_interval_hours=24
 
     if [[ -f "$last_cleanup_file" ]]; then
@@ -290,7 +290,7 @@ batch_validate_files() {
 
     # Read state once
     local state_content
-    state_content=$(cat .idumb/idumb-brain/state.json 2>/dev/null) || return 1
+    state_content=$(cat .idumb/brain/state.json 2>/dev/null) || return 1
 
     # Validate all files in single pass
     for file in "${files[@]}"; do
@@ -348,7 +348,7 @@ check_resource_usage() {
     fi
 
     # Check for excessive report files
-    local report_count=$(find .idumb/idumb-brain/governance -name "*.json" 2>/dev/null | wc -l)
+    local report_count=$(find .idumb/brain/governance -name "*.json" 2>/dev/null | wc -l)
     if [[ $report_count -gt 100 ]]; then
         echo "WARN: $report_count report files (consider cleanup)"
     fi
@@ -451,11 +451,11 @@ idumb-performance check --iteration-limits
 ```yaml
 reads_from:
   - "src/commands/idumb/*.md" (bash scripts)
-  - ".idumb/idumb-brain/governance/" (report files)
+  - ".idumb/brain/governance/" (report files)
 
 writes_to:
-  - ".idumb/idumb-brain/.performance-report.json"
-  - ".idumb/idumb-brain/.last-cleanup"
+  - ".idumb/brain/.performance-report.json"
+  - ".idumb/brain/.last-cleanup"
 
 validates_against:
   - "Performance targets"

@@ -273,7 +273,7 @@ Use idumb-research-writer skill to persist findings:
 [Specific improvements for this domain]
 ```
 
-File location: `.idumb/idumb-project-output/research/CODEBASE-CHUNK-{n}-{domain}.md`
+File location: `.idumb/project-output/research/CODEBASE-CHUNK-{n}-{domain}.md`
 </step>
 
 <step name="return_summary">
@@ -325,7 +325,7 @@ When domain analysis finishes successfully:
 
 ### Artifact Written
 
-**File:** `.idumb/idumb-project-output/research/CODEBASE-CHUNK-{n}-{domain}.md`
+**File:** `.idumb/project-output/research/CODEBASE-CHUNK-{n}-{domain}.md`
 
 ### Key Finding
 

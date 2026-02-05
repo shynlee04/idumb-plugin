@@ -2,7 +2,7 @@
  * Index Manager for Hierarchical Data
  * 
  * Creates searchable indexes with unique IDs for fast lookup.
- * Stores indexes in .idumb/idumb-brain/indexes/
+ * Stores indexes in .idumb/brain/indexes/
  * 
  * CRITICAL: NO console.log - would pollute TUI
  */
@@ -162,7 +162,7 @@ export function createIndex(
  * Get indexes directory path
  */
 export function getIndexesDir(directory: string): string {
-    return join(directory, '.idumb', 'idumb-brain', 'indexes')
+    return join(directory, '.idumb', 'brain', 'indexes')
 }
 
 /**

@@ -4,7 +4,7 @@ version: "0.1.0"
 created: "2026-02-03"
 purpose: "Document project directory structure, file organization, and naming conventions"
 consumed_by: ["idumb-codebase-mapper", "idumb-planner", "idumb-builder"]
-produces: ".idumb/idumb-project-output/codebase/STRUCTURE.md"
+produces: ".idumb/project-output/codebase/STRUCTURE.md"
 validation:
   required_fields: ["tree", "key_directories", "file_patterns", "naming_conventions"]
   schema: "codebase-structure-schema-v1"

@@ -16,7 +16,7 @@ permission:
     "git diff*": allow
     "git rev-parse*": allow
     "mkdir -p .idumb/*": allow
-    "mkdir -p .idumb/idumb-modules/*": allow
+    "mkdir -p .idumb/modules/*": allow
     "mkdir -p src/templates/*": allow
     "mkdir -p src/config/*": allow
     "mkdir -p src/schemas/*": allow
@@ -39,7 +39,7 @@ permission:
     ".plugin-dev/**": allow
   write:
     ".idumb/**": allow
-    ".idumb/idumb-modules/**": allow
+    ".idumb/modules/**": allow
     "src/templates/**": allow
     "src/config/**": allow
     "src/schemas/**": allow
@@ -433,7 +433,7 @@ src/references/**        # Reference documentation
 
 ## What NOT to Commit
 
-- `.idumb/idumb-brain/` - Runtime state
+- `.idumb/brain/` - Runtime state
 - `*.env` files - Environment secrets
 - Intermediate planning artifacts (commit with completion)
 - "Fixed typo" micro-commits (batch with meaningful work)

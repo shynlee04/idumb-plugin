@@ -58,7 +58,7 @@ Prepare validation context and log start.
 
 ```bash
 # Create validation report directory
-mkdir -p .idumb/idumb-brain/governance/validations
+mkdir -p .idumb/brain/governance/validations
 
 # Generate report ID
 REPORT_ID="validation-$(date +%Y%m%d-%H%M%S)"
@@ -102,18 +102,18 @@ Use tool: idumb-validate_structure
 Checks:
   directories:
     - .idumb/
-    - .idumb/idumb-brain/
-    - .idumb/idumb-brain/history/
-    - .idumb/idumb-brain/context/
-    - .idumb/idumb-brain/governance/
-    - .idumb/idumb-brain/governance/validations/
-    - .idumb/idumb-brain/anchors/
-    - .idumb/idumb-brain/sessions/
-    - .idumb/idumb-project-output/
+    - .idumb/brain/
+    - .idumb/brain/history/
+    - .idumb/brain/context/
+    - .idumb/brain/governance/
+    - .idumb/brain/governance/validations/
+    - .idumb/brain/anchors/
+    - .idumb/brain/sessions/
+    - .idumb/project-output/
     
   files:
-    - .idumb/idumb-brain/state.json
-    - .idumb/idumb-brain/config.json
+    - .idumb/brain/state.json
+    - .idumb/brain/config.json
 ```
 
 **Structure Check Logic:**
@@ -181,15 +181,15 @@ Use tool: idumb-validate_freshness
 maxAgeHours: 48
 
 Check paths:
-  - .idumb/idumb-brain/context/*
-  - .idumb/idumb-brain/governance/*
-  - .idumb/idumb-brain/anchors/*
+  - .idumb/brain/context/*
+  - .idumb/brain/governance/*
+  - .idumb/brain/anchors/*
 ```
 
 **Freshness Check Logic:**
 ```bash
 # Find stale files
-STALE_FILES=$(find .idumb/idumb-brain -type f -mtime +2)
+STALE_FILES=$(find .idumb/brain -type f -mtime +2)
 
 if [ -n "$STALE_FILES" ]; then
   echo "WARNING: Stale files detected"
@@ -276,7 +276,7 @@ auto_fix:
     action: "Initialize with defaults"
     
   stale_context:
-    action: "Archive to .idumb/idumb-brain/history/"
+    action: "Archive to .idumb/brain/history/"
     
   schema_issues:
     action: "Add missing fields with defaults"
@@ -309,7 +309,7 @@ Generate validation report file.
 Delegate to: @idumb-builder
 
 Task: Create validation report
-Path: .idumb/idumb-brain/governance/validations/{REPORT_ID}.json
+Path: .idumb/brain/governance/validations/{REPORT_ID}.json
 ```
 
 ## Step 12: Anchor Critical Findings
@@ -353,9 +353,9 @@ checks:
     status: warning
     details: "3 files older than 48h"
     stale_files:
-      - path: ".idumb/idumb-brain/context/old-context.md"
+      - path: ".idumb/brain/context/old-context.md"
         age: "72h"
-      - path: ".idumb/idumb-brain/governance/old-report.json"
+      - path: ".idumb/brain/governance/old-report.json"
         age: "96h"
         
   alignment:
@@ -407,7 +407,7 @@ recommendation:
 ├────────────────────────────────────────────────────────────────┤
 │ Recommendation: Run /idumb:validate --fix to auto-repair        │
 ├────────────────────────────────────────────────────────────────┤
-│ Report: .idumb/idumb-brain/governance/validations/validation-*  │
+│ Report: .idumb/brain/governance/validations/validation-*  │
 └────────────────────────────────────────────────────────────────┘
 ```
 
@@ -427,8 +427,8 @@ recommendation:
 │ └── Integrity:     - skipped (deps failed)                      │
 ├────────────────────────────────────────────────────────────────┤
 │ Critical Issues:                                                │
-│ ├── CRITICAL: Missing .idumb/idumb-brain/state.json             │
-│ └── CRITICAL: Missing .idumb/idumb-brain/config.json            │
+│ ├── CRITICAL: Missing .idumb/brain/state.json             │
+│ └── CRITICAL: Missing .idumb/brain/config.json            │
 ├────────────────────────────────────────────────────────────────┤
 │ Fix Required: Run /idumb:init --repair                          │
 └────────────────────────────────────────────────────────────────┘
@@ -473,13 +473,13 @@ recommendation:
 
 ```bash
 # Check validation recorded
-cat .idumb/idumb-brain/state.json | jq '.lastValidation, .validationCount'
+cat .idumb/brain/state.json | jq '.lastValidation, .validationCount'
 
 # Check report created
-ls -la .idumb/idumb-brain/governance/validations/
+ls -la .idumb/brain/governance/validations/
 
 # Check history updated
-cat .idumb/idumb-brain/state.json | jq '.history[-1]'
+cat .idumb/brain/state.json | jq '.history[-1]'
 ```
 
 </success_criteria>

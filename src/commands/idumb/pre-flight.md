@@ -13,12 +13,12 @@ Execute pre-flight validation checks before starting development work on a proje
 <execution_context>
 ## Reference Files
 - Skill: `src/skills/idumb-project-validation/SKILL.md`
-- State: `.idumb/idumb-brain/state.json`
-- Config: `.idumb/idumb-brain/config.json`
+- State: `.idumb/brain/state.json`
+- Config: `.idumb/brain/config.json`
 
 ## Integration Points
 - Reads: Environment, git state, project structure
-- Writes: `.idumb/idumb-brain/governance/pre-flight-{timestamp}.json`
+- Writes: `.idumb/brain/governance/pre-flight-{timestamp}.json`
 - Triggers: Auto-validation on session start
 </execution_context>
 
@@ -165,22 +165,22 @@ echo "Environment: $CHECKS_PASSED passed, $CHECKS_FAILED failed"
 echo "Running governance checks..."
 
 # Check 1: iDumb initialized
-if [ -d ".idumb/idumb-brain" ]; then
+if [ -d ".idumb/brain" ]; then
   echo "✓ iDumb brain directory exists"
   
   # Check 2: state.json valid
-  if jq . .idumb/idumb-brain/state.json > /dev/null 2>&1; then
+  if jq . .idumb/brain/state.json > /dev/null 2>&1; then
     echo "✓ state.json is valid JSON"
     
     # Check 3: State freshness
-    LAST_VALIDATION=$(jq -r '.lastValidation // "never"' .idumb/idumb-brain/state.json)
+    LAST_VALIDATION=$(jq -r '.lastValidation // "never"' .idumb/brain/state.json)
     echo "  Last validation: $LAST_VALIDATION"
   else
     echo "✗ state.json is invalid or missing"
   fi
   
   # Check 4: config.json valid
-  if jq . .idumb/idumb-brain/config.json > /dev/null 2>&1; then
+  if jq . .idumb/brain/config.json > /dev/null 2>&1; then
     echo "✓ config.json is valid JSON"
   else
     echo "✗ config.json is invalid or missing"
@@ -250,16 +250,16 @@ if [ "$FIX" == "true" ]; then
   echo "Running auto-fix..."
   
   # Fix 1: Initialize iDumb if missing
-  if [ ! -d ".idumb/idumb-brain" ]; then
+  if [ ! -d ".idumb/brain" ]; then
     echo "AUTO-FIX: Initializing iDumb..."
-    mkdir -p .idumb/idumb-brain
+    mkdir -p .idumb/brain
     TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-    echo '{"version":"0.3.0","initialized":"'$TIMESTAMP'","framework":"idumb","phase":"init"}' > .idumb/idumb-brain/state.json
-    echo '{"governance":{"level":"standard"}}' > .idumb/idumb-brain/config.json
+    echo '{"version":"0.3.0","initialized":"'$TIMESTAMP'","framework":"idumb","phase":"init"}' > .idumb/brain/state.json
+    echo '{"governance":{"level":"standard"}}' > .idumb/brain/config.json
   fi
   
   # Fix 2: Create missing directories with security checks
-  for dir in ".idumb/idumb-project-output" ".idumb/idumb-brain/governance" ".idumb/idumb-brain/history"; do
+  for dir in ".idumb/project-output" ".idumb/brain/governance" ".idumb/brain/history"; do
     if [ ! -d "$dir" ]; then
       echo "AUTO-FIX: Creating $dir"
       # Security: Validate directory path

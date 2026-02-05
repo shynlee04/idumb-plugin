@@ -4,7 +4,7 @@ version: "0.1.0"
 created: "2026-02-03"
 purpose: "Document project architecture patterns, layers, and component relationships"
 consumed_by: ["idumb-codebase-mapper", "idumb-planner", "idumb-architect"]
-produces: ".idumb/idumb-project-output/codebase/ARCHITECTURE.md"
+produces: ".idumb/project-output/codebase/ARCHITECTURE.md"
 validation:
   required_fields: ["pattern", "layers", "components", "data_flow"]
   schema: "codebase-architecture-schema-v1"

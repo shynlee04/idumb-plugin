@@ -6,8 +6,8 @@ agent: idumb-supreme-coordinator
 ---
 
 <execution_context>
-@.idumb/idumb-brain/config.json
-@.idumb/idumb-project-output/roadmaps/
+@.idumb/brain/config.json
+@.idumb/project-output/roadmaps/
 @src/agents/idumb-planner.md
 @src/agents/idumb-plan-checker.md
 </execution_context>
@@ -72,7 +72,7 @@ Normalize phase input in step 2 before any directory lookups.
 ## 0. Resolve Model Profile
 
 ```bash
-ls .idumb/idumb-brain/config.json 2>/dev/null
+ls .idumb/brain/config.json 2>/dev/null
 ```
 
 **If not found:** Error - user should run `/idumb:setup` first.
@@ -80,7 +80,7 @@ ls .idumb/idumb-brain/config.json 2>/dev/null
 **Resolve model profile for agent spawning:**
 
 ```bash
-MODEL_PROFILE=$(cat .idumb/idumb-brain/config.json 2>/dev/null | grep -o '"model_profile"[[:space:]]*:[[:space:]]*"[^"]*"' | grep -o '"[^"]*"$' | tr -d '"' || echo "balanced")
+MODEL_PROFILE=$(cat .idumb/brain/config.json 2>/dev/null | grep -o '"model_profile"[[:space:]]*:[[:space:]]*"[^"]*"' | grep -o '"[^"]*"$' | tr -d '"' || echo "balanced")
 ```
 
 Default to "balanced" if not set.
@@ -121,7 +121,7 @@ fi
 **Validate phase exists:**
 
 ```bash
-grep -A5 "Phase ${PHASE}:" .idumb/idumb-project-output/roadmaps/ROADMAP.md 2>/dev/null
+grep -A5 "Phase ${PHASE}:" .idumb/project-output/roadmaps/ROADMAP.md 2>/dev/null
 ```
 
 **If not found:** Error with available phases. 
@@ -131,12 +131,12 @@ grep -A5 "Phase ${PHASE}:" .idumb/idumb-project-output/roadmaps/ROADMAP.md 2>/de
 
 ```bash
 # PHASE is already normalized (08, 02.1, etc.) from step 1
-PHASE_DIR=$(ls -d .idumb/idumb-project-output/phases/${PHASE}-* 2>/dev/null | head -1)
+PHASE_DIR=$(ls -d .idumb/project-output/phases/${PHASE}-* 2>/dev/null | head -1)
 if [ -z "$PHASE_DIR" ]; then
   # Create phase directory from roadmap name
-  PHASE_NAME=$(grep "Phase ${PHASE}:" .idumb/idumb-project-output/roadmaps/ROADMAP.md | sed 's/.*Phase [0-9]*: //' | tr '[:upper:]' '[:lower:]' | tr ' ' '-')
-  mkdir -p ".idumb/idumb-project-output/phases/${PHASE}-${PHASE_NAME}"
-  PHASE_DIR=".idumb/idumb-project-output/phases/${PHASE}-${PHASE_NAME}"
+  PHASE_NAME=$(grep "Phase ${PHASE}:" .idumb/project-output/roadmaps/ROADMAP.md | sed 's/.*Phase [0-9]*: //' | tr '[:upper:]' '[:lower:]' | tr ' ' '-')
+  mkdir -p ".idumb/project-output/phases/${PHASE}-${PHASE_NAME}"
+  PHASE_DIR=".idumb/project-output/phases/${PHASE}-${PHASE_NAME}"
 fi
 
 # Load CONTEXT.md immediately - this informs ALL downstream agents
@@ -164,7 +164,7 @@ If CONTEXT.md exists, display: `Using phase context from: ${PHASE_DIR}/*-CONTEXT
 **Check config for research setting:**
 
 ```bash
-WORKFLOW_RESEARCH=$(cat .idumb/idumb-brain/config.json 2>/dev/null | grep -o '"research"[[:space:]]*:[[:space:]]*[^,}]*' | grep -o 'true\|false' || echo "true")
+WORKFLOW_RESEARCH=$(cat .idumb/brain/config.json 2>/dev/null | grep -o '"research"[[:space:]]*:[[:space:]]*[^,}]*' | grep -o 'true\|false' || echo "true")
 ```
 
 **If `workflow.research` is `false` AND `--research` flag NOT set:** Skip to step 3.
@@ -201,11 +201,11 @@ Display stage banner:
 
 ```bash
 # Read required files
-STATE_CONTENT=$(cat .idumb/idumb-brain/state.json)
-ROADMAP_CONTENT=$(cat .idumb/idumb-project-output/roadmaps/ROADMAP.md)
+STATE_CONTENT=$(cat .idumb/brain/state.json)
+ROADMAP_CONTENT=$(cat .idumb/project-output/roadmaps/ROADMAP.md)
 
 # Read optional files (empty string if missing)
-REQUIREMENTS_CONTENT=$(cat .idumb/idumb-project-output/REQUIREMENTS.md 2>/dev/null)
+REQUIREMENTS_CONTENT=$(cat .idumb/project-output/REQUIREMENTS.md 2>/dev/null)
 # CONTEXT_CONTENT already loaded in step 2
 RESEARCH_CONTENT=$(cat "${PHASE_DIR}"/*-RESEARCH.md 2>/dev/null)
 
@@ -500,7 +500,7 @@ Verification: {Passed | Passed with override | Skipped}
 ───────────────────────────────────────────────────────────────
 
 **Also available:**
-- cat .idumb/idumb-project-output/phases/{phase-dir}/*-PLAN.md — review plans
+- cat .idumb/project-output/phases/{phase-dir}/*-PLAN.md — review plans
 - /idumb:plan-phase {X} --research — re-research first
 
 ───────────────────────────────────────────────────────────────

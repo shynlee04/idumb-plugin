@@ -16,9 +16,9 @@ Generate a structured project roadmap with phases, milestones, dependencies, and
 <execution_context>
 
 ## Reference Files (Read Before Execution)
-- `.idumb/idumb-brain/state.json` - Current governance state
-- `.idumb/idumb-brain/config.json` - User settings
-- `.idumb/idumb-project-output/research/*.md` - Research outputs
+- `.idumb/brain/state.json` - Current governance state
+- `.idumb/brain/config.json` - User settings
+- `.idumb/project-output/research/*.md` - Research outputs
 - `.planning/PROJECT.md` - Project definition (if exists)
 - `.planning/ROADMAP.md` - Existing roadmap (if updating)
 - `PROJECT.md` or `README.md` - Project requirements (fallback)
@@ -98,7 +98,7 @@ validation:
   
 input_sources:
   check_in_order:
-    1: ".idumb/idumb-project-output/research/*.md" (if --from-research)
+    1: ".idumb/project-output/research/*.md" (if --from-research)
     2: ".planning/PROJECT.md"
     3: "PROJECT.md" (root)
     4: "README.md"
@@ -144,7 +144,7 @@ context_gathering:
     
   from_research:
     condition: --from-research flag
-    action: Load latest research from .idumb/idumb-project-output/research/
+    action: Load latest research from .idumb/project-output/research/
     extract:
       - Technical recommendations
       - User requirements
@@ -226,7 +226,7 @@ storage:
   delegate_to: "@idumb-builder"
   
   primary_path: ".planning/ROADMAP.md"
-  backup_path: ".idumb/idumb-project-output/roadmaps/{date}-roadmap.md"
+  backup_path: ".idumb/project-output/roadmaps/{date}-roadmap.md"
   
   state_update:
     tool: idumb-state_write
@@ -364,7 +364,7 @@ Phase 1 ──→ Phase 2 ──→ Phase 4
 ## Stored At
 
 - Primary: `.planning/ROADMAP.md`
-- Backup: `.idumb/idumb-project-output/roadmaps/{date}-roadmap.md`
+- Backup: `.idumb/project-output/roadmaps/{date}-roadmap.md`
 
 ## Next Steps
 
@@ -443,6 +443,6 @@ requires: governance-initialized
 outputs:
   - .planning/ROADMAP.md
   - .planning/phases/*/README.md
-  - .idumb/idumb-project-output/roadmaps/*.md
+  - .idumb/project-output/roadmaps/*.md
 ```
 </metadata>

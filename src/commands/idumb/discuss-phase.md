@@ -53,7 +53,7 @@ Verify the requested phase is in the roadmap.
 
 ```bash
 # Check roadmap exists
-if [ ! -f ".planning/ROADMAP.md" ] && [ ! -f ".idumb/idumb-project-output/roadmaps/roadmap.md" ]; then
+if [ ! -f ".planning/ROADMAP.md" ] && [ ! -f ".idumb/project-output/roadmaps/roadmap.md" ]; then
   echo "ERROR: No roadmap found. Run /idumb:roadmap first."
   exit 1
 fi
@@ -73,7 +73,7 @@ Gather all relevant context for the discussion.
 ```yaml
 sources:
   - .planning/ROADMAP.md (if planning framework)
-  - .idumb/idumb-project-output/roadmaps/roadmap.md
+  - .idumb/project-output/roadmaps/roadmap.md
   - Previous phase outputs (if not phase 1)
   - Research documents for this phase
   - Existing anchors related to phase
@@ -242,14 +242,14 @@ Compile all discussion outcomes.
 Delegate to: @idumb-builder
 
 Task: Create phase context document
-Path: .idumb/idumb-brain/governance/phases/<phase>-context.md
+Path: .idumb/brain/governance/phases/<phase>-context.md
 ```
 
 ## Step 8: Store Context Document
 
 Save the synthesized discussion.
 
-**Document Path:** `.idumb/idumb-brain/governance/phases/phase-<N>-context.md`
+**Document Path:** `.idumb/brain/governance/phases/phase-<N>-context.md`
 
 </process>
 
@@ -332,7 +332,7 @@ Save the synthesized discussion.
   ├── Open questions: <count>
   └── Anchors created: <count>
 
-  Document: .idumb/idumb-brain/governance/phases/phase-<N>-context.md
+  Document: .idumb/brain/governance/phases/phase-<N>-context.md
 
   Next:
   1. /idumb:plan-phase <N> - Create detailed plan
@@ -378,13 +378,13 @@ Save the synthesized discussion.
 
 ```bash
 # Check context document created
-ls .idumb/idumb-brain/governance/phases/phase-*-context.md
+ls .idumb/brain/governance/phases/phase-*-context.md
 
 # Check anchors created
-cat .idumb/idumb-brain/state.json | jq '.anchors[] | select(.type == "decision")'
+cat .idumb/brain/state.json | jq '.anchors[] | select(.type == "decision")'
 
 # Check history updated
-cat .idumb/idumb-brain/state.json | jq '.history[-1]'
+cat .idumb/brain/state.json | jq '.history[-1]'
 ```
 
 </success_criteria>

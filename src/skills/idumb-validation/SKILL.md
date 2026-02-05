@@ -167,8 +167,8 @@ agent_integration_validation:
 
   required_connections:
     - reads_from:
-        - ".idumb/idumb-brain/state.json"
-        - ".idumb/idumb-brain/config.json"
+        - ".idumb/brain/state.json"
+        - ".idumb/brain/config.json"
         - "Current TODO list"
 
     - writes_to:

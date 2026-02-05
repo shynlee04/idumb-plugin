@@ -11,8 +11,8 @@ Complete integration point matrices for all iDumb components. Use as reference w
 #### Reads From (8)
 | Source | Fields | Purpose |
 |--------|--------|---------|
-| `.idumb/idumb-brain/state.json` | phase, framework, anchors | Get current governance state |
-| `.idumb/idumb-brain/config.json` | user, governance, automation | Get user preferences |
+| `.idumb/brain/state.json` | phase, framework, anchors | Get current governance state |
+| `.idumb/brain/config.json` | user, governance, automation | Get user preferences |
 | `todoread` tool | all TODOs | Check pending work |
 | `idumb-state` tool | all exports | Read governance state |
 | `idumb-context` tool | project classification | Understand project type |
@@ -23,8 +23,8 @@ Complete integration point matrices for all iDumb components. Use as reference w
 #### Writes To (6)
 | Target | Fields | Purpose |
 |--------|--------|---------|
-| `.idumb/idumb-brain/state.json` | history, lastValidation | Record actions |
-| `.idumb/idumb-brain/history/` | action entries | Archive history |
+| `.idumb/brain/state.json` | history, lastValidation | Record actions |
+| `.idumb/brain/history/` | action entries | Archive history |
 | `todowrite` tool | task updates | Track progress |
 | `idumb-state_history` tool | entries | Log actions |
 | `idumb-state_anchor` tool | critical decisions | Persist decisions |
@@ -58,7 +58,7 @@ Complete integration point matrices for all iDumb components. Use as reference w
 #### Depends On (3)
 | Component | Reason |
 |-----------|--------|
-| `.idumb/idumb-brain/state.json` | Required for context |
+| `.idumb/brain/state.json` | Required for context |
 | Agent profiles | Delegation targets must exist |
 | Tool definitions | Must have tools to call |
 
@@ -86,8 +86,8 @@ Complete integration point matrices for all iDumb components. Use as reference w
 #### Reads From (6)
 | Source | Fields | Purpose |
 |--------|--------|---------|
-| `.idumb/idumb-brain/state.json` | all | Schema validation |
-| `.idumb/idumb-brain/config.json` | all | Config validation |
+| `.idumb/brain/state.json` | all | Schema validation |
+| `.idumb/brain/config.json` | all | Config validation |
 | `.idumb/` directory | structure | Structure check |
 | `.planning/` directory | files | Alignment check |
 | `src/schemas/*.json` | definitions | Schema references |
@@ -97,7 +97,7 @@ Complete integration point matrices for all iDumb components. Use as reference w
 | Target | Fields | Purpose |
 |--------|--------|---------|
 | Validation reports | all findings | Return results |
-| `.idumb/idumb-brain/governance/validations/` | JSON | Persistent records |
+| `.idumb/brain/governance/validations/` | JSON | Persistent records |
 | Console output | structured JSON | User feedback |
 
 #### Validates Against (5)

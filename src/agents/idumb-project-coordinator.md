@@ -28,9 +28,9 @@ permission:
     "git status*": allow
     "git log*": allow
   edit:
-    ".idumb/idumb-project-output/**/*.md": allow
+    ".idumb/project-output/**/*.md": allow
   write:
-    ".idumb/idumb-project-output/**/*.md": allow
+    ".idumb/project-output/**/*.md": allow
 tools:
   task: true
   idumb-state: true

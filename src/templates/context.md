@@ -250,7 +250,7 @@ User discusses → @idumb-high-governance routes to discussion
 
 **State Tracking:**
 
-Context creation is recorded in `.idumb/idumb-brain/state.json`:
+Context creation is recorded in `.idumb/brain/state.json`:
 - Phase status updated to "context-gathered"
 - Anchor created with key decisions
 - History entry logged

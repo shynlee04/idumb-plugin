@@ -30,7 +30,7 @@ Core principles guiding research:
 # At least one of these must be true
 
 # Check 1: iDumb initialized
-test -f ".idumb/idumb-brain/state.json" || {
+test -f ".idumb/brain/state.json" || {
   echo "WARNING: iDumb not initialized"
   echo "Research can proceed standalone"
 }
@@ -54,7 +54,7 @@ test -f ".planning/ROADMAP.md" && echo "✓ ROADMAP.md available for scope"
 
 # Create research output directory
 mkdir -p ".planning/research"
-mkdir -p ".idumb/idumb-project-output/research"
+mkdir -p ".idumb/project-output/research"
 
 echo "✓ Research workflow ready"
 echo "Topic: ${RESEARCH_TOPIC}"
@@ -475,7 +475,7 @@ EOF
 echo "✓ Research document created: ${OUTPUT_PATH}"
 
 # Also copy to brain output
-cp "${OUTPUT_PATH}" ".idumb/idumb-project-output/research/${TOPIC_SLUG}-RESEARCH.md"
+cp "${OUTPUT_PATH}" ".idumb/project-output/research/${TOPIC_SLUG}-RESEARCH.md"
 ```
 
 **Validation:**
@@ -496,7 +496,7 @@ test -f "${OUTPUT_PATH}" && \
 **Commands:**
 ```bash
 # Update state
-STATE_FILE=".idumb/idumb-brain/state.json"
+STATE_FILE=".idumb/brain/state.json"
 
 if [ -f "${STATE_FILE}" ]; then
   # Add history entry via jq or idumb-state tool
@@ -579,7 +579,7 @@ ls -la "${RESEARCH_DIR}/"
 ## Artifact: {topic}-RESEARCH.md
 
 **Path:** `.planning/research/{topic-slug}-RESEARCH.md`
-**Backup:** `.idumb/idumb-project-output/research/{topic-slug}-RESEARCH.md`
+**Backup:** `.idumb/project-output/research/{topic-slug}-RESEARCH.md`
 
 ### Frontmatter
 ```yaml
@@ -674,7 +674,7 @@ EOF
 ## On Failure (Research Error)
 **Action:** Log error, save partial work
 ```bash
-echo "[${TIMESTAMP}] research:${RESEARCH_TOPIC}:failed" >> .idumb/idumb-brain/history/errors.log
+echo "[${TIMESTAMP}] research:${RESEARCH_TOPIC}:failed" >> .idumb/brain/history/errors.log
 ```
 </chain_rules>
 
@@ -725,14 +725,14 @@ echo "[${TIMESTAMP}] research:${RESEARCH_TOPIC}:failed" >> .idumb/idumb-brain/hi
 - Project codebase (src/, lib/, etc.)
 - `.planning/PROJECT.md` - Project context
 - `.planning/ROADMAP.md` - Scope context
-- `.idumb/idumb-brain/state.json` - Current state
+- `.idumb/brain/state.json` - Current state
 - External sources via MCP tools
 
 ### Writes To
 - `.planning/research/{topic}-RESEARCH.md` - Main output
 - `.planning/research/{topic}/` - Working directory
-- `.idumb/idumb-project-output/research/` - Backup
-- `.idumb/idumb-brain/state.json` - History entry
+- `.idumb/project-output/research/` - Backup
+- `.idumb/brain/state.json` - History entry
 
 ### Never Modifies
 - Source code files

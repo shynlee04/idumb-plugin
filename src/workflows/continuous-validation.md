@@ -25,10 +25,10 @@ I am the continuous validation workflow that runs throughout development. I prov
 <entry_check>
 ```bash
 # Must have iDumb initialized
-test -d ".idumb/idumb-brain" || { echo "ERROR: iDumb not initialized"; exit 1; }
+test -d ".idumb/brain" || { echo "ERROR: iDumb not initialized"; exit 1; }
 
 # State must be valid
-jq . .idumb/idumb-brain/state.json > /dev/null 2>&1 || { echo "ERROR: Invalid state"; exit 1; }
+jq . .idumb/brain/state.json > /dev/null 2>&1 || { echo "ERROR: Invalid state"; exit 1; }
 
 echo "Continuous validation ready"
 ```
@@ -44,7 +44,7 @@ micro_triggers:
       action: "validate_agent_on_change"
     - pattern: "src/commands/idumb/*.md"
       action: "validate_command_on_change"
-    - pattern: ".idumb/idumb-brain/state.json"
+    - pattern: ".idumb/brain/state.json"
       action: "validate_state_consistency"
       
   action_events:
@@ -114,7 +114,7 @@ CHANGED_FILES=$(git status --porcelain 2>/dev/null | wc -l)
 echo "Changed files: $CHANGED_FILES"
 
 # Check time since last validation
-LAST_VALIDATION=$(jq -r '.lastValidation // "1970-01-01T00:00:00Z"' .idumb/idumb-brain/state.json)
+LAST_VALIDATION=$(jq -r '.lastValidation // "1970-01-01T00:00:00Z"' .idumb/brain/state.json)
 NOW=$(date -u +%s)
 LAST=$(date -d "$LAST_VALIDATION" +%s 2>/dev/null || echo 0)
 MINUTES_SINCE=$(( (NOW - LAST) / 60 ))
@@ -167,7 +167,7 @@ if [ "$MODE" == "micro" ]; then
   
   # Check 1: State consistency (<1s)
   echo "  Check: State consistency..."
-  if jq . .idumb/idumb-brain/state.json > /dev/null 2>&1; then
+  if jq . .idumb/brain/state.json > /dev/null 2>&1; then
     echo "    ✓ State valid"
     ((MICRO_PASSED++))
   else
@@ -177,7 +177,7 @@ if [ "$MODE" == "micro" ]; then
   
   # Check 2: Permission not violated (<1s)
   echo "  Check: Recent actions..."
-  LAST_ACTION=$(jq -r '.history[-1].action // "none"' .idumb/idumb-brain/state.json)
+  LAST_ACTION=$(jq -r '.history[-1].action // "none"' .idumb/brain/state.json)
   echo "    Last action: $LAST_ACTION"
   ((MICRO_PASSED++))
   
@@ -316,8 +316,8 @@ echo "Updating state..."
 # idumb-state_history action="continuous-validation:$MODE:$RESULT" result="$RESULT"
 
 # Save validation record
-RECORD=".idumb/idumb-brain/governance/validations/validation-$TIMESTAMP.json"
-mkdir -p .idumb/idumb-brain/governance/validations
+RECORD=".idumb/brain/governance/validations/validation-$TIMESTAMP.json"
+mkdir -p .idumb/brain/governance/validations
 
 cat > "$RECORD" << EOF
 {

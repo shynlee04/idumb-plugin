@@ -40,7 +40,7 @@ Manage output styles that control how iDumb agents format their responses.
 ## Prerequisites
 
 - `.idumb/` directory must exist (run `/idumb:init` first)
-- Styles are stored in `.idumb/idumb-brain/styles/`
+- Styles are stored in `.idumb/brain/styles/`
 
 ## Style File Format
 

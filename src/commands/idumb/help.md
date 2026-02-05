@@ -228,7 +228,7 @@ THE CHAIN CANNOT BREAK
        ↓
   coordinator → governance → validator → builder
 
-Every action is traceable through .idumb/idumb-brain/state.json
+Every action is traceable through .idumb/brain/state.json
 ```
 
 ## Quick Start Output
@@ -290,13 +290,13 @@ TIPS
   • Use /idumb:validate regularly to check governance health
   • Use /idumb:config experience pro for less guidance
   • Use /idumb:resume when returning after idle time
-  • Check .idumb/idumb-brain/state.json for current state
+  • Check .idumb/brain/state.json for current state
 
 FILES TO KNOW
 ─────────────
-  .idumb/idumb-brain/state.json    Current governance state
-  .idumb/idumb-brain/config.json   Your preferences
-  .idumb/idumb-project-output/     Generated artifacts
+  .idumb/brain/state.json    Current governance state
+  .idumb/brain/config.json   Your preferences
+  .idumb/project-output/     Generated artifacts
 ```
 
 ## Specific Command Help Output
@@ -386,12 +386,12 @@ Load skills with the `skill` tool:
 
 | Path | Purpose |
 |------|---------|
-| `.idumb/idumb-brain/state.json` | Current governance state |
-| `.idumb/idumb-brain/config.json` | User configuration |
-| `.idumb/idumb-brain/governance/` | Validation history |
-| `.idumb/idumb-brain/anchors/` | Context anchors |
-| `.idumb/idumb-brain/sessions/` | Session tracking |
-| `.idumb/idumb-project-output/` | Generated artifacts |
+| `.idumb/brain/state.json` | Current governance state |
+| `.idumb/brain/config.json` | User configuration |
+| `.idumb/brain/governance/` | Validation history |
+| `.idumb/brain/anchors/` | Context anchors |
+| `.idumb/brain/sessions/` | Session tracking |
+| `.idumb/project-output/` | Generated artifacts |
 
 ## Related Commands
 

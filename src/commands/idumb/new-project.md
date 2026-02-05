@@ -73,25 +73,25 @@ Build the complete `.idumb/` hierarchy.
 
 ```bash
 # Create brain directories
-mkdir -p .idumb/idumb-brain/history
-mkdir -p .idumb/idumb-brain/context
-mkdir -p .idumb/idumb-brain/governance/validations
-mkdir -p .idumb/idumb-brain/anchors
-mkdir -p .idumb/idumb-brain/sessions
-mkdir -p .idumb/idumb-brain/execution
-mkdir -p .idumb/idumb-brain/drift
-mkdir -p .idumb/idumb-brain/metadata
-mkdir -p .idumb/idumb-brain/indexes
+mkdir -p .idumb/brain/history
+mkdir -p .idumb/brain/context
+mkdir -p .idumb/brain/governance/validations
+mkdir -p .idumb/brain/anchors
+mkdir -p .idumb/brain/sessions
+mkdir -p .idumb/brain/execution
+mkdir -p .idumb/brain/drift
+mkdir -p .idumb/brain/metadata
+mkdir -p .idumb/brain/indexes
 
 # Create project output directories
-mkdir -p .idumb/idumb-project-output/phases
-mkdir -p .idumb/idumb-project-output/roadmaps
-mkdir -p .idumb/idumb-project-output/research
-mkdir -p .idumb/idumb-project-output/validations
-mkdir -p .idumb/idumb-project-output/codebase
+mkdir -p .idumb/project-output/phases
+mkdir -p .idumb/project-output/roadmaps
+mkdir -p .idumb/project-output/research
+mkdir -p .idumb/project-output/validations
+mkdir -p .idumb/project-output/codebase
 
 # Create modules directory for extensions
-mkdir -p .idumb/idumb-modules
+mkdir -p .idumb/modules
 ```
 
 ## Step 3: Detect Existing Frameworks
@@ -247,7 +247,7 @@ Display summary and next steps.
 
   Structure Created:
   ├── .idumb/
-  │   ├── idumb-brain/
+  │   ├── brain/
   │   │   ├── state.json ✓
   │   │   ├── config.json ✓
   │   │   ├── history/
@@ -255,11 +255,11 @@ Display summary and next steps.
   │   │   ├── governance/
   │   │   ├── anchors/
   │   │   └── sessions/
-  │   ├── idumb-project-output/
+  │   ├── project-output/
   │   │   ├── phases/
   │   │   ├── roadmaps/
   │   │   └── research/
-  │   └── idumb-modules/
+  │   └── modules/
 
   Detected:
   - Project type: <node|rust|go|python|unknown>
@@ -299,8 +299,8 @@ Display summary and next steps.
 ## Initialization Checklist
 
 - [ ] `.idumb/` directory created
-- [ ] `idumb-brain/` subdirectory created with all children
-- [ ] `idumb-project-output/` subdirectory created
+- [ ] `brain/` subdirectory created with all children
+- [ ] `project-output/` subdirectory created
 - [ ] `config.json` created with valid JSON
 - [ ] `state.json` created with valid JSON
 - [ ] Framework detected or selected
@@ -314,13 +314,13 @@ Display summary and next steps.
 ```bash
 # Verify structure
 ls -la .idumb/
-ls -la .idumb/idumb-brain/
+ls -la .idumb/brain/
 
 # Verify config
-cat .idumb/idumb-brain/config.json | jq .
+cat .idumb/brain/config.json | jq .
 
 # Verify state
-cat .idumb/idumb-brain/state.json | jq .
+cat .idumb/brain/state.json | jq .
 ```
 
 </success_criteria>

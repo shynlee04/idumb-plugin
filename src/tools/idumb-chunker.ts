@@ -590,7 +590,7 @@ export const shard = tool({
 
 // Create searchable index with IDs
 export const index = tool({
-  description: "Create ID-based index of hierarchical data for fast lookup. Stores in .idumb/idumb-brain/indexes/",
+  description: "Create ID-based index of hierarchical data for fast lookup. Stores in .idumb/brain/indexes/",
   args: {
     path: tool.schema.string().describe("Path to file (relative to project root)"),
     force: tool.schema.boolean().optional().describe("Force re-index even if cached index exists")

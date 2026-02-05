@@ -67,14 +67,14 @@ bash_injection_patterns:
 ```yaml
 safe_bash_patterns:
   file_paths:
-    safe: 'CERT_FILE=".idumb/idumb-brain/governance/certificate-\${TIMESTAMP}.json"'
+    safe: 'CERT_FILE=".idumb/brain/governance/certificate-\${TIMESTAMP}.json"'
     reason: "Variable at end, quoted, TIMESTAMP generated internally"
 
     unsafe: 'CERT_FILE="${USER_INPUT}/${FILE_NAME}"'
-    fix: 'CERT_FILE=".idumb/idumb-brain/governance/$(basename "${USER_INPUT}")"'
+    fix: 'CERT_FILE=".idumb/brain/governance/$(basename "${USER_INPUT}")"'
 
   command_execution:
-    safe: 'mkdir -p ".idumb/idumb-brain/governance"'
+    safe: 'mkdir -p ".idumb/brain/governance"'
     reason: "Static path, no variables"
 ```
 </security_category>
@@ -311,10 +311,10 @@ idumb-security scan
 reads_from:
   - "src/commands/idumb/*.md" (bash blocks)
   - ".opencode/agents/idumb-*.md" (permissions)
-  - ".idumb/idumb-brain/state.json" (state)
+  - ".idumb/brain/state.json" (state)
 
 writes_to:
-  - ".idumb/idumb-brain/governance/security-reports/"
+  - ".idumb/brain/governance/security-reports/"
 
 validates_against:
   - "Permission matrix rules"

@@ -341,7 +341,7 @@ Normal.
 grep -rE "agent:.*$agent_name|@$agent_name" "src/commands/"
 
 # Agent in config
-grep -E "$agent_name" ".idumb/idumb-brain/config.json"
+grep -E "$agent_name" ".idumb/brain/config.json"
 ```
 
 </agent_profiles>

@@ -2,7 +2,7 @@
  * iDumb Plugin Checkpoint Management
  * 
  * Checkpoint CRUD operations for execution state snapshots.
- * Stores checkpoints in .idumb/idumb-brain/execution/{phase}/
+ * Stores checkpoints in .idumb/brain/execution/{phase}/
  * 
  * CRITICAL: NO console.log anywhere - causes TUI background text exposure
  */
@@ -21,7 +21,7 @@ import { readState, addHistoryEntry } from "./state"
  * Get the checkpoint directory path for a phase
  */
 export function getCheckpointDir(directory: string, phase: string): string {
-    return join(directory, ".idumb", "idumb-brain", "execution", phase)
+    return join(directory, ".idumb", "brain", "execution", phase)
 }
 
 /**

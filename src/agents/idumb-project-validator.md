@@ -30,9 +30,9 @@ permission:
     "head*": allow
     "tail*": allow
   edit:
-    ".idumb/idumb-project-output/validations/**/*.md": allow
+    ".idumb/project-output/validations/**/*.md": allow
   write:
-    ".idumb/idumb-project-output/validations/**/*.md": allow
+    ".idumb/project-output/validations/**/*.md": allow
 tools:
   task: true
   idumb-state: true

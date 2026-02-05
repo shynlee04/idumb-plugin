@@ -14,7 +14,7 @@ Plans execute autonomously. Checkpoints formalize the interaction points where h
 **iDumb Integration:**
 - `@idumb-executor` manages checkpoints during phase execution
 - `@idumb-verifier` triggers human verification checkpoints
-- Checkpoint state persisted in `.idumb/idumb-brain/state.json` anchors
+- Checkpoint state persisted in `.idumb/brain/state.json` anchors
 </overview>
 
 <checkpoint_types>
@@ -116,7 +116,7 @@ Plans execute autonomously. Checkpoints formalize the interaction points where h
 
 **iDumb agents involved:**
 - `@idumb-executor` displays options, waits for response
-- Decision recorded in `.idumb/idumb-brain/state.json` history
+- Decision recorded in `.idumb/brain/state.json` history
 - Anchor created: `type: decision, priority: critical`
 
 **Example: Auth Provider Selection**
@@ -380,7 +380,7 @@ timeout 30 bash -c 'until curl -s localhost:3000 > /dev/null 2>&1; do sleep 1; d
 
 ## iDumb Anchor Format
 
-Checkpoints are persisted as anchors in `.idumb/idumb-brain/state.json`:
+Checkpoints are persisted as anchors in `.idumb/brain/state.json`:
 
 ```json
 {

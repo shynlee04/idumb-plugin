@@ -145,11 +145,11 @@ rollback_recovery:
   steps:
     1_identify_checkpoint:
       action: "Find last valid checkpoint"
-      method: "Search .idumb/idumb-brain/executions/{phase}/checkpoint-{id}.json"
+      method: "Search .idumb/brain/executions/{phase}/checkpoint-{id}.json"
 
     2_restore_state:
       action: "Restore state from checkpoint"
-      method: "Copy checkpoint state.json to .idumb/idumb-brain/"
+      method: "Copy checkpoint state.json to .idumb/brain/"
 
     3_restore_files:
       action: "Restore modified files"
@@ -272,7 +272,7 @@ drift_detection_section:
 ## Drift Detection
 
 **Drift Check Method:**
-1. Compare `.idumb/idumb-brain/state.json` checksum with stored value
+1. Compare `.idumb/brain/state.json` checksum with stored value
 2. Validate all workflow steps have corresponding agent profiles
 3. Check tool exports match expected signatures
 4. Verify no conflicting modules exist

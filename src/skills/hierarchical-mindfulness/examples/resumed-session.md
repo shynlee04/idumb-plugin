@@ -32,7 +32,7 @@ session_state:
 ## Step 2: Context Assessment
 
 ```yaml
-state_from_file: ".idumb/idumb-brain/state.json"
+state_from_file: ".idumb/brain/state.json"
   version: "0.1.0"
   phase: "Phase 3 - Implementation"
   lastValidation: "2026-02-04T10:30:00Z"

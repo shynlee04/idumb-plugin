@@ -16,7 +16,7 @@ Set up the iDumb governance framework by creating the `.idumb/` directory struct
 <execution_context>
 
 ## Reference Files (Read Before Execution)
-- `.idumb/idumb-brain/state.json` - Check if already initialized
+- `.idumb/brain/state.json` - Check if already initialized
 - `.planning/` - Detect planning framework
 - `.planning/PROJECT.md` - Project definition
 - `.planning/STATE.md` - Current state
@@ -90,7 +90,7 @@ Set up the iDumb governance framework by creating the `.idumb/` directory struct
 
 ```yaml
 existing_check:
-  read: ".idumb/idumb-brain/state.json"
+  read: ".idumb/brain/state.json"
   
   if_exists:
     check: Is already initialized?
@@ -104,7 +104,7 @@ existing_check:
       
   if_force:
     action: Archive existing state
-    backup: ".idumb/idumb-brain/state.json.bak-{timestamp}"
+    backup: ".idumb/brain/state.json.bak-{timestamp}"
     continue: Fresh initialization
 ```
 
@@ -148,21 +148,21 @@ structure_creation:
     
     **Directories to Create:**
     - .idumb/
-    - .idumb/idumb-brain/
-    - .idumb/idumb-brain/context/
-    - .idumb/idumb-brain/history/
-    - .idumb/idumb-brain/governance/
-    - .idumb/idumb-brain/governance/validations/
-    - .idumb/idumb-brain/sessions/
-    - .idumb/idumb-brain/execution/
-    - .idumb/idumb-project-output/
-    - .idumb/idumb-project-output/phases/
-    - .idumb/idumb-project-output/roadmaps/
-    - .idumb/idumb-project-output/research/
+    - .idumb/brain/
+    - .idumb/brain/context/
+    - .idumb/brain/history/
+    - .idumb/brain/governance/
+    - .idumb/brain/governance/validations/
+    - .idumb/brain/sessions/
+    - .idumb/brain/execution/
+    - .idumb/project-output/
+    - .idumb/project-output/phases/
+    - .idumb/project-output/roadmaps/
+    - .idumb/project-output/research/
     
     **Files to Create:**
     
-    1. `.idumb/idumb-brain/state.json`:
+    1. `.idumb/brain/state.json`:
     \`\`\`json
     {
       "version": "0.2.0",
@@ -176,7 +176,7 @@ structure_creation:
     }
     \`\`\`
     
-    2. `.idumb/idumb-brain/config.json`:
+    2. `.idumb/brain/config.json`:
     \`\`\`json
     {
       "version": "0.2.0",
@@ -194,14 +194,14 @@ structure_creation:
       },
       "paths": {
         "state": {
-          "brain": ".idumb/idumb-brain/state.json",
-          "history": ".idumb/idumb-brain/history/",
-          "sessions": ".idumb/idumb-brain/sessions/"
+          "brain": ".idumb/brain/state.json",
+          "history": ".idumb/brain/history/",
+          "sessions": ".idumb/brain/sessions/"
         },
         "output": {
-          "phases": ".idumb/idumb-project-output/phases/",
-          "roadmaps": ".idumb/idumb-project-output/roadmaps/",
-          "research": ".idumb/idumb-project-output/research/"
+          "phases": ".idumb/project-output/phases/",
+          "roadmaps": ".idumb/project-output/roadmaps/",
+          "research": ".idumb/project-output/research/"
         }
       },
       "planning": {
@@ -230,9 +230,9 @@ structure_validation:
     
     **iDumb Structure Checks:**
     - .idumb/ directory exists
-    - .idumb/idumb-brain/state.json exists and valid JSON
-    - .idumb/idumb-brain/config.json exists and valid JSON
-    - .idumb/idumb-brain/governance/ exists
+    - .idumb/brain/state.json exists and valid JSON
+    - .idumb/brain/config.json exists and valid JSON
+    - .idumb/brain/governance/ exists
     
     **Planning Integration Checks (if detected):**
     - .planning/PROJECT.md exists (REQUIRED)
@@ -445,10 +445,10 @@ report:
     **Governance Mode:** hierarchical
     
     ### Structure Created
-    - .idumb/idumb-brain/state.json
-    - .idumb/idumb-brain/config.json
-    - .idumb/idumb-brain/governance/
-    - .idumb/idumb-project-output/
+    - .idumb/brain/state.json
+    - .idumb/brain/config.json
+    - .idumb/brain/governance/
+    - .idumb/project-output/
     
     ### Next Steps
     {Based on project type detection}
@@ -475,7 +475,7 @@ report:
 
 ```
 .idumb/
-├── idumb-brain/
+├── brain/
 │   ├── state.json          ✓ Created
 │   ├── config.json         ✓ Created
 │   ├── context/            ✓ Created
@@ -484,7 +484,7 @@ report:
 │   │   └── validations/    ✓ Created
 │   ├── sessions/           ✓ Created
 │   └── execution/          ✓ Created
-└── idumb-project-output/
+└── project-output/
     ├── phases/             ✓ Created
     ├── roadmaps/           ✓ Created
     └── research/           ✓ Created
@@ -675,9 +675,9 @@ complexity: medium
 version: 0.2.0
 requires: nothing (entry point)
 outputs:
-  - .idumb/idumb-brain/state.json
-  - .idumb/idumb-brain/config.json
-  - .idumb/idumb-brain/governance/
-  - .idumb/idumb-project-output/
+  - .idumb/brain/state.json
+  - .idumb/brain/config.json
+  - .idumb/brain/governance/
+  - .idumb/project-output/
 ```
 </metadata>

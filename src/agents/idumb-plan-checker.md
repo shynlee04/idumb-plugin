@@ -18,7 +18,7 @@ permission:
   edit:
     ".planning/phases/**/PLAN-*.md": allow
   write:
-    ".idumb/idumb-project-output/phases/**/*.md": allow
+    ".idumb/project-output/phases/**/*.md": allow
 tools:
   task: true
   read: true

@@ -29,8 +29,8 @@ Phase: $ARGUMENTS
 - `--batch-size=N` — Tasks per batch (default: 5).
 - `--timeout=Nm` — Per-task timeout (default: 10m).
 
-@.idumb/idumb-project-output/roadmaps/ROADMAP.md
-@.idumb/idumb-brain/state.json
+@.idumb/project-output/roadmaps/ROADMAP.md
+@.idumb/brain/state.json
 </context>
 
 <process>
@@ -38,7 +38,7 @@ Phase: $ARGUMENTS
 
    Read model profile for agent spawning:
    ```bash
-   MODEL_PROFILE=$(cat .idumb/idumb-brain/config.json 2>/dev/null | grep -o '"model_profile"[[:space:]]*:[[:space:]]*"[^"]*"' | grep -o '"[^"]*"$' | tr -d '"' || echo "balanced")
+   MODEL_PROFILE=$(cat .idumb/brain/config.json 2>/dev/null | grep -o '"model_profile"[[:space:]]*:[[:space:]]*"[^"]*"' | grep -o '"[^"]*"$' | tr -d '"' || echo "balanced")
    ```
 
    Default to "balanced" if not set.
@@ -56,7 +56,7 @@ Phase: $ARGUMENTS
 1. **Validate phase exists**
 
    ```bash
-   PHASE_DIR=".idumb/idumb-project-output/phases/$PHASE_ARG"
+   PHASE_DIR=".idumb/project-output/phases/$PHASE_ARG"
    [ -d "$PHASE_DIR" ] || { echo "ERROR: Phase directory not found: $PHASE_DIR"; exit 1; }
    
    PLAN_COUNT=$(find "$PHASE_DIR" -name "*-PLAN.md" 2>/dev/null | wc -l | tr -d ' ')
@@ -66,7 +66,7 @@ Phase: $ARGUMENTS
 
    If `--resume` flag set:
    ```bash
-   STATE_FILE=".idumb/idumb-brain/execution/$PHASE_ARG/checkpoint-latest.json"
+   STATE_FILE=".idumb/brain/execution/$PHASE_ARG/checkpoint-latest.json"
    [ -f "$STATE_FILE" ] && echo "Resuming from checkpoint" || echo "No checkpoint found, starting fresh"
    ```
 
@@ -121,7 +121,7 @@ Phase: $ARGUMENTS
    # Task() does not support @ references - must inline content
    PLAN_01_CONTENT=$(cat "$PLAN_01_PATH")
    PLAN_02_CONTENT=$(cat "$PLAN_02_PATH")
-   STATE_CONTENT=$(cat .idumb/idumb-brain/state.json)
+   STATE_CONTENT=$(cat .idumb/brain/state.json)
    ```
 
    **4b. Spawn parallel executors:**
@@ -177,7 +177,7 @@ Phase: $ARGUMENTS
 
    Check config for verifier setting:
    ```bash
-   WORKFLOW_VERIFIER=$(cat .idumb/idumb-brain/config.json 2>/dev/null | grep -o '"verifier"[[:space:]]*:[[:space:]]*[^,}]*' | grep -o 'true\|false' || echo "true")
+   WORKFLOW_VERIFIER=$(cat .idumb/brain/config.json 2>/dev/null | grep -o '"verifier"[[:space:]]*:[[:space:]]*[^,}]*' | grep -o 'true\|false' || echo "true")
    ```
 
    **If `verifier` is `false`:** Skip to step 8 (treat as passed).
@@ -219,7 +219,7 @@ Phase: $ARGUMENTS
    REQ_IDS=$(grep -A5 "Phase $PHASE_ARG" ROADMAP.md | grep "Requirements:" | sed 's/.*Requirements://' | tr ',' '\n' | xargs)
    
    # Update REQUIREMENTS.md if it exists
-   REQUIREMENTS_FILE=".idumb/idumb-project-output/REQUIREMENTS.md"
+   REQUIREMENTS_FILE=".idumb/project-output/REQUIREMENTS.md"
    if [ -f "$REQUIREMENTS_FILE" ]; then
      for req in $REQ_IDS; do
        sed -i '' "s/| $req .* Pending/| $req ... Complete/" "$REQUIREMENTS_FILE"
@@ -233,15 +233,15 @@ Phase: $ARGUMENTS
 
     Check `commit_planning_docs` from config.json (default: true):
     ```bash
-    COMMIT_DOCS=$(cat .idumb/idumb-brain/config.json 2>/dev/null | grep -o '"commit_planning_docs"[[:space:]]*:[[:space:]]*[^,}]*' | grep -o 'true\|false' || echo "true")
+    COMMIT_DOCS=$(cat .idumb/brain/config.json 2>/dev/null | grep -o '"commit_planning_docs"[[:space:]]*:[[:space:]]*[^,}]*' | grep -o 'true\|false' || echo "true")
     ```
 
     **If false:** Skip git operations for phase metadata files.
 
     **If true:** Bundle all phase metadata updates in one commit:
     ```bash
-    git add .idumb/idumb-project-output/roadmaps/ROADMAP.md
-    git add .idumb/idumb-brain/state.json
+    git add .idumb/project-output/roadmaps/ROADMAP.md
+    git add .idumb/brain/state.json
     [ -f "$PHASE_DIR/$PHASE_ARG-VERIFICATION.md" ] && git add "$PHASE_DIR/$PHASE_ARG-VERIFICATION.md"
     [ -f "$REQUIREMENTS_FILE" ] && git add "$REQUIREMENTS_FILE"
     
@@ -309,7 +309,7 @@ Before spawning, read file contents. The `@` syntax does not work across Task() 
 PLAN_01_CONTENT=$(cat "{plan_01_path}")
 PLAN_02_CONTENT=$(cat "{plan_02_path}")
 PLAN_03_CONTENT=$(cat "{plan_03_path}")
-STATE_CONTENT=$(cat .idumb/idumb-brain/state.json)
+STATE_CONTENT=$(cat .idumb/brain/state.json)
 ```
 
 Spawn all plans in a wave with a single message containing multiple Task calls, with inlined content:
@@ -359,8 +359,8 @@ NO code files (already committed per-task).
 
 **Phase Completion Commit (step 10):**
 ```bash
-git add .idumb/idumb-project-output/roadmaps/ROADMAP.md
-git add .idumb/idumb-brain/state.json
+git add .idumb/project-output/roadmaps/ROADMAP.md
+git add .idumb/brain/state.json
 git add "$PHASE_DIR/$PHASE_ARG-VERIFICATION.md"
 git commit -m "docs({phase}): complete {phase-name} phase"
 ```
@@ -461,7 +461,7 @@ Also available:
 Phase {Z}: {Name}
 
 Score: {N}/{M} must-haves verified
-Report: .idumb/idumb-project-output/phases/{phase_dir}/{phase}-VERIFICATION.md
+Report: .idumb/project-output/phases/{phase_dir}/{phase}-VERIFICATION.md
 
 ### What's Missing
 
@@ -480,7 +480,7 @@ Plan gap closure - create additional plans to complete the phase
 -------------------------------------------------------
 
 Also available:
-- cat .idumb/idumb-project-output/phases/{phase_dir}/{phase}-VERIFICATION.md - see full report
+- cat .idumb/project-output/phases/{phase_dir}/{phase}-VERIFICATION.md - see full report
 - /idumb:verify-work {Z} - manual testing before planning
 
 -------------------------------------------------------

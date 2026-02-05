@@ -133,8 +133,8 @@ total_duration: "{duration}"
 ## Artifact Locations
 
 - Phase artifacts: `.planning/phases/{1..N}/`
-- Execution logs: `.idumb/idumb-brain/execution/{1..N}/`
-- Archive: `.idumb/idumb-brain/archive/milestones/{milestone}/`
+- Execution logs: `.idumb/brain/execution/{1..N}/`
+- Archive: `.idumb/brain/archive/milestones/{milestone}/`
 
 ---
 *Milestone completed on {date}*
@@ -187,7 +187,7 @@ archive:
     - "Clear execution directories"
     - "Update state to next milestone"
     
-  archive_path: ".idumb/idumb-brain/archive/milestones/{milestone}/"
+  archive_path: ".idumb/brain/archive/milestones/{milestone}/"
   
   retention:
     keep_indefinitely: true

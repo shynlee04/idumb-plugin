@@ -159,7 +159,7 @@ interface SessionMetadata {
 ### Metadata Storage
 
 ```yaml
-location: ".idumb/idumb-brain/sessions/{sessionId}.json"
+location: ".idumb/brain/sessions/{sessionId}.json"
 update_policy: "Update lastUpdated on each access"
 creation: "Auto-create on session.created hook"
 ```

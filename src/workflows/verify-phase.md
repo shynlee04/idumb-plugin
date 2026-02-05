@@ -46,7 +46,7 @@ Core principles that govern my verification:
 # 1. Verify there's something to verify
 # Either summary exists (execution completed) or phase is marked executing
 SUMMARY_EXISTS=$(ls .planning/phases/${N}/*SUMMARY.md 2>/dev/null | head -1)
-STATE_FILE=".idumb/idumb-brain/state.json"
+STATE_FILE=".idumb/brain/state.json"
 PHASE_STATUS=$(grep -o '"phase"[[:space:]]*:[[:space:]]*"[^"]*"' "$STATE_FILE" 2>/dev/null | cut -d'"' -f4)
 
 if [ -z "$SUMMARY_EXISTS" ] && [ "$PHASE_STATUS" != "executed" ] && [ "$PHASE_STATUS" != "executing" ]; then
@@ -82,7 +82,7 @@ fi
 echo "=== Evidence Sources ==="
 echo "Plan: $PLAN_PATH"
 echo "Summary: $SUMMARY_EXISTS"
-echo "Checkpoints: $(ls .idumb/idumb-brain/execution/${N}/checkpoint-*.json 2>/dev/null | wc -l) files"
+echo "Checkpoints: $(ls .idumb/brain/execution/${N}/checkpoint-*.json 2>/dev/null | wc -l) files"
 echo "Git commits since phase start: (will be calculated)"
 ```
 
@@ -148,7 +148,7 @@ if [ -n "$SUMMARY_PATH" ]; then
 fi
 
 # Evidence Source 2: Checkpoints
-CHECKPOINT_DIR=".idumb/idumb-brain/execution/${N}"
+CHECKPOINT_DIR=".idumb/brain/execution/${N}"
 if [ -d "$CHECKPOINT_DIR" ]; then
     echo "--- Checkpoints ---"
     CHECKPOINT_COUNT=$(ls "$CHECKPOINT_DIR"/checkpoint-*.json 2>/dev/null | wc -l)
@@ -201,7 +201,7 @@ TASK: |
   {criteria_list}
   
   EVIDENCE SOURCES:
-  - Checkpoints: .idumb/idumb-brain/execution/${N}/
+  - Checkpoints: .idumb/brain/execution/${N}/
   - Summary: .planning/phases/${N}/*SUMMARY.md
   - Codebase: entire project
   - Git: recent commits
@@ -656,7 +656,7 @@ npm test -- --grep "FeatureName" 2>&1 | tail -5
 
 ### Storage Location
 ```bash
-CHECKPOINT_FILE=".idumb/idumb-brain/execution/${N}/verify-checkpoint.json"
+CHECKPOINT_FILE=".idumb/brain/execution/${N}/verify-checkpoint.json"
 ```
 </checkpoint_protocol>
 
@@ -957,16 +957,16 @@ Recommended action: Resolve access issues and re-verify.
 | `.planning/phases/{N}/*CONTEXT.md` | Goals/objectives | No |
 | `.planning/phases/{N}/*SUMMARY.md` | Execution evidence | Preferred |
 | `.planning/ROADMAP.md` | Phase deliverables | No |
-| `.idumb/idumb-brain/execution/{N}/` | Checkpoints | Yes |
-| `.idumb/idumb-brain/state.json` | Phase status | Yes |
+| `.idumb/brain/execution/{N}/` | Checkpoints | Yes |
+| `.idumb/brain/state.json` | Phase status | Yes |
 | Entire codebase | Evidence search | Yes |
 
 ### Writes To
 | Path | Purpose | Created By |
 |------|---------|------------|
 | `.planning/phases/{N}/*VERIFICATION.md` | Verification report | This workflow |
-| `.idumb/idumb-brain/state.json` | Status update | Via idumb-state tool |
-| `.idumb/idumb-brain/execution/{N}/verify-checkpoint.json` | Checkpoint | This workflow |
+| `.idumb/brain/state.json` | Status update | Via idumb-state tool |
+| `.idumb/brain/execution/{N}/verify-checkpoint.json` | Checkpoint | This workflow |
 
 ### Never Modifies
 - Source code files (read-only verification)

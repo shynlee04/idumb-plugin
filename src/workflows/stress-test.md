@@ -26,10 +26,10 @@ I am the stress testing workflow that orchestrates comprehensive validation of t
 ```bash
 # Verify we're in iDumb project
 test -d "src/agents" || { echo "ERROR: Not in iDumb project (no src/agents/)"; exit 1; }
-test -d ".idumb/idumb-brain" || { echo "ERROR: iDumb not initialized"; exit 1; }
+test -d ".idumb/brain" || { echo "ERROR: iDumb not initialized"; exit 1; }
 
 # Verify governance state
-jq . .idumb/idumb-brain/state.json > /dev/null 2>&1 || { echo "ERROR: Invalid state.json"; exit 1; }
+jq . .idumb/brain/state.json > /dev/null 2>&1 || { echo "ERROR: Invalid state.json"; exit 1; }
 
 echo "Entry check passed"
 ```
@@ -47,7 +47,7 @@ MODE="${1:-auto}"
 if [ "$MODE" == "auto" ]; then
   # Coordinator decides based on conditions
   FILES_CHANGED=$(git status --porcelain | wc -l)
-  LAST_VALIDATION=$(jq -r '.lastValidation // "1970-01-01"' .idumb/idumb-brain/state.json)
+  LAST_VALIDATION=$(jq -r '.lastValidation // "1970-01-01"' .idumb/brain/state.json)
   HOURS_SINCE=$(( ($(date +%s) - $(date -d "$LAST_VALIDATION" +%s 2>/dev/null || echo 0)) / 3600 ))
   
   if [ "$FILES_CHANGED" -eq 0 ] && [ "$HOURS_SINCE" -lt 1 ]; then
@@ -338,8 +338,8 @@ echo "Conflicts: $CONFLICTS"
 echo "=========================================="
 
 # Save report
-REPORT=".idumb/idumb-brain/governance/stress-test-$TIMESTAMP.json"
-mkdir -p .idumb/idumb-brain/governance
+REPORT=".idumb/brain/governance/stress-test-$TIMESTAMP.json"
+mkdir -p .idumb/brain/governance
 
 cat > "$REPORT" << EOF
 {

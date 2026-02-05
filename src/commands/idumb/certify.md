@@ -317,7 +317,7 @@ if [ "$CERTIFIED" == "YES" ]; then
   
   # Security: Sanitize timestamp in filename
   SAFE_TIMESTAMP=$(echo "$TIMESTAMP" | tr -d ':')
-  CERT_DIR=".idumb/idumb-brain/governance"
+  CERT_DIR=".idumb/brain/governance"
   safe_mkdir "$CERT_DIR"
   CERT_FILE="$CERT_DIR/certificate-${SAFE_TIMESTAMP}.json"
   

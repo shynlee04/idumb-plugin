@@ -647,8 +647,8 @@ Use structured format from `<structured_returns>` section.
 
 ### Consumes From
 - **User**: All requests enter through me
-- **State**: .idumb/idumb-brain/state.json
-- **Config**: .idumb/idumb-brain/config.json
+- **State**: .idumb/brain/state.json
+- **Config**: .idumb/brain/config.json
 - **TODO System**: todoread/todowrite
 
 ### Delivers To

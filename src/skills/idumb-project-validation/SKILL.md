@@ -133,8 +133,8 @@ pre_flight_checks:
     
   idumb_state:
     - idumb_initialized: "test -d .idumb"
-    - state_valid: "jq . .idumb/idumb-brain/state.json"
-    - config_valid: "jq . .idumb/idumb-brain/config.json"
+    - state_valid: "jq . .idumb/brain/state.json"
+    - config_valid: "jq . .idumb/brain/config.json"
     
   project_state:
     - no_uncommitted_changes: "git status --porcelain"
@@ -271,9 +271,9 @@ greenfield_bootstrap:
     action: "Initialize iDumb framework"
     command: "/idumb:init"
     creates:
-      - ".idumb/idumb-brain/state.json"
-      - ".idumb/idumb-brain/config.json"
-      - ".idumb/idumb-project-output/"
+      - ".idumb/brain/state.json"
+      - ".idumb/brain/config.json"
+      - ".idumb/project-output/"
       
   step_3_configure:
     action: "Configure for project type"
@@ -366,8 +366,8 @@ brownfield_integration:
     action: "Initialize iDumb minimally"
     command: "/idumb:init --brownfield"
     creates:
-      - ".idumb/idumb-brain/state.json (minimal)"
-      - ".idumb/idumb-brain/config.json (adaptive)"
+      - ".idumb/brain/state.json (minimal)"
+      - ".idumb/brain/config.json (adaptive)"
     does_not_modify:
       - existing_source_code
       - existing_config_files
@@ -567,16 +567,16 @@ compatibility_checks:
 ```yaml
 framework_integration:
   reads_from:
-    - ".idumb/idumb-brain/state.json"
-    - ".idumb/idumb-brain/config.json"
+    - ".idumb/brain/state.json"
+    - ".idumb/brain/config.json"
     - ".opencode/agents/idumb-*.md"
     - ".opencode/commands/idumb/*.md"
     - ".opencode/tools/idumb-*.ts"
     
   writes_to:
-    - ".idumb/idumb-brain/governance/validations/"
-    - ".idumb/idumb-brain/governance/health-checks/"
-    - ".idumb/idumb-brain/history/"
+    - ".idumb/brain/governance/validations/"
+    - ".idumb/brain/governance/health-checks/"
+    - ".idumb/brain/history/"
     
   triggers:
     - "/idumb:validate"

@@ -52,7 +52,7 @@ PHASE_EXISTS=$(grep -c "Phase ${N}" .planning/ROADMAP.md 2>/dev/null || echo 0)
 test "$PHASE_EXISTS" -gt 0 || { echo "ERROR: Phase ${N} not found in roadmap"; echo "ACTION: Update roadmap or use correct phase number"; exit 1; }
 
 # 3. Verify iDumb state is initialized
-STATE_FILE=".idumb/idumb-brain/state.json"
+STATE_FILE=".idumb/brain/state.json"
 test -f "$STATE_FILE" || { echo "ERROR: iDumb not initialized"; echo "ACTION: Run /idumb:init first"; exit 1; }
 
 # 4. Check for existing plan (require --force to overwrite)
@@ -361,7 +361,7 @@ fi
 **Commands:**
 ```bash
 # Update state.json via tool
-STATE_FILE=".idumb/idumb-brain/state.json"
+STATE_FILE=".idumb/brain/state.json"
 
 # Read current state for verification
 cat "$STATE_FILE" | head -20
@@ -482,7 +482,7 @@ USE: idumb-state_anchor (if critical decisions made)
 
 ### Checkpoint Storage
 ```bash
-CHECKPOINT_DIR=".idumb/idumb-brain/execution/${N}"
+CHECKPOINT_DIR=".idumb/brain/execution/${N}"
 mkdir -p "$CHECKPOINT_DIR"
 
 # Save checkpoint
@@ -500,7 +500,7 @@ EOF
 ### Resume Protocol
 ```bash
 # Check for existing checkpoint
-CHECKPOINT_FILE=".idumb/idumb-brain/execution/${N}/plan-checkpoint.json"
+CHECKPOINT_FILE=".idumb/brain/execution/${N}/plan-checkpoint.json"
 
 if [ -f "$CHECKPOINT_FILE" ]; then
     LAST_STEP=$(grep -o '"step"[[:space:]]*:[[:space:]]*"[^"]*"' "$CHECKPOINT_FILE" | cut -d'"' -f4)
@@ -812,15 +812,15 @@ Options:
 | `.planning/ROADMAP.md` | Phase objectives | Yes |
 | `.planning/phases/{N}/*CONTEXT.md` | Existing context | No |
 | `.planning/PROJECT.md` | Project overview | No |
-| `.idumb/idumb-brain/state.json` | Governance state | Yes |
+| `.idumb/brain/state.json` | Governance state | Yes |
 
 ### Writes To
 | Path | Purpose | Created By |
 |------|---------|------------|
 | `.planning/phases/{N}/*PLAN.md` | Execution plan | idumb-planner |
 | `.planning/phases/{N}/RESEARCH.md` | Research output | idumb-phase-researcher |
-| `.idumb/idumb-brain/state.json` | State updates | Via idumb-state tool |
-| `.idumb/idumb-brain/execution/{N}/plan-checkpoint.json` | Workflow checkpoint | This workflow |
+| `.idumb/brain/state.json` | State updates | Via idumb-state tool |
+| `.idumb/brain/execution/{N}/plan-checkpoint.json` | Workflow checkpoint | This workflow |
 
 ### Never Modifies
 - `.planning/ROADMAP.md` - Read only
