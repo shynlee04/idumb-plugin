@@ -371,21 +371,23 @@ function getDefaultConfig(experience: ExperienceLevel = "guided"): IdumbConfig {
 
     paths: {
       root: ".idumb/",
-      config: ".idumb/idumb-brain/config.json",
-      state: ".idumb/idumb-brain/state.json",
-      brain: ".idumb/idumb-brain/",
-      history: ".idumb/idumb-brain/history/",
-      context: ".idumb/idumb-brain/context/",
-      governance: ".idumb/idumb-brain/governance/",
-      validations: ".idumb/idumb-brain/governance/validations/",
-      sessions: ".idumb/idumb-brain/sessions/",
-      drift: ".idumb/idumb-brain/drift/",
-      metadata: ".idumb/idumb-brain/metadata/",
-      output: ".idumb/idumb-project-output/",
-      phases: ".idumb/idumb-project-output/phases/",
-      roadmaps: ".idumb/idumb-project-output/roadmaps/",
-      research: ".idumb/idumb-project-output/research/",
-      modules: ".idumb/idumb-modules/"
+      config: ".idumb/brain/config.json",
+      state: ".idumb/brain/state.json",
+      brain: ".idumb/brain/",
+      history: ".idumb/brain/history/",
+      context: ".idumb/brain/context/",
+      governance: ".idumb/brain/governance/",
+      validations: ".idumb/brain/governance/validations/",
+      sessions: ".idumb/sessions/",
+      drift: ".idumb/brain/drift/",
+      metadata: ".idumb/brain/metadata/",
+      output: ".idumb/project-output/",
+      phases: ".idumb/project-output/phases/",
+      roadmaps: ".idumb/project-output/roadmaps/",
+      research: ".idumb/project-output/research/",
+      modules: ".idumb/modules/",
+      projectCore: ".idumb/project-core/",
+      governanceRoot: ".governance/"
     },
 
     staleness: {
@@ -771,7 +773,7 @@ export const update = tool({
  * Initialize configuration with defaults and planning detection
  */
 export const init = tool({
-  description: "Initialize .idumb/idumb-brain/config.json with defaults and planning system detection",
+  description: "Initialize .idumb/brain/config.json with defaults and planning system detection",
   args: {
     userName: tool.schema.string().optional().describe("User's preferred name"),
     language: tool.schema.string().optional().describe("Communication language (english, vietnamese, etc.)"),

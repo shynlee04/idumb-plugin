@@ -577,46 +577,64 @@ async function step9_createIdumbDir(location, selectedLanguage = 'en') {
     // NEW DIRECTORY STRUCTURE - All nested under .idumb/
     const idumbRoot = join(cwd, '.idumb');
 
-    // .idumb/idumb-brain/ - AI governance memory
-    const brainDir = join(idumbRoot, 'idumb-brain');
-    const brainSessionsDir = join(brainDir, 'sessions');
+    // .idumb/brain/ - Runtime governance state
+    const brainDir = join(idumbRoot, 'brain');
     const brainContextDir = join(brainDir, 'context');
     const brainGovernanceDir = join(brainDir, 'governance');
     const brainDriftDir = join(brainDir, 'drift');
     const brainMetadataDir = join(brainDir, 'metadata');
     const brainStylesDir = join(brainDir, 'styles');
+    const brainHistoryDir = join(brainDir, 'history');
 
-    // .idumb/idumb-project-output/ - Project artifacts (replaces .plan/)
-    const outputDir = join(idumbRoot, 'idumb-project-output');
+    // .idumb/sessions/ - Session tracking (moved out of brain)
+    const sessionsDir = join(idumbRoot, 'sessions');
+
+    // .idumb/project-output/ - Phase-based deliverables
+    const outputDir = join(idumbRoot, 'project-output');
     const outputPhasesDir = join(outputDir, 'phases');
     const outputRoadmapsDir = join(outputDir, 'roadmaps');
     const outputResearchDir = join(outputDir, 'research');
     const outputValidationsDir = join(outputDir, 'validations');
 
-    // .idumb/idumb-modules/ - Optional user-generated extensions
-    const modulesDir = join(idumbRoot, 'idumb-modules');
+    // .idumb/modules/ - User-extendable components
+    const modulesDir = join(idumbRoot, 'modules');
 
-    // Create .idumb/ root and .idumb/idumb-brain/ structure
+    // .idumb/project-core/ - Single source of truth
+    const projectCoreDir = join(idumbRoot, 'project-core');
+
+    // .governance/ - Unified governance framework (NEW)
+    const governanceRoot = join(cwd, '.governance');
+
+    // Create .idumb/ root and .idumb/brain/ structure
     mkdirSync(idumbRoot, { recursive: true });
     mkdirSync(brainDir, { recursive: true });
-    mkdirSync(brainSessionsDir, { recursive: true });
     mkdirSync(brainContextDir, { recursive: true });
     mkdirSync(brainGovernanceDir, { recursive: true });
     mkdirSync(brainDriftDir, { recursive: true });
     mkdirSync(brainMetadataDir, { recursive: true });
     mkdirSync(brainStylesDir, { recursive: true });
+    mkdirSync(brainHistoryDir, { recursive: true });
 
-    // Create .idumb/idumb-project-output/ structure
+    // Create .idumb/sessions/ (moved out of brain)
+    mkdirSync(sessionsDir, { recursive: true });
+
+    // Create .idumb/project-output/ structure
     mkdirSync(outputDir, { recursive: true });
     mkdirSync(outputPhasesDir, { recursive: true });
     mkdirSync(outputRoadmapsDir, { recursive: true });
     mkdirSync(outputResearchDir, { recursive: true });
     mkdirSync(outputValidationsDir, { recursive: true });
 
-    // Create .idumb/idumb-modules/ (optional but create structure)
+    // Create .idumb/modules/
     mkdirSync(modulesDir, { recursive: true });
 
-    // Copy default style templates to .idumb/idumb-brain/styles/
+    // Create .idumb/project-core/
+    mkdirSync(projectCoreDir, { recursive: true });
+
+    // Create .governance/ root (subdirs deferred)
+    mkdirSync(governanceRoot, { recursive: true });
+
+    // Copy default style templates to .idumb/brain/styles/
     const styleTemplatesDir = join(SRC_DIR, 'templates', 'styles');
     if (existsSync(styleTemplatesDir)) {
         try {
@@ -720,21 +738,24 @@ async function step9_createIdumbDir(location, selectedLanguage = 'en') {
 
             paths: {
                 root: '.idumb/',
-                brain: '.idumb/idumb-brain/',
-                state: '.idumb/idumb-brain/state.json',
-                config: '.idumb/idumb-brain/config.json',
-                sessions: '.idumb/idumb-brain/sessions/',
-                context: '.idumb/idumb-brain/context/',
-                governance: '.idumb/idumb-brain/governance/',
-                drift: '.idumb/idumb-brain/drift/',
-                metadata: '.idumb/idumb-brain/metadata/',
-                styles: '.idumb/idumb-brain/styles/',
-                output: '.idumb/idumb-project-output/',
-                phases: '.idumb/idumb-project-output/phases/',
-                roadmaps: '.idumb/idumb-project-output/roadmaps/',
-                research: '.idumb/idumb-project-output/research/',
-                validations: '.idumb/idumb-project-output/validations/',
-                modules: '.idumb/idumb-modules/'
+                brain: '.idumb/brain/',
+                state: '.idumb/brain/state.json',
+                config: '.idumb/brain/config.json',
+                history: '.idumb/brain/history/',
+                context: '.idumb/brain/context/',
+                governance: '.idumb/brain/governance/',
+                drift: '.idumb/brain/drift/',
+                metadata: '.idumb/brain/metadata/',
+                styles: '.idumb/brain/styles/',
+                sessions: '.idumb/sessions/',
+                output: '.idumb/project-output/',
+                phases: '.idumb/project-output/phases/',
+                roadmaps: '.idumb/project-output/roadmaps/',
+                research: '.idumb/project-output/research/',
+                validations: '.idumb/project-output/validations/',
+                modules: '.idumb/modules/',
+                projectCore: '.idumb/project-core/',
+                governanceRoot: '.governance/'
             },
 
             staleness: {
@@ -750,12 +771,13 @@ async function step9_createIdumbDir(location, selectedLanguage = 'en') {
                 mustCheckHierarchy: true,
                 blockOnMissingArtifacts: false,
                 requirePhaseAlignment: true,
-                noNumericIterationLimits: true
+                noNumericIterationLimits: true,
+                blockOnPermissionViolation: true
             }
         }, null, 2));
     }
 
-    // Create PROJECT.md template in .idumb-project-output/
+    // Create PROJECT.md template in .idumb/project-output/
     const projectFile = join(outputDir, 'PROJECT.md');
     if (!existsSync(projectFile)) {
         const projectContent = `---
@@ -784,17 +806,20 @@ status: draft
 
     // Output summary
     print('');
-    print('  ✓ .idumb-brain/');
+    print('  ✓ .idumb/brain/');
     print('    ├── state.json');
     print('    ├── config.json');
-    print('    ├── sessions/');
     print('    ├── context/');
     print('    ├── governance/');
     print('    └── drift/');
-    print('  ✓ .idumb-project-output/');
+    print('  ✓ .idumb/sessions/');
+    print('  ✓ .idumb/project-output/');
     print('    ├── PROJECT.md');
     print('    ├── phases/');
-    print('    └── artifacts/');
+    print('    └── research/');
+    print('  ✓ .idumb/modules/');
+    print('  ✓ .idumb/project-core/');
+    print('  ✓ .governance/');
 }
 
 async function showComplete(targetDir, location, selectedLanguage = 'en') {
@@ -975,7 +1000,7 @@ async function main() {
         const overwritePrompt = getLocale() === 'vi'
             ? '⚠ Đã phát hiện cài đặt iDumb trước đó. Ghi đè? [y/n]: '
             : '⚠ Existing iDumb installation detected. Overwrite? [y/n]: ';
-        const answer = await prompt(overwritePrompt, 'n');
+const answer = await prompt(overwritePrompt, 'y');
         if (answer !== 'y' && answer !== 'yes') {
             print(getLocale() === 'vi' ? 'Đã hủy cài đặt.' : 'Installation cancelled.');
             return;

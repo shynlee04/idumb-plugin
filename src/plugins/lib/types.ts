@@ -90,7 +90,7 @@ export interface InlineIdumbConfig {
     paths: Record<string, string>
     staleness: { warningHours: number; criticalHours: number; checkOnLoad: boolean; autoArchive: boolean }
     timestamps: { enabled: boolean; format: "ISO8601"; injectInFrontmatter: boolean; trackModifications: boolean }
-    enforcement: { mustLoadConfig: true; mustHaveState: boolean; mustCheckHierarchy: boolean; blockOnMissingArtifacts: boolean; requirePhaseAlignment: boolean }
+    enforcement: { mustLoadConfig: true; mustHaveState: boolean; mustCheckHierarchy: boolean; blockOnMissingArtifacts: boolean; requirePhaseAlignment: boolean; blockOnPermissionViolation: boolean }
 }
 
 // ============================================================================

@@ -169,7 +169,7 @@ Installer script that:
 Main event hook system. Key responsibilities:
 - **Session tracking**: Tracks agent role, delegation depth, first tool used
 - **Checkpoint management**: Create/load/list/delete checkpoints for rollback
-- **State persistence**: Manages `.idumb/idumb-brain/state.json` with anchors and history
+- **State persistence**: Manages `.idumb/brain/state.json` with anchors and history
 - **Governance enforcement**: Intercepts tools to enforce permissions
 - **Security**: Input validation, sanitization, and pre-write gates
 
@@ -203,7 +203,7 @@ All iDumb tools:
 - `idumb-quality.ts` - Quality metrics
 - `idumb-security.ts` - Security checks
 
-### `.idumb/idumb-brain/state.json`
+### `.idumb/brain/state.json`
 Single source of truth for governance state:
 ```json
 {
@@ -218,7 +218,7 @@ Single source of truth for governance state:
 }
 ```
 
-### `.idumb/idumb-brain/config.json`
+### `.idumb/brain/config.json`
 User settings and governance configuration. Contains:
 - User profile (name, experience level, language preferences)
 - Hierarchy settings (agent order, permissions, chain enforcement)
@@ -229,25 +229,32 @@ User settings and governance configuration. Contains:
 
 ```
 .idumb/                      # Root iDumb directory
-├── idumb-brain/             # AI governance memory (runtime state)
+├── brain/                   # Runtime governance state
 │   ├── state.json           # Governance state (SINGLE SOURCE OF TRUTH)
 │   ├── config.json          # User settings and governance config
 │   ├── context/             # Preserved context artifacts
 │   ├── history/             # Archived history entries
 │   ├── governance/          # Governance rules and reports
 │   │   └── validations/     # Validation reports (JSON)
-│   ├── sessions/            # Session tracking
 │   ├── drift/               # Drift detection artifacts
-│   ├── metadata/            # Metadata storage
-│   └── execution/           # Checkpoints per phase
-│       └── {phase}/
-│           └── checkpoint-{id}.json
-├── idumb-project-output/    # Project artifacts (replaces .plan/)
+│   └── metadata/            # Metadata storage
+├── sessions/                # Session tracking (moved out of brain)
+├── project-output/          # Phase-based deliverables
 │   ├── phases/              # Phase outputs
 │   ├── roadmaps/            # Project roadmaps
 │   ├── research/            # Research outputs
 │   └── validations/         # Validation outputs
-└── idumb-modules/           # Optional user-generated extensions
+├── modules/                 # User-extendable components
+├── project-core/            # Single source of truth (NEW)
+│   └── PROJECT.md           # Project overview
+└── (future: execution/)     # Checkpoints per phase
+
+.governance/                 # Unified governance framework (NEW)
+├── schemas/                 # Relational metadata definitions
+├── hooks/                   # Event-triggered actions
+├── entities/                # Knowledge graph nodes
+├── relationships/           # Connection definitions
+└── policies/                # Governance rules
 
 .opencode/                   # Installed by iDumb from src/
 ├── agents/idumb-*.md        # 23 agent profiles

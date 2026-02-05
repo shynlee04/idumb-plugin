@@ -90,22 +90,24 @@ export function getDefaultConfig(experience: "pro" | "guided" | "strict" = "guid
         automation: automationSettings as any,
         paths: {
             root: ".idumb/",
-            config: ".idumb/idumb-brain/config.json",
-            state: ".idumb/idumb-brain/state.json",
-            brain: ".idumb/idumb-brain/",
-            history: ".idumb/idumb-brain/history/",
-            context: ".idumb/idumb-brain/context/",
-            governance: ".idumb/idumb-brain/governance/",
-            validations: ".idumb/idumb-brain/governance/validations/",
-            sessions: ".idumb/idumb-brain/sessions/",
-            drift: ".idumb/idumb-brain/drift/",
-            metadata: ".idumb/idumb-brain/metadata/",
-            output: ".idumb/idumb-project-output/",
-            phases: ".idumb/idumb-project-output/phases/",
-            roadmaps: ".idumb/idumb-project-output/roadmaps/",
-            research: ".idumb/idumb-project-output/research/",
-            validationReports: ".idumb/idumb-project-output/validations/",
-            modules: ".idumb/idumb-modules/"
+            config: ".idumb/brain/config.json",
+            state: ".idumb/brain/state.json",
+            brain: ".idumb/brain/",
+            history: ".idumb/brain/history/",
+            context: ".idumb/brain/context/",
+            governance: ".idumb/brain/governance/",
+            validations: ".idumb/brain/governance/validations/",
+            sessions: ".idumb/sessions/",
+            drift: ".idumb/brain/drift/",
+            metadata: ".idumb/brain/metadata/",
+            output: ".idumb/project-output/",
+            phases: ".idumb/project-output/phases/",
+            roadmaps: ".idumb/project-output/roadmaps/",
+            research: ".idumb/project-output/research/",
+            validationReports: ".idumb/project-output/validations/",
+            modules: ".idumb/modules/",
+            projectCore: ".idumb/project-core/",
+            governanceRoot: ".governance/"
         },
         staleness: {
             warningHours: 48,
@@ -124,7 +126,8 @@ export function getDefaultConfig(experience: "pro" | "guided" | "strict" = "guid
             mustHaveState: true,
             mustCheckHierarchy: true,
             blockOnMissingArtifacts: false,
-            requirePhaseAlignment: true
+            requirePhaseAlignment: true,
+            blockOnPermissionViolation: true
         }
     }
 }

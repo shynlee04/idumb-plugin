@@ -1,7 +1,7 @@
 /**
  * iDumb Plugin State Management
  * 
- * Read/write functions for .idumb/idumb-brain/state.json
+ * Read/write functions for .idumb/brain/state.json
  * Core state operations used by multiple modules.
  * 
  * CRITICAL: NO console.log anywhere - causes TUI background text exposure
@@ -16,11 +16,11 @@ import type { IdumbState, Anchor } from "./types"
 // ============================================================================
 
 export function getStatePath(directory: string): string {
-    return join(directory, ".idumb", "idumb-brain", "state.json")
+    return join(directory, ".idumb", "brain", "state.json")
 }
 
 export function getBrainDir(directory: string): string {
-    return join(directory, ".idumb", "idumb-brain")
+    return join(directory, ".idumb", "brain")
 }
 
 // ============================================================================
@@ -28,7 +28,7 @@ export function getBrainDir(directory: string): string {
 // ============================================================================
 
 /**
- * Read state from .idumb/idumb-brain/state.json
+ * Read state from .idumb/brain/state.json
  * Returns null if state file doesn't exist or is corrupted
  */
 export function readState(directory: string): IdumbState | null {
@@ -45,7 +45,7 @@ export function readState(directory: string): IdumbState | null {
 }
 
 /**
- * Write state to .idumb/idumb-brain/state.json
+ * Write state to .idumb/brain/state.json
  * Uses atomic write pattern (write temp, then rename) to prevent corruption
  */
 export function writeState(directory: string, state: IdumbState): void {

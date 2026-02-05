@@ -50,18 +50,18 @@ export const structure = tool({
     })
 
     // Check brain/ subdirectory
-    const brainDir = join(idumbDir, "idumb-brain")
+    const brainDir = join(idumbDir, "brain")
     if (!existsSync(brainDir)) {
       results.push({
         check: "brain_dir",
         status: "fail",
-        message: ".idumb/idumb-brain/ directory missing"
+        message: ".idumb/brain/ directory missing"
       })
     } else {
       results.push({
         check: "brain_dir",
         status: "pass",
-        message: ".idumb/idumb-brain/ exists"
+        message: ".idumb/brain/ exists"
       })
     }
 
@@ -71,7 +71,7 @@ export const structure = tool({
       results.push({
         check: "state_file",
         status: "fail",
-        message: ".idumb/idumb-brain/state.json missing"
+        message: ".idumb/brain/state.json missing"
       })
     } else {
       results.push({
@@ -87,13 +87,13 @@ export const structure = tool({
       results.push({
         check: "governance_dir",
         status: "warning",
-        message: ".idumb/idumb-brain/governance/ missing (optional)"
+        message: ".idumb/brain/governance/ missing (optional)"
       })
     } else {
       results.push({
         check: "governance_dir",
         status: "pass",
-        message: ".idumb/idumb-brain/governance/ exists"
+        message: ".idumb/brain/governance/ exists"
       })
     }
 
@@ -957,7 +957,7 @@ export const configSchema = tool({
 
         return JSON.stringify({
           configType: "state",
-          file: ".idumb/idumb-brain/state.json",
+          file: ".idumb/brain/state.json",
           valid: errors.length === 0,
           errors: errors.length > 0 ? errors : undefined,
           state: {
@@ -1021,7 +1021,7 @@ export const configSchema = tool({
 
         return JSON.stringify({
           configType: "config",
-          file: ".idumb/idumb-brain/config.json",
+          file: ".idumb/brain/config.json",
           valid: errors.length === 0,
           errors: errors.length > 0 ? errors : undefined
         }, null, 2)

@@ -116,6 +116,14 @@ const pendingDenials = new Map<string, { agent: string; tool: string; timestamp?
 // Output style constants
 const MAX_COMPACTION_CONTEXT_CHARS = 3000
 
+// ============================================================================
+// PERMISSION DENIAL MESSAGE BUILDER
+// ============================================================================
+
+function buildPermissionDenialMessage(agentRole: string, toolName: string): string {
+  return `The tool "${toolName}" is not permitted for your current role (${agentRole}). This tool does not align with your agent profile, the active workflow phase, or the permission boundaries for ${agentRole}-tier agents. Consider delegating to an appropriate agent or requesting escalation.`
+}
+
 // In-memory session trackers (per plugin instance)
 const sessionTrackers = new Map<string, SessionTracker>()
 
@@ -664,36 +672,65 @@ export const IdumbCorePlugin: Plugin = async ({ directory, client }) => {
         )
 
         if (agentRole && allowedTools.length > 0 && !isAllowed) {
-          // LOG ONLY - DO NOT DENY
-          // output.status = "deny"
-          log(directory, `[WARN] ${agentRole} permission for ${toolName} - LOG ONLY, not blocking`)
+          // Check config for blocking behavior
+          const config = ensureIdumbConfig(directory)
+          const shouldBlock = config.enforcement?.blockOnPermissionViolation ?? true
 
-          // Add to pending denials for tracking (but not blocking)
-          pendingDenials.set(sessionId, {
-            agent: agentRole || 'unknown',
-            tool: toolName,
-            timestamp: new Date().toISOString(),
-            shouldBlock: false  // LOG ONLY - do not block
-          })
+          if (shouldBlock) {
+            // PROPER DENY: Set status and message
+            output.status = "deny"
+            output.message = buildPermissionDenialMessage(agentRole, toolName)
+            log(directory, `[DENY] ${agentRole} blocked from ${toolName}`)
 
-          // Add to pending violations for tracking (P1-T3) - LOG ONLY
-          addPendingViolation(sessionId, {
-            agent: agentRole || 'unknown',
-            tool: toolName,
-            timestamp: new Date().toISOString(),
-            violations: [`Tool '${toolName}' not in allowed list for ${agentRole}`],
-            shouldBlock: false  // LOG ONLY - do not block
-          })
+            // Track the denial
+            pendingDenials.set(sessionId, {
+              agent: agentRole || 'unknown',
+              tool: toolName,
+              timestamp: new Date().toISOString(),
+              shouldBlock: true
+            })
 
-          addHistoryEntry(
-            directory,
-            `permission_denied:${agentRole}:${toolName}`,
-            'interceptor',
-            'fail'
-          )
+            addPendingViolation(sessionId, {
+              agent: agentRole || 'unknown',
+              tool: toolName,
+              timestamp: new Date().toISOString(),
+              violations: [`Tool '${toolName}' denied for ${agentRole}`],
+              shouldBlock: true
+            })
 
-          // Permission denied - output.status already set to "deny"
-          return
+            addHistoryEntry(
+              directory,
+              `denied:${agentRole}:${toolName}`,
+              'interceptor',
+              'fail'
+            )
+          } else {
+            // LOG ONLY MODE: Track but don't block
+            log(directory, `[WARN] ${agentRole} used ${toolName} - logged but not blocked`)
+
+            pendingDenials.set(sessionId, {
+              agent: agentRole || 'unknown',
+              tool: toolName,
+              timestamp: new Date().toISOString(),
+              shouldBlock: false
+            })
+
+            addPendingViolation(sessionId, {
+              agent: agentRole || 'unknown',
+              tool: toolName,
+              timestamp: new Date().toISOString(),
+              violations: [`Tool '${toolName}' not in allowed list for ${agentRole}`],
+              shouldBlock: false
+            })
+
+            addHistoryEntry(
+              directory,
+              `warn:permission:${agentRole}:${toolName}`,
+              'interceptor',
+              'partial'
+            )
+          }
+          // Always return output (never early return without output set)
         }
 
         // Permission granted - output.status remains default (allow)
