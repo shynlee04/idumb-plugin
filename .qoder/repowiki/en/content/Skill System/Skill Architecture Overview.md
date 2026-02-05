@@ -3,6 +3,7 @@
 <cite>
 **Referenced Files in This Document**
 - [SKILL-ARCHITECTURE.md](file://src/skills/SKILL-ARCHITECTURE.md)
+- [brainstorm.md](file://src/workflows/brainstorm.md)
 - [idumb-meta-orchestrator/SKILL.md](file://src/skills/idumb-meta-orchestrator/SKILL.md)
 - [idumb-validation/SKILL.md](file://src/skills/idumb-validation/SKILL.md)
 - [idumb-stress-test/SKILL.md](file://src/skills/idumb-stress-test/SKILL.md)
@@ -17,25 +18,84 @@
 - [auto-activation-hooks.md](file://src/skills/idumb-stress-test/references/auto-activation-hooks.md)
 - [module-schema.md](file://src/skills/idumb-meta-builder/references/module-schema.md)
 - [validation-patterns.md](file://src/skills/idumb-meta-builder/references/validation-patterns.md)
+- [frontend-design/SKILL.md](file://.agents/skills/frontend-design/SKILL.md)
+- [find-skills/SKILL.md](file://.agents/skills/find-skills/SKILL.md)
 </cite>
+
+## Update Summary
+**Changes Made**
+- Added comprehensive three-layer architecture explanation (Commands → Workflows → Skills)
+- Updated sector-based skill discovery system with detailed mappings
+- Clarified that skills are domain expertise modules loaded dynamically by workflows
+- Enhanced skill registry table with new sector-specific skills
+- Updated activation patterns to reflect dynamic skill loading
+- Added practical examples of skill discovery and loading workflows
 
 ## Table of Contents
 1. [Introduction](#introduction)
-2. [Project Structure](#project-structure)
-3. [Core Components](#core-components)
-4. [Architecture Overview](#architecture-overview)
-5. [Detailed Component Analysis](#detailed-component-analysis)
-6. [Dependency Analysis](#dependency-analysis)
-7. [Performance Considerations](#performance-considerations)
-8. [Troubleshooting Guide](#troubleshooting-guide)
-9. [Conclusion](#conclusion)
-10. [Appendices](#appendices)
+2. [Three-Layer Architecture](#three-layer-architecture)
+3. [Project Structure](#project-structure)
+4. [Core Components](#core-components)
+5. [Architecture Overview](#architecture-overview)
+6. [Detailed Component Analysis](#detailed-component-analysis)
+7. [Dependency Analysis](#dependency-analysis)
+8. [Performance Considerations](#performance-considerations)
+9. [Troubleshooting Guide](#troubleshooting-guide)
+10. [Conclusion](#conclusion)
+11. [Appendices](#appendices)
 
 ## Introduction
-This document presents the iDumb skill architecture overview, detailing the foundational principles, the 10 complementary skills, non-overlapping design philosophy, integration thresholds, and activation patterns. It explains how the idumb-meta-orchestrator automatically coordinates validation across skills based on operation type, risk level, file type, and context. It also covers the integration point validation system, minimum point requirements, and practical activation scenarios, concluding with consolidation recommendations and maintenance guidelines.
+This document presents the iDumb skill architecture overview, detailing the foundational principles, the 10 complementary skills, non-overlapping design philosophy, integration thresholds, and activation patterns. The architecture now emphasizes a clear three-layer separation: Commands (user entry points), Workflows (execution logic), and Skills (domain expertise). It explains how the idumb-meta-orchestrator automatically coordinates validation across skills based on operation type, risk level, file type, and context. The system now includes sector-based skill discovery that maps technical domains to specialized skills like frontend-design, api-design, and mcp-builder. It also covers the integration point validation system, minimum point requirements, and practical activation scenarios, concluding with consolidation recommendations and maintenance guidelines.
+
+## Three-Layer Architecture
+The iDumb framework implements a clear three-layer architecture where each layer has distinct responsibilities:
+
+### Command Layer
+Commands serve as user-facing entry points that handle routing and parameter processing. They trigger workflows based on user intent and provide the initial context for skill loading.
+
+### Workflow Layer  
+Workflows contain the step-by-step execution logic and manage state transitions. They analyze the request context, detect required sectors, and dynamically load appropriate domain skills.
+
+### Skill Layer
+Skills represent domain expertise modules that provide specialized knowledge and capabilities. They are loaded dynamically by workflows based on detected sectors and user requirements.
+
+```mermaid
+graph TB
+subgraph "Command Layer"
+CmdBrainstorm["/idumb:brainstorm"]
+CmdResearch["/idumb:research"]
+CmdPlan["/idumb:plan"]
+end
+subgraph "Workflow Layer"
+WfBrainstorm["brainstorm.md"]
+WfResearch["research.md"]
+WfPlan["plan-phase.md"]
+end
+subgraph "Skill Layer"
+SFrontend["frontend-design"]
+SApi["api-design"]
+SMcp["mcp-builder"]
+SCli["cli-patterns"]
+SFind["find-skills"]
+end
+CmdBrainstorm --> WfBrainstorm
+CmdResearch --> WfResearch
+CmdPlan --> WfPlan
+WfBrainstorm --> SFrontend
+WfBrainstorm --> SApi
+WfResearch --> SFind
+WfPlan --> SCli
+```
+
+**Diagram sources**
+- [SKILL-ARCHITECTURE.md](file://src/skills/SKILL-ARCHITECTURE.md#L15-L47)
+- [brainstorm.md](file://src/workflows/brainstorm.md#L88-L127)
+
+**Section sources**
+- [SKILL-ARCHITECTURE.md](file://src/skills/SKILL-ARCHITECTURE.md#L9-L47)
 
 ## Project Structure
-The iDumb framework organizes governance, validation, security, performance, and meta capabilities into discrete skills. Each skill defines its purpose, integration points, activation rules, and validation layers. The meta-orchestrator coordinates activation across these skills to ensure context-aware, risk-based validation.
+The iDumb framework organizes governance, validation, security, performance, and meta capabilities into discrete skills. Each skill defines its purpose, integration points, activation rules, and validation layers. The meta-orchestrator coordinates activation across these skills to ensure context-aware, risk-based validation. The system now includes sector-based skill discovery that maps technical domains to specialized skills.
 
 ```mermaid
 graph TB
@@ -56,6 +116,14 @@ subgraph "Quality & Performance"
 CodeQuality["idumb-code-quality"]
 Performance["idumb-performance"]
 end
+subgraph "Sector Skills"
+Frontend["frontend-design"]
+ApiDesign["api-design"]
+McpBuilder["mcp-builder"]
+CliPatterns["cli-patterns"]
+MobileDesign["mobile-design"]
+FindSkills["find-skills"]
+end
 Orchestrator --> Security["idumb-security"]
 Orchestrator --> Validation
 Orchestrator --> Performance
@@ -64,69 +132,82 @@ Orchestrator --> Mindfulness
 Orchestrator --> ProjectValidation
 Orchestrator --> StressTest
 Orchestrator --> MetaBuilder
+Frontend --> FindSkills
+ApiDesign --> FindSkills
+McpBuilder --> FindSkills
+CliPatterns --> FindSkills
+MobileDesign --> FindSkills
 ```
 
 **Diagram sources**
-- [idumb-meta-orchestrator/SKILL.md](file://src/skills/idumb-meta-orchestrator/SKILL.md#L36-L51)
-- [SKILL-ARCHITECTURE.md](file://src/skills/SKILL-ARCHITECTURE.md#L13-L27)
+- [SKILL-ARCHITECTURE.md](file://src/skills/SKILL-ARCHITECTURE.md#L77-L91)
+- [brainstorm.md](file://src/workflows/brainstorm.md#L100-L124)
 
 **Section sources**
-- [SKILL-ARCHITECTURE.md](file://src/skills/SKILL-ARCHITECTURE.md#L9-L28)
+- [SKILL-ARCHITECTURE.md](file://src/skills/SKILL-ARCHITECTURE.md#L73-L91)
 
 ## Core Components
-The iDumb skill system comprises 10 complementary skills organized by domain and purpose:
+The iDumb skill system comprises 10 complementary skills organized by domain and purpose, with sector-based specialization:
 
-- idumb-meta-orchestrator (META): Master coordinator that activates other skills based on context, operation type, and risk level.
-- idumb-security (SECURITY): Validates security posture (injection, traversal, permissions).
-- idumb-code-quality (CODE-QUALITY): Enforces error handling, cross-platform compatibility, and documentation.
-- idumb-performance (PERFORMANCE): Optimizes scanning efficiency, enforces iteration limits, and manages cleanup.
-- idumb-validation (VALIDATION): Iterative gap detection, integration completeness, and self-healing workflows.
-- idumb-governance (GOVERNANCE): Defines agent categories, delegation hierarchy, and state management.
-- hierarchical-mindfulness (MINDFULNESS): Maintains chain integrity, delegation depth, and session resumption.
-- idumb-project-validation (PROJECT): Validates user projects (greenfield/brownfield) without blocking development.
-- idumb-stress-test (META): Validates agent coordination, integration completeness, and regression prevention.
-- idumb-meta-builder (META): Ingests external frameworks and transforms them into iDumb-compatible governance patterns.
+- **idumb-meta-orchestrator (META)**: Master coordinator that activates other skills based on context, operation type, and risk level.
+- **idumb-security (SECURITY)**: Validates security posture (injection, traversal, permissions).
+- **idumb-code-quality (CODE-QUALITY)**: Enforces error handling, cross-platform compatibility, and documentation.
+- **idumb-performance (PERFORMANCE)**: Optimizes scanning efficiency, enforces iteration limits, and manages cleanup.
+- **idumb-validation (VALIDATION)**: Iterative gap detection, integration completeness, and self-healing workflows.
+- **idumb-governance (GOVERNANCE)**: Defines agent categories, delegation hierarchy, and state management.
+- **hierarchical-mindfulness (MINDFULNESS)**: Maintains chain integrity, delegation depth, and session resumption.
+- **idumb-project-validation (PROJECT)**: Validates user projects (greenfield/brownfield) without blocking development.
+- **idumb-stress-test (META)**: Validates agent coordination, integration completeness, and regression prevention.
+- **idumb-meta-builder (META)**: Ingests external frameworks and transforms them into iDumb-compatible governance patterns.
+
+**Updated** Added sector-specific skills including frontend-design, api-design, mcp-builder, cli-patterns, mobile-design, and find-skills for dynamic skill discovery.
 
 **Section sources**
-- [SKILL-ARCHITECTURE.md](file://src/skills/SKILL-ARCHITECTURE.md#L13-L27)
+- [SKILL-ARCHITECTURE.md](file://src/skills/SKILL-ARCHITECTURE.md#L77-L91)
 
 ## Architecture Overview
 The idumb-meta-orchestrator serves as the central decision-maker, selecting which validation skills to activate depending on:
 - Operation type (write, delegate, transition, cleanup)
 - Risk level (Critical, High, Medium, Low)
-- File type (.sh, .ts, .md, .json)
+- File type (.sh, .ts, .md)
 - Context (phase boundaries, session state, resource usage)
 
-It maintains an activation matrix that escalates checks from minimal to comprehensive based on risk and operation type.
+The system now includes dynamic skill discovery where workflows detect sectors and load appropriate domain expertise skills. Higher risk operations trigger broader validation sets.
 
 ```mermaid
 sequenceDiagram
 participant Dev as "Developer"
+participant Cmd as "Command"
+participant Wf as "Workflow"
 participant Orchestrator as "idumb-meta-orchestrator"
-participant Validator as "Selected Validation Skills"
-Dev->>Orchestrator : "Trigger action (write/delegate/transition)"
+participant Skill as "Dynamic Skill"
+Dev->>Cmd : "/idumb : brainstorm --sector web-fe"
+Cmd->>Wf : "Trigger workflow with context"
+Wf->>Wf : "Detect sector : web-fe"
+Wf->>Skill : "Load frontend-design skill"
+Skill-->>Wf : "Provide domain expertise"
+Wf->>Orchestrator : "Request validation"
 Orchestrator->>Orchestrator : "Classify operation + risk + file type"
-Orchestrator->>Validator : "Activate subset based on matrix"
-Validator-->>Orchestrator : "Validation results (pass/warn/block)"
+Orchestrator->>Skill : "Activate validation skills"
+Skill-->>Orchestrator : "Validation results"
 Orchestrator-->>Dev : "Proceed/Block with guidance"
 ```
 
 **Diagram sources**
-- [idumb-meta-orchestrator/SKILL.md](file://src/skills/idumb-meta-orchestrator/SKILL.md#L54-L88)
-- [idumb-meta-orchestrator/SKILL.md](file://src/skills/idumb-meta-orchestrator/SKILL.md#L94-L147)
+- [SKILL-ARCHITECTURE.md](file://src/skills/SKILL-ARCHITECTURE.md#L39-L47)
+- [brainstorm.md](file://src/workflows/brainstorm.md#L88-L127)
 
 **Section sources**
-- [idumb-meta-orchestrator/SKILL.md](file://src/skills/idumb-meta-orchestrator/SKILL.md#L54-L88)
-- [idumb-meta-orchestrator/SKILL.md](file://src/skills/idumb-meta-orchestrator/SKILL.md#L94-L147)
+- [SKILL-ARCHITECTURE.md](file://src/skills/SKILL-ARCHITECTURE.md#L179-L207)
 
 ## Detailed Component Analysis
 
 ### Skill Registry and Domain Coverage
-The registry table defines each skill’s package, primary domain, and integration threshold. The domain coverage matrix maps skills to their coverage areas, ensuring non-overlapping responsibilities.
+The registry table defines each skill's package, primary domain, and integration threshold. The domain coverage matrix maps skills to their coverage areas, ensuring non-overlapping responsibilities with sector-based specialization.
 
 ```mermaid
 table
-title Skill Registry
+title Enhanced Skill Registry with Sector Skills
 "Skill" "Package" "Primary Domain" "Integration Threshold"
 "idumb-meta-orchestrator" "META" "Coordination - activates other skills based on context" "30+"
 "idumb-security" "SECURITY" "Security validation (injection, traversal, permissions)" "20+"
@@ -138,14 +219,20 @@ title Skill Registry
 "idumb-project-validation" "PROJECT" "Greenfield/brownfield, health checks" "20+"
 "idumb-stress-test" "META" "Agent coordination, regression sweeps" "25+"
 "idumb-meta-builder" "META" "Framework ingestion, transformation" "30+"
+"frontend-design" "SECTOR" "UI patterns, components, styling" "20+"
+"api-design" "SECTOR" "API patterns, architecture" "20+"
+"mcp-builder" "SECTOR" "AI/ML agent patterns" "20+"
+"cli-patterns" "SECTOR" "CLI UX patterns" "20+"
+"mobile-design" "SECTOR" "Mobile app patterns" "20+"
+"find-skills" "SECTOR" "Discover appropriate skill" "15+"
 ```
 
 **Diagram sources**
-- [SKILL-ARCHITECTURE.md](file://src/skills/SKILL-ARCHITECTURE.md#L15-L27)
+- [SKILL-ARCHITECTURE.md](file://src/skills/SKILL-ARCHITECTURE.md#L77-L91)
 
 ```mermaid
 table
-title Domain Coverage Matrix
+title Enhanced Domain Coverage Matrix with Sector Skills
 "Domain" "Skills" "Coverage"
 "Security" "idumb-security, idumb-governance" "Bash injection, path traversal, permissions, secrets"
 "Code Quality" "idumb-code-quality" "Error handling, cross-platform, documentation, standards"
@@ -155,20 +242,54 @@ title Domain Coverage Matrix
 "Project" "idumb-project-validation" "Greenfield/brownfield, health monitoring"
 "Coordination" "idumb-meta-orchestrator" "Context-aware skill activation"
 "Meta" "idumb-meta-builder" "Framework ingestion and transformation"
+"Web Frontend" "frontend-design, find-skills" "UI patterns, components, styling, responsive design"
+"Web Backend" "api-design, find-skills" "API patterns, architecture, REST endpoints"
+"AI/ML" "mcp-builder, find-skills" "Agent patterns, LLM integration, prompt engineering"
+"CLI Applications" "cli-patterns, find-skills" "Command patterns, argument parsing, UX design"
+"Mobile Apps" "mobile-design, find-skills" "Mobile patterns, touch interactions, platform-specific design"
+"Skill Discovery" "find-skills" "Dynamic skill finding and installation"
 ```
 
 **Diagram sources**
-- [SKILL-ARCHITECTURE.md](file://src/skills/SKILL-ARCHITECTURE.md#L30-L42)
+- [SKILL-ARCHITECTURE.md](file://src/skills/SKILL-ARCHITECTURE.md#L94-L106)
 
 **Section sources**
-- [SKILL-ARCHITECTURE.md](file://src/skills/SKILL-ARCHITECTURE.md#L13-L42)
+- [SKILL-ARCHITECTURE.md](file://src/skills/SKILL-ARCHITECTURE.md#L77-L106)
+
+### Sector-Based Skill Discovery System
+The system now implements dynamic skill discovery that maps technical sectors to specialized skills:
+
+#### Sector Detection Process
+1. **Detect sector** from codebase analysis, user flags, or keyword extraction
+2. **Map sector to skill** using predefined sector-to-skill mappings
+3. **Check local skills** availability in the skills directory
+4. **Discover missing skills** via find-skills pattern
+5. **Load skill context** for domain-specific guidance
+
+#### Sector-to-Skill Mapping
+| Sector | Skill to Load | Expertise Provided |
+|--------|---------------|-------------------|
+| `web-fe` | `frontend-design` | UI patterns, components, styling |
+| `web-be` | `api-design` | API patterns, architecture |
+| `fullstack` | `frontend-design` + `api-design` | Full stack patterns |
+| `aiml` | `mcp-builder` | AI/ML agent patterns |
+| `cli` | `cli-patterns` | CLI UX patterns |
+| `mobile` | `mobile-design` | Mobile app patterns |
+| `unknown` | `find-skills` | Discover appropriate skill |
+
+**Updated** Added comprehensive sector-based skill discovery system with mappings from technical domains to specialized skills.
+
+**Section sources**
+- [SKILL-ARCHITECTURE.md](file://src/skills/SKILL-ARCHITECTURE.md#L49-L70)
+- [brainstorm.md](file://src/workflows/brainstorm.md#L100-L124)
 
 ### Non-Overlapping Design Philosophy
 The architecture resolves potential overlaps by assigning distinct purposes:
-- idumb-validation focuses on framework-level structure and integration completeness.
-- idumb-stress-test focuses on runtime behavior and coordination.
-- idumb-governance defines framework structure and permission matrices.
-- hierarchical-mindfulness tracks session state and chain integrity during execution.
+- **idumb-validation** focuses on framework-level structure and integration completeness.
+- **idumb-stress-test** focuses on runtime behavior and coordination.
+- **idumb-governance** defines framework structure and permission matrices.
+- **hierarchical-mindfulness** tracks session state and chain integrity during execution.
+- **Sector skills** provide domain expertise without overlapping with governance functions.
 
 ```mermaid
 flowchart TD
@@ -188,26 +309,32 @@ D["hierarchical-mindfulness"] --> D1["Runtime delegation mindfulness"]
 D --> D2["Delegation depth tracking"]
 D --> D3["Session resumption protocols"]
 D --> D4["Chain violation detection"]
+E["Sector Skills"] --> E1["Domain expertise provision"]
+E --> E2["Dynamic skill loading"]
+E --> E3["Specialized knowledge modules"]
 ```
 
 **Diagram sources**
-- [SKILL-ARCHITECTURE.md](file://src/skills/SKILL-ARCHITECTURE.md#L47-L96)
+- [SKILL-ARCHITECTURE.md](file://src/skills/SKILL-ARCHITECTURE.md#L109-L159)
 
 **Section sources**
-- [SKILL-ARCHITECTURE.md](file://src/skills/SKILL-ARCHITECTURE.md#L45-L96)
+- [SKILL-ARCHITECTURE.md](file://src/skills/SKILL-ARCHITECTURE.md#L109-L159)
 
 ### Activation Patterns and Matrix
-The idumb-meta-orchestrator defines activation matrices by operation type, risk level, and file type. Higher risk operations trigger broader validation sets.
+The idumb-meta-orchestrator defines activation matrices by operation type, risk level, and file type. Higher risk operations trigger broader validation sets. The system now includes dynamic skill loading based on detected sectors.
 
 ```mermaid
 flowchart TD
 Start(["Trigger Detected"]) --> Classify["Classify: Operation Type + Risk Level + File Type + Context"]
-Classify --> Risk{"Risk Level"}
-Risk --> |Critical| Full["Activate Full Suite"]
-Risk --> |High| Selective["Activate Selective Checks"]
+Classify --> Sector{"Sector Detected?"}
+Sector --> |Yes| LoadSkill["Load Sector Skill"]
+Sector --> |No| Risk{"Risk Level"}
+Risk --> |Critical| Full["Activate Full Suite + Sector Skills"]
+Risk --> |High| Selective["Activate Selective Checks + Sector Skills"]
 Risk --> |Medium| Minimal["Activate Minimal Checks"]
 Risk --> |Low| None["No Activation"]
-Full --> Execute["Execute Parallel Validation"]
+LoadSkill --> Execute["Execute Parallel Validation"]
+Full --> Execute
 Selective --> Execute
 Minimal --> Execute
 Execute --> Aggregate["Aggregate Results"]
@@ -218,18 +345,18 @@ Decision --> |Pass| Proceed["Proceed"]
 ```
 
 **Diagram sources**
-- [idumb-meta-orchestrator/SKILL.md](file://src/skills/idumb-meta-orchestrator/SKILL.md#L56-L88)
-- [idumb-meta-orchestrator/SKILL.md](file://src/skills/idumb-meta-orchestrator/SKILL.md#L94-L147)
+- [SKILL-ARCHITECTURE.md](file://src/skills/SKILL-ARCHITECTURE.md#L179-L207)
+- [brainstorm.md](file://src/workflows/brainstorm.md#L88-L127)
 
 **Section sources**
-- [idumb-meta-orchestrator/SKILL.md](file://src/skills/idumb-meta-orchestrator/SKILL.md#L54-L88)
-- [idumb-meta-orchestrator/SKILL.md](file://src/skills/idumb-meta-orchestrator/SKILL.md#L94-L147)
+- [SKILL-ARCHITECTURE.md](file://src/skills/SKILL-ARCHITECTURE.md#L179-L207)
 
 ### Integration Point Validation System
 Each skill must meet minimum integration point thresholds:
-- META agents: 30+ points (tools, commands, workflows, state files, other skills)
-- Validation skills: 20+ points (read sources, write targets, validation rules, triggers)
-- Package skills: 20+ points (package components, integration points, triggers)
+- **META agents**: 30+ points (tools, commands, workflows, state files, other skills)
+- **Validation skills**: 20+ points (read sources, write targets, validation rules, triggers)
+- **Package skills**: 20+ points (package components, integration points, triggers)
+- **Sector skills**: 15+ points (domain expertise, examples, references)
 
 The idumb-meta-orchestrator integrates with state, skill registries, and agent definitions, writing governance reports and validation queues.
 
@@ -253,34 +380,38 @@ G --> K
 H --> K
 I --> K
 J --> K
-K --> L["Threshold Check (30+/25+/20+)"]
+K --> L["Threshold Check (45+/30+/25+/20+/15+)"]
 ```
 
 **Diagram sources**
-- [SKILL-ARCHITECTURE.md](file://src/skills/SKILL-ARCHITECTURE.md#L147-L187)
-- [integration-points-reference.md](file://src/skills/idumb-validation/references/integration-points-reference.md#L186-L247)
+- [SKILL-ARCHITECTURE.md](file://src/skills/SKILL-ARCHITECTURE.md#L211-L251)
 
 **Section sources**
-- [SKILL-ARCHITECTURE.md](file://src/skills/SKILL-ARCHITECTURE.md#L147-L187)
-- [integration-checklist.md](file://src/skills/idumb-meta-builder/references/integration-checklist.md#L1-L315)
-- [integration-points-reference.md](file://src/skills/idumb-validation/references/integration-points-reference.md#L186-L247)
+- [SKILL-ARCHITECTURE.md](file://src/skills/SKILL-ARCHITECTURE.md#L211-L251)
 
 ### Practical Activation Scenarios
 Common activation scenarios include:
-- Pre-write validation: Security, code quality, validation, governance checks before file writes.
-- Phase transition: Full integration scan, stress test, performance check at phase boundaries.
-- Continuous monitoring: Periodic resource usage, governance state consistency, drift detection.
+- **Pre-write validation**: Security, code quality, validation, governance checks before file writes.
+- **Phase transition**: Full integration scan, stress test, performance check at phase boundaries.
+- **Continuous monitoring**: Periodic resource usage, governance state consistency, drift detection.
+- **Dynamic skill loading**: Sector detection triggering appropriate domain expertise skills.
 
 ```mermaid
 sequenceDiagram
 participant Dev as "Developer"
+participant Cmd as "Command"
+participant Wf as "Workflow"
 participant Orchestrator as "idumb-meta-orchestrator"
 participant Sec as "idumb-security"
 participant QC as "idumb-code-quality"
 participant Val as "idumb-validation"
 participant Gov as "idumb-governance"
 participant Perf as "idumb-performance"
-Dev->>Orchestrator : "Create new command with bash script"
+Dev->>Cmd : "/idumb : brainstorm --sector web-fe"
+Cmd->>Wf : "Trigger workflow"
+Wf->>Wf : "Detect sector : web-fe"
+Wf->>Wf : "Load frontend-design skill"
+Wf->>Orchestrator : "Request validation"
 Orchestrator->>Sec : "Bash injection scan"
 Orchestrator->>QC : "Error handling check"
 Orchestrator->>Val : "Integration point check"
@@ -293,10 +424,10 @@ Orchestrator-->>Dev : "Pass with warnings / Block with issues"
 ```
 
 **Diagram sources**
-- [SKILL-ARCHITECTURE.md](file://src/skills/SKILL-ARCHITECTURE.md#L191-L229)
+- [SKILL-ARCHITECTURE.md](file://src/skills/SKILL-ARCHITECTURE.md#L255-L292)
 
 **Section sources**
-- [SKILL-ARCHITECTURE.md](file://src/skills/SKILL-ARCHITECTURE.md#L191-L229)
+- [SKILL-ARCHITECTURE.md](file://src/skills/SKILL-ARCHITECTURE.md#L255-L292)
 
 ### Meta-Builder and Framework Ingestion
 The idumb-meta-builder ingests external frameworks, classifies patterns, transforms them into iDumb equivalents, validates the transformation, and integrates new components. It supports self-upgrade through feedback loops.
@@ -343,7 +474,7 @@ Coord-->>Plugin : "Action (allow/block/log)"
 - [auto-activation-hooks.md](file://src/skills/idumb-stress-test/references/auto-activation-hooks.md#L1-L329)
 
 ## Dependency Analysis
-Skills depend on each other through integration points, governance rules, and the meta-orchestrator. The governance skill defines agent categories and permission matrices; the mindfulness skill enforces chain integrity; validation and stress tests ensure completeness and runtime behavior; performance and code quality optimize and standardize operations.
+Skills depend on each other through integration points, governance rules, and the meta-orchestrator. The governance skill defines agent categories and permission matrices; the mindfulness skill enforces chain integrity; validation and stress tests ensure completeness and runtime behavior; performance and code quality optimize and standardize operations. Sector skills depend on the find-skills mechanism for dynamic discovery.
 
 ```mermaid
 graph TB
@@ -362,62 +493,62 @@ Orchestrator --> Mindfulness
 Orchestrator --> ProjectValidation
 Orchestrator --> Stress
 Orchestrator --> MetaBuilder
+Frontend["frontend-design"] --> FindSkills["find-skills"]
+ApiDesign["api-design"] --> FindSkills
+McpBuilder["mcp-builder"] --> FindSkills
+CliPatterns["cli-patterns"] --> FindSkills
+MobileDesign["mobile-design"] --> FindSkills
+FindSkills --> Orchestrator
 ```
 
 **Diagram sources**
-- [idumb-governance/SKILL.md](file://src/skills/idumb-governance/SKILL.md#L49-L97)
-- [hierarchical-mindfulness/SKILL.md](file://src/skills/hierarchical-mindfulness/SKILL.md#L147-L170)
-- [idumb-validation/SKILL.md](file://src/skills/idumb-validation/SKILL.md#L72-L87)
-- [idumb-stress-test/SKILL.md](file://src/skills/idumb-stress-test/SKILL.md#L113-L130)
-- [idumb-meta-orchestrator/SKILL.md](file://src/skills/idumb-meta-orchestrator/SKILL.md#L36-L51)
+- [SKILL-ARCHITECTURE.md](file://src/skills/SKILL-ARCHITECTURE.md#L77-L91)
 
 **Section sources**
-- [idumb-governance/SKILL.md](file://src/skills/idumb-governance/SKILL.md#L49-L97)
-- [hierarchical-mindfulness/SKILL.md](file://src/skills/hierarchical-mindfulness/SKILL.md#L147-L170)
-- [idumb-validation/SKILL.md](file://src/skills/idumb-validation/SKILL.md#L72-L87)
-- [idumb-stress-test/SKILL.md](file://src/skills/idumb-stress-test/SKILL.md#L113-L130)
-- [idumb-meta-orchestrator/SKILL.md](file://src/skills/idumb-meta-orchestrator/SKILL.md#L36-L51)
+- [SKILL-ARCHITECTURE.md](file://src/skills/SKILL-ARCHITECTURE.md#L77-L91)
 
 ## Performance Considerations
 - Risk-based activation reduces overhead by escalating checks only when needed.
 - Parallel execution of selected validations improves throughput.
 - Iteration limits and cleanup policies prevent resource accumulation and infinite loops.
 - Continuous monitoring balances background checks with user productivity.
-
-[No sources needed since this section provides general guidance]
+- Dynamic skill loading optimizes memory usage by loading only required domain expertise.
+- Sector-based filtering reduces unnecessary skill activation.
 
 ## Troubleshooting Guide
 Common issues and resolutions:
-- Permission violations: Validate against governance rules and chain enforcement.
-- Integration gaps: Use validation matrices to identify missing connections and propose fixes.
-- Drift detection: Monitor schema and configuration drift; apply self-healing where possible.
-- Infinite loops: Enforce delegation depth limits and detect circular references.
+- **Permission violations**: Validate against governance rules and chain enforcement.
+- **Integration gaps**: Use validation matrices to identify missing connections and propose fixes.
+- **Drift detection**: Monitor schema and configuration drift; apply self-healing where possible.
+- **Infinite loops**: Enforce delegation depth limits and detect circular references.
+- **Skill loading failures**: Verify sector detection and skill availability in the skills directory.
+- **Missing domain expertise**: Use find-skills to discover and install appropriate sector skills.
 
 **Section sources**
-- [idumb-stress-test/SKILL.md](file://src/skills/idumb-stress-test/SKILL.md#L455-L517)
-- [idumb-validation/SKILL.md](file://src/skills/idumb-validation/SKILL.md#L564-L608)
-- [hierarchical-mindfulness/SKILL.md](file://src/skills/hierarchical-mindfulness/SKILL.md#L254-L288)
+- [SKILL-ARCHITECTURE.md](file://src/skills/SKILL-ARCHITECTURE.md#L322-L328)
+- [find-skills/SKILL.md](file://.agents/skills/find-skills/SKILL.md#L58-L109)
 
 ## Conclusion
-The iDumb skill architecture balances comprehensive validation with non-intrusive operation. The idumb-meta-orchestrator coordinates activation based on risk and context, while integration thresholds and validation layers ensure robust governance. The design philosophy emphasizes non-overlapping domains, defense-in-depth, and continuous self-improvement through meta-learning and self-upgrade.
-
-[No sources needed since this section summarizes without analyzing specific files]
+The iDumb skill architecture balances comprehensive validation with non-intrusive operation. The three-layer architecture (Commands → Workflows → Skills) provides clear separation of concerns with dynamic skill loading based on sector detection. The idumb-meta-orchestrator coordinates activation based on risk and context, while integration thresholds and validation layers ensure robust governance. The sector-based skill discovery system enables specialized domain expertise without duplicating functionality. The design philosophy emphasizes non-overlapping domains, defense-in-depth, and continuous self-improvement through meta-learning and self-upgrade.
 
 ## Appendices
 
 ### Consolidation Recommendations
-- No further consolidation is needed; each skill has a distinct primary domain.
-- Cross-references exist for coordination, not duplication.
-- The meta-orchestrator prevents redundant checks by managing activation.
+- **No further consolidation needed**: Each skill has a distinct primary domain with clear separation between commands, workflows, and skills.
+- **Cross-references exist for coordination**, not duplication, maintaining the three-layer architecture.
+- **The meta-orchestrator prevents redundant checks** by managing activation and dynamic skill loading.
+- **Sector skills complement rather than duplicate** governance functions.
 
 **Section sources**
-- [SKILL-ARCHITECTURE.md](file://src/skills/SKILL-ARCHITECTURE.md#L232-L255)
+- [SKILL-ARCHITECTURE.md](file://src/skills/SKILL-ARCHITECTURE.md#L296-L318)
 
 ### Maintenance Guidelines
-- Add new validation to the most specific skill to avoid duplication.
-- Update integration point counts when modifying skills.
-- Follow package naming conventions (SECURITY, CODE-QUALITY, etc.).
-- Update the meta-orchestrator activation matrix when triggers change.
+- **When adding new validation**: Add to the most specific skill, avoid duplication across the three-layer architecture.
+- **When modifying skills**: Update integration point counts and sector mappings.
+- **When adding new packages**: Follow the package naming convention (SECURITY, CODE-QUALITY, etc.) and ensure proper layer separation.
+- **When triggers change**: Update the meta-orchestrator activation matrix and sector detection logic.
+- **When adding sector skills**: Ensure proper integration with the find-skills discovery mechanism.
+- **Follow three-layer separation**: Commands trigger workflows, workflows load domain skills, skills provide expertise.
 
 **Section sources**
-- [SKILL-ARCHITECTURE.md](file://src/skills/SKILL-ARCHITECTURE.md#L258-L265)
+- [SKILL-ARCHITECTURE.md](file://src/skills/SKILL-ARCHITECTURE.md#L322-L328)

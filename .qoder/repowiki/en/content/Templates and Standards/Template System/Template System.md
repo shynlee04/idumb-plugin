@@ -2,6 +2,8 @@
 
 <cite>
 **Referenced Files in This Document**
+- [IDEA-BRIEF.template.md](file://src/templates/brainstorm/IDEA-BRIEF.template.md)
+- [RESEARCH.template.md](file://src/templates/research/RESEARCH.template.md)
 - [architecture.md](file://src/templates/codebase/architecture.md)
 - [conventions.md](file://src/templates/codebase/conventions.md)
 - [stack.md](file://src/templates/codebase/stack.md)
@@ -24,6 +26,13 @@
 - [verification.md](file://src/templates/verification.md)
 </cite>
 
+## Update Summary
+**Changes Made**
+- Updated template locations to reflect new organization under src/templates/
+- Added new brainstorm and research template categories
+- Updated project structure diagrams to show new template hierarchy
+- Revised template documentation to reflect restructured organization
+
 ## Table of Contents
 1. [Introduction](#introduction)
 2. [Project Structure](#project-structure)
@@ -37,17 +46,21 @@
 10. [Appendices](#appendices)
 
 ## Introduction
-This document explains iDumb’s template system: how templates are structured, validated, versioned, and integrated into workflows. It covers:
+This document explains iDumb's template system: how templates are structured, validated, versioned, and integrated into workflows. It covers:
 - Codebase templates (architecture, conventions, stack, structure)
 - Style templates (default, governance, learning, terse, verbose)
 - Workflow templates (config, context, continue-here, milestone-summary, phase-prompt, plan, research, state, summary, verification-report, verification)
+- New brainstorm and research templates for ideation and research workflows
 
 It also details customization, inheritance patterns, parameter substitution, conditional logic, validation, versioning, maintenance, and best practices for contributing templates.
 
 ## Project Structure
-Templates are organized under src/templates in two primary categories:
-- Codebase templates: describe the project’s architecture, conventions, stack, and structure
+Templates are now organized under src/templates in four primary categories:
+- Codebase templates: describe the project's architecture, conventions, stack, and structure
+- Style templates: define behavioral modes and output formats
 - Workflow templates: define artifacts produced during planning, execution, and verification
+- Brainstorm templates: support initial idea generation and validation
+- Research templates: support comprehensive ecosystem research
 
 ```mermaid
 graph TB
@@ -77,6 +90,12 @@ W9["summary.md"]
 W10["verification-report.md"]
 W11["verification.md"]
 end
+subgraph "Brainstorm Templates"
+B1["IDEA-BRIEF.template.md"]
+end
+subgraph "Research Templates"
+R1["RESEARCH.template.md"]
+end
 A1 --> A2
 A2 --> A3
 A3 --> A4
@@ -94,9 +113,12 @@ W7 --> W8
 W8 --> W9
 W9 --> W10
 W10 --> W11
+B1 --> R1
 ```
 
 **Diagram sources**
+- [IDEA-BRIEF.template.md](file://src/templates/brainstorm/IDEA-BRIEF.template.md#L1-L251)
+- [RESEARCH.template.md](file://src/templates/research/RESEARCH.template.md#L1-L534)
 - [architecture.md](file://src/templates/codebase/architecture.md#L1-L255)
 - [conventions.md](file://src/templates/codebase/conventions.md#L1-L331)
 - [stack.md](file://src/templates/codebase/stack.md#L1-L212)
@@ -119,6 +141,8 @@ W10 --> W11
 - [verification.md](file://src/templates/verification.md#L1-L252)
 
 **Section sources**
+- [IDEA-BRIEF.template.md](file://src/templates/brainstorm/IDEA-BRIEF.template.md#L1-L251)
+- [RESEARCH.template.md](file://src/templates/research/RESEARCH.template.md#L1-L534)
 - [architecture.md](file://src/templates/codebase/architecture.md#L1-L255)
 - [conventions.md](file://src/templates/codebase/conventions.md#L1-L331)
 - [stack.md](file://src/templates/codebase/stack.md#L1-L212)
@@ -141,7 +165,7 @@ W10 --> W11
 - [verification.md](file://src/templates/verification.md#L1-L252)
 
 ## Core Components
-- Codebase templates capture the “what” and “how” of a project’s structure and conventions:
+- Codebase templates capture the "what" and "how" of a project's structure and conventions:
   - architecture.md: architecture patterns, layers, components, data flow, API structure, design decisions, constraints
   - conventions.md: code style, naming, import/export, error handling, async patterns, testing conventions
   - stack.md: languages, runtime, frameworks, dependencies, build tools, detection evidence
@@ -150,8 +174,14 @@ W10 --> W11
   - default.md, governance.md, learning.md, terse.md, verbose.md
 - Workflow templates define artifacts and state:
   - config.md, state.md, context.md, continue-here.md, milestone-summary.md, phase-prompt.md, plan.md, research.md, summary.md, verification-report.md, verification.md
+- Brainstorm templates support initial idea generation and validation:
+  - IDEA-BRIEF.template.md: comprehensive idea brief with constraints, scope, assumptions, and research triggers
+- Research templates support comprehensive ecosystem research:
+  - RESEARCH.template.md: detailed research documentation with tool inventory, scope assessment, and synthesis
 
 **Section sources**
+- [IDEA-BRIEF.template.md](file://src/templates/brainstorm/IDEA-BRIEF.template.md#L1-L251)
+- [RESEARCH.template.md](file://src/templates/research/RESEARCH.template.md#L1-L534)
 - [architecture.md](file://src/templates/codebase/architecture.md#L1-L255)
 - [conventions.md](file://src/templates/codebase/conventions.md#L1-L331)
 - [stack.md](file://src/templates/codebase/stack.md#L1-L212)
@@ -174,23 +204,31 @@ W10 --> W11
 - [verification.md](file://src/templates/verification.md#L1-L252)
 
 ## Architecture Overview
-The template system is a layered pipeline:
+The template system is a layered pipeline with enhanced brainstorm and research capabilities:
 - Codebase templates are produced by codebase analysis and inform higher-level planning
 - Style templates govern output format and behavior
 - Workflow templates orchestrate planning, execution, and verification, with state and governance
+- Brainstorm templates initiate new projects and validate idea feasibility
+- Research templates provide comprehensive ecosystem analysis before planning
 
 ```mermaid
 graph TB
 CB["Codebase Templates<br/>architecture.md, conventions.md, stack.md, structure.md"]
 ST["Style Templates<br/>default/governance/learning/terse/verbose"]
 WT["Workflow Templates<br/>config, state, context, continue-here,<br/>milestone-summary, phase-prompt, plan, research,<br/>summary, verification-report, verification"]
+BT["Brainstorm Templates<br/>IDEA-BRIEF.template.md"]
+RT["Research Templates<br/>RESEARCH.template.md"]
 CB --> WT
 ST --> WT
+BT --> RT
 WT --> |"state.json, .planning, .idumb"| EXEC["Execution & Governance"]
 EXEC --> WT
+RT --> WT
 ```
 
 **Diagram sources**
+- [IDEA-BRIEF.template.md](file://src/templates/brainstorm/IDEA-BRIEF.template.md#L1-L251)
+- [RESEARCH.template.md](file://src/templates/research/RESEARCH.template.md#L1-L534)
 - [architecture.md](file://src/templates/codebase/architecture.md#L1-L255)
 - [conventions.md](file://src/templates/codebase/conventions.md#L1-L331)
 - [stack.md](file://src/templates/codebase/stack.md#L1-L212)
@@ -215,7 +253,7 @@ EXEC --> WT
 ## Detailed Component Analysis
 
 ### Codebase Templates
-These templates document the project’s internal structure and conventions.
+These templates document the project's internal structure and conventions.
 
 - architecture.md
   - Purpose: capture architecture patterns, layers, components, data flow, API structure, design decisions, constraints
@@ -274,7 +312,7 @@ These templates define behavioral modes and output formatting.
 
 - verbose.md
   - Purpose: detailed explanations and reasoning
-  - Output guidelines: explain the “why”, show your work, teach as you go, structure for clarity
+  - Output guidelines: explain the "why", show your work, teach as you go, structure for clarity
 
 **Section sources**
 - [default.md](file://src/templates/styles/default.md#L1-L12)
@@ -331,7 +369,7 @@ These templates define artifacts and state for planning, execution, and verifica
 
 - research.md
   - Purpose: comprehensive ecosystem research before planning
-  - Structure: summary, standard stack, architecture patterns, don’t hand-roll, common pitfalls, code examples, state of the art, open questions, sources, metadata
+  - Structure: summary, standard stack, architecture patterns, don't hand-roll, common pitfalls, code examples, state of the art, open questions, sources, metadata
   - Guidelines: when to create, structure, content quality, integration with planning, after creation
   - iDumb integration: agent flow, MCP tool usage, research quality gates
 
@@ -368,21 +406,53 @@ These templates define artifacts and state for planning, execution, and verifica
 - [verification-report.md](file://src/templates/verification-report.md#L1-L240)
 - [verification.md](file://src/templates/verification.md#L1-L252)
 
+### Brainstorm Templates
+These templates support the initial ideation and validation phase of projects.
+
+- IDEA-BRIEF.template.md
+  - Purpose: comprehensive idea brief capturing intent, constraints, scope, assumptions, and research triggers
+  - Structure: YAML frontmatter with type, id, status, created, sector, complexity, clarity_score, validation_flags; Markdown body with sections for raw idea, intent statement, constraints, scope definition, assumptions, clarity assessment, research triggers, synthesis, and validation checklist
+  - Validation: required_fields include type, status, created, sector, complexity; clarity scoring and gate decisions
+  - Output: IDEA-BRIEF.md files for project ideation
+  - Integration: routes to research phase based on clarity scores and constraint analysis
+
+**Section sources**
+- [IDEA-BRIEF.template.md](file://src/templates/brainstorm/IDEA-BRIEF.template.md#L1-L251)
+
+### Research Templates
+These templates support comprehensive ecosystem research before planning.
+
+- RESEARCH.template.md
+  - Purpose: detailed research documentation with tool inventory, scope assessment, and synthesis
+  - Structure: YAML frontmatter with type, id, topic, status, created, researcher, sector, complexity, sources_count, confidence, tools_used, time_spent; Markdown body with sections for tool inventory, research trigger, research scope, primary research questions, codebase analysis, tech stack research, external research, assumption validation, cross-dependency mapping, risk identification, research synthesis, research questions answered, open questions, research-to-spec readiness, sources bibliography
+  - Validation: required_fields include type, status, created, sector, complexity; confidence assessment and routing decisions
+  - Output: RESEARCH.md files for phase research documentation
+  - Integration: feeds into spec development based on confidence levels and research readiness
+
+**Section sources**
+- [RESEARCH.template.md](file://src/templates/research/RESEARCH.template.md#L1-L534)
+
 ## Dependency Analysis
-The templates depend on each other through content and state:
+The templates depend on each other through content and state, with new brainstorm and research dependencies:
 
 ```mermaid
 graph TB
 ST["Styles<br/>default, governance, learning, terse, verbose"]
 CT["Codebase<br/>architecture, conventions, stack, structure"]
 WT["Workflows<br/>config, state, context, continue-here, milestone-summary,<br/>phase-prompt, plan, research, summary, verification-report, verification"]
+BT["Brainstorm<br/>IDEA-BRIEF"]
+RT["Research<br/>RESEARCH"]
 CT --> WT
 ST --> WT
+BT --> RT
 WT --> |"state.json, .planning, .idumb"| EXEC["Execution & Governance"]
 EXEC --> WT
+RT --> WT
 ```
 
 **Diagram sources**
+- [IDEA-BRIEF.template.md](file://src/templates/brainstorm/IDEA-BRIEF.template.md#L1-L251)
+- [RESEARCH.template.md](file://src/templates/research/RESEARCH.template.md#L1-L534)
 - [default.md](file://src/templates/styles/default.md#L1-L12)
 - [governance.md](file://src/templates/styles/governance.md#L1-L48)
 - [learning.md](file://src/templates/styles/learning.md#L1-L34)
@@ -405,6 +475,8 @@ EXEC --> WT
 - [verification.md](file://src/templates/verification.md#L1-L252)
 
 **Section sources**
+- [IDEA-BRIEF.template.md](file://src/templates/brainstorm/IDEA-BRIEF.template.md#L1-L251)
+- [RESEARCH.template.md](file://src/templates/research/RESEARCH.template.md#L1-L534)
 - [default.md](file://src/templates/styles/default.md#L1-L12)
 - [governance.md](file://src/templates/styles/governance.md#L1-L48)
 - [learning.md](file://src/templates/styles/learning.md#L1-L34)
@@ -430,21 +502,27 @@ EXEC --> WT
 - Template generation is lightweight Markdown/JSON/YAML composition; performance primarily depends on downstream agents and file system operations
 - Use concise frontmatter and structured sections to minimize parsing overhead
 - Prefer parallel execution plans (waves) to reduce total wall-clock time
-
-[No sources needed since this section provides general guidance]
+- Brainstorm and research templates can be computationally intensive; consider caching and incremental processing
 
 ## Troubleshooting Guide
 - Validation failures
   - Codebase templates define required_fields and schema references; ensure all required fields are present and conform to schema
   - Workflow templates define frontmatter schemas; validate with JSON/YAML schema tools
+  - Brainstorm templates require clarity scoring and constraint validation
+  - Research templates require confidence assessment and routing decisions
 - State synchronization
   - state.md defines operations and validation; ensure timestamps and enums are correct
   - config.md defines merging rules; conflicts resolved by iDumb values with warnings
 - Governance and checkpoints
   - governance style templates enforce evidence tables and delegation tracking; ensure all claims have supporting evidence
   - continue-here.md checkpoints preserve critical context; verify anchors and in-progress tasks are accurate
+- Template location issues
+  - Ensure templates are located in src/templates/ with proper subdirectory organization
+  - Verify brainstorm templates in src/templates/brainstorm/ and research templates in src/templates/research/
 
 **Section sources**
+- [IDEA-BRIEF.template.md](file://src/templates/brainstorm/IDEA-BRIEF.template.md#L164-L173)
+- [RESEARCH.template.md](file://src/templates/research/RESEARCH.template.md#L488-L506)
 - [architecture.md](file://src/templates/codebase/architecture.md#L8-L11)
 - [conventions.md](file://src/templates/codebase/conventions.md#L8-L11)
 - [stack.md](file://src/templates/codebase/stack.md#L8-L11)
@@ -453,9 +531,7 @@ EXEC --> WT
 - [state.md](file://src/templates/state.md#L238-L250)
 
 ## Conclusion
-iDumb’s template system provides a robust, schema-driven framework for capturing project knowledge, governing behavior, and orchestrating planning and execution. By structuring templates with clear frontmatter, validation, and integration points, teams can maintain consistency, improve collaboration, and scale complex projects efficiently.
-
-[No sources needed since this section summarizes without analyzing specific files]
+iDumb's template system provides a robust, schema-driven framework for capturing project knowledge, governing behavior, and orchestrating planning and execution. The restructured organization under src/templates/ improves accessibility and maintainability, while the addition of brainstorm and research templates enhances the system's ability to support comprehensive project lifecycle management. By structuring templates with clear frontmatter, validation, and integration points, teams can maintain consistency, improve collaboration, and scale complex projects efficiently.
 
 ## Appendices
 
@@ -468,8 +544,16 @@ iDumb’s template system provides a robust, schema-driven framework for capturi
   - JSON schemas for config and state enable automated validation
 - Style templates
   - Behavioral guarantees enforced through explicit output formats and rules
+- Brainstorm templates
+  - Clarity scoring and gate decision mechanisms ensure quality validation
+  - Constraint analysis and research trigger evaluation
+- Research templates
+  - Confidence assessment and routing decision mechanisms
+  - Multi-source validation and synthesis capabilities
 
 **Section sources**
+- [IDEA-BRIEF.template.md](file://src/templates/brainstorm/IDEA-BRIEF.template.md#L145-L173)
+- [RESEARCH.template.md](file://src/templates/research/RESEARCH.template.md#L474-L486)
 - [architecture.md](file://src/templates/codebase/architecture.md#L8-L11)
 - [conventions.md](file://src/templates/codebase/conventions.md#L8-L11)
 - [stack.md](file://src/templates/codebase/stack.md#L8-L11)
@@ -481,6 +565,7 @@ iDumb’s template system provides a robust, schema-driven framework for capturi
 - Version fields in templates indicate stability and compatibility
 - Maintenance involves updating schemas, adding validation checks, and revising generation rules
 - Backward compatibility should be preserved when evolving templates
+- Template locations should follow src/templates/ organization with proper subdirectories
 
 **Section sources**
 - [config.md](file://src/templates/config.md#L7-L7)
@@ -504,8 +589,17 @@ iDumb’s template system provides a robust, schema-driven framework for capturi
 - Parameter substitution and conditional logic
   - Use frontmatter placeholders and conditional sections to tailor content for different contexts
   - Leverage anchors and state to preserve critical context across sessions
+- Adding new template categories
+  - Create appropriate subdirectories under src/templates/ for new template types
+  - Follow naming conventions and include proper frontmatter schemas
+- Integrating brainstorm and research workflows
+  - Use IDEA-BRIEF templates for initial idea validation
+  - Use RESEARCH templates for comprehensive ecosystem analysis
+  - Implement routing logic based on clarity scores and confidence levels
 
 **Section sources**
+- [IDEA-BRIEF.template.md](file://src/templates/brainstorm/IDEA-BRIEF.template.md#L1-L251)
+- [RESEARCH.template.md](file://src/templates/research/RESEARCH.template.md#L1-L534)
 - [default.md](file://src/templates/styles/default.md#L1-L12)
 - [governance.md](file://src/templates/styles/governance.md#L1-L48)
 - [learning.md](file://src/templates/styles/learning.md#L1-L34)
@@ -526,9 +620,15 @@ iDumb’s template system provides a robust, schema-driven framework for capturi
 - Use clear section headings and consistent formatting
 - Provide validation examples and evidence where applicable
 - Maintain backward compatibility and document breaking changes
+- Organize templates under src/templates/ with proper subdirectory structure
+- Follow naming conventions: IDEA-BRIEF.template.md, RESEARCH.template.md for specialized templates
 - Encourage community contributions with explicit review and testing procedures
+- Implement proper validation mechanisms for new template types
+- Ensure template locations are accessible and well-documented
 
 **Section sources**
+- [IDEA-BRIEF.template.md](file://src/templates/brainstorm/IDEA-BRIEF.template.md#L1-L251)
+- [RESEARCH.template.md](file://src/templates/research/RESEARCH.template.md#L1-L534)
 - [phase-prompt.md](file://src/templates/phase-prompt.md#L470-L477)
 - [plan.md](file://src/templates/plan.md#L132-L152)
 - [research.md](file://src/templates/research.md#L226-L251)

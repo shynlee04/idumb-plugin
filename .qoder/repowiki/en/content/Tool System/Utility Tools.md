@@ -14,10 +14,21 @@
 - [idumb-state.ts](file://src/tools/idumb-state.ts)
 - [idumb-security.ts](file://src/tools/idumb-security.ts)
 - [idumb-performance.ts](file://src/tools/idumb-performance.ts)
+- [frontmatter.ts](file://src/plugins/lib/frontmatter.ts)
+- [idumb-core.ts](file://src/plugins/idumb-core.ts)
 - [hierarchy-parsers.ts](file://src/tools/lib/hierarchy-parsers.ts)
 - [index-manager.ts](file://src/tools/lib/index-manager.ts)
 - [bash-executors.ts](file://src/tools/lib/bash-executors.ts)
 </cite>
+
+## Update Summary
+**Changes Made**
+- Enhanced Frontmatter Injection System documentation with Phase 7 schema support
+- Updated Frontmatter Auto-Generation section to include new relationship tracking fields
+- Added documentation for automatic schema versioning and enhanced validation logic
+- Updated Frontmatter Injection Integration section with new field preservation behavior
+- Added new section for Phase 7 Enhanced Relationship Tracking Fields
+- Updated tool integration patterns to reflect enhanced frontmatter system
 
 ## Table of Contents
 1. [Introduction](#introduction)
@@ -31,10 +42,10 @@
 9. [Conclusion](#conclusion)
 
 ## Introduction
-This document provides comprehensive documentation for iDumb Utility Tools, focusing on supporting capabilities for text processing, context management, manifest generation, quality assessment, style enforcement, and TODO management. It explains the APIs, configuration options, integration patterns, performance characteristics, error handling, and best practices for composing these tools effectively.
+This document provides comprehensive documentation for iDumb Utility Tools, focusing on supporting capabilities for text processing, context management, manifest generation, quality assessment, style enforcement, TODO management, and **automated frontmatter generation with Phase 7 schema support**. It explains the APIs, configuration options, integration patterns, performance characteristics, error handling, and best practices for composing these tools effectively.
 
 ## Project Structure
-The utility tools are implemented as modular TypeScript modules under the `src/tools` directory. Each tool exposes one or more functions wrapped with the `@opencode-ai/plugin` tool decorator, enabling standardized invocation and argument validation. Supporting libraries under `src/tools/lib` provide specialized functionality for hierarchical parsing, indexing, and bash-based operations.
+The utility tools are implemented as modular TypeScript modules under the `src/tools` directory, with the new frontmatter system integrated into the plugin architecture. Each tool exposes one or more functions wrapped with the `@opencode-ai/plugin` tool decorator, enabling standardized invocation and argument validation. Supporting libraries under `src/tools/lib` provide specialized functionality for hierarchical parsing, indexing, and bash-based operations, while the frontmatter system operates as part of the core plugin infrastructure with enhanced Phase 7 schema support.
 
 ```mermaid
 graph TB
@@ -57,12 +68,18 @@ M["hierarchy-parsers.ts"]
 N["index-manager.ts"]
 O["bash-executors.ts"]
 end
+subgraph "Frontmatter System"
+P["frontmatter.ts"]
+Q["idumb-core.ts"]
+R["frontmatter-phase7.test.ts"]
+end
 A --> M
 A --> N
 A --> O
 H --> D
 H --> K
 H --> L
+Q --> P
 ```
 
 **Diagram sources**
@@ -71,6 +88,8 @@ H --> L
 - [hierarchy-parsers.ts](file://src/tools/lib/hierarchy-parsers.ts#L1-L567)
 - [index-manager.ts](file://src/tools/lib/index-manager.ts#L1-L373)
 - [bash-executors.ts](file://src/tools/lib/bash-executors.ts#L1-L429)
+- [frontmatter.ts](file://src/plugins/lib/frontmatter.ts#L1-L360)
+- [idumb-core.ts](file://src/plugins/idumb-core.ts#L1-L1215)
 
 **Section sources**
 - [idumb-chunker.ts](file://src/tools/idumb-chunker.ts#L1-L930)
@@ -85,6 +104,8 @@ H --> L
 - [idumb-state.ts](file://src/tools/idumb-state.ts#L1-L599)
 - [idumb-security.ts](file://src/tools/idumb-security.ts#L1-L359)
 - [idumb-performance.ts](file://src/tools/idumb-performance.ts#L1-L533)
+- [frontmatter.ts](file://src/plugins/lib/frontmatter.ts#L1-L360)
+- [idumb-core.ts](file://src/plugins/idumb-core.ts#L1-L1215)
 - [hierarchy-parsers.ts](file://src/tools/lib/hierarchy-parsers.ts#L1-L567)
 - [index-manager.ts](file://src/tools/lib/index-manager.ts#L1-L373)
 - [bash-executors.ts](file://src/tools/lib/bash-executors.ts#L1-L429)
@@ -102,6 +123,7 @@ H --> L
 - State Management: idumb-state reads/writes governance state, anchors, history, and session records.
 - Security Validation: idumb-security scans bash scripts for injection, traversal, permission bypass, and race conditions.
 - Performance Validation: idumb-performance evaluates scanning efficiency, memory safety, iteration limits, and resource usage.
+- **Enhanced Frontmatter Auto-Generation**: Automatic YAML frontmatter injection for .idumb/ directory documents with intelligent type detection, UUID v7 generation, title extraction, non-destructive updates, **Phase 7 relationship tracking fields**, and automatic schema versioning.
 
 **Section sources**
 - [idumb-chunker.ts](file://src/tools/idumb-chunker.ts#L123-L930)
@@ -116,9 +138,10 @@ H --> L
 - [idumb-state.ts](file://src/tools/idumb-state.ts#L82-L599)
 - [idumb-security.ts](file://src/tools/idumb-security.ts#L247-L359)
 - [idumb-performance.ts](file://src/tools/idumb-performance.ts#L380-L533)
+- [frontmatter.ts](file://src/plugins/lib/frontmatter.ts#L1-L360)
 
 ## Architecture Overview
-The tools integrate through a unified plugin framework. The orchestrator coordinates validation across specialized tools, while libraries provide reusable functionality for hierarchical parsing, indexing, and bash-based operations.
+The tools integrate through a unified plugin framework. The orchestrator coordinates validation across specialized tools, while libraries provide reusable functionality for hierarchical parsing, indexing, and bash-based operations. The new frontmatter system operates as part of the core plugin infrastructure, intercepting file write operations to automatically inject YAML frontmatter into .idumb/ directory documents with **Phase 7 enhanced relationship tracking** and automatic schema versioning.
 
 ```mermaid
 sequenceDiagram
@@ -127,6 +150,8 @@ participant Orchestrator as "idumb-orchestrator.ts"
 participant Quality as "idumb-quality.ts"
 participant Security as "idumb-security.ts"
 participant Perf as "idumb-performance.ts"
+participant Frontmatter as "frontmatter.ts"
+participant Core as "idumb-core.ts"
 Caller->>Orchestrator : orchestrate(operation_type, target_path, risk_level)
 Orchestrator->>Orchestrator : assessRisk()
 Orchestrator->>Orchestrator : determineSkills()
@@ -142,6 +167,11 @@ Orchestrator->>Perf : validate(target_path)
 Perf-->>Orchestrator : issues
 end
 Orchestrator-->>Caller : aggregated result
+Note over Core,Frontmatter : Tool interception for file operations
+Core->>Frontmatter : shouldAutoFrontmatter(filePath)
+Frontmatter-->>Core : boolean
+Core->>Frontmatter : injectFrontmatter(filePath, content, agentRole, sessionId)
+Frontmatter-->>Core : enhancedContent with Phase 7 fields
 ```
 
 **Diagram sources**
@@ -149,6 +179,8 @@ Orchestrator-->>Caller : aggregated result
 - [idumb-security.ts](file://src/tools/idumb-security.ts#L247-L359)
 - [idumb-quality.ts](file://src/tools/idumb-quality.ts#L419-L524)
 - [idumb-performance.ts](file://src/tools/idumb-performance.ts#L380-L533)
+- [frontmatter.ts](file://src/plugins/lib/frontmatter.ts#L80-L322)
+- [idumb-core.ts](file://src/plugins/idumb-core.ts#L943-L972)
 
 ## Detailed Component Analysis
 
@@ -449,8 +481,133 @@ Query --> End(["End"])
 **Section sources**
 - [idumb-performance.ts](file://src/tools/idumb-performance.ts#L380-L533)
 
+### Enhanced Frontmatter Auto-Generation System
+**Updated** Enhanced with Phase 7 schema support and comprehensive relationship tracking fields.
+
+Added new automated frontmatter generation system that automatically injects YAML frontmatter into markdown files in .idumb/ directories with **Phase 7 enhanced relationship tracking** and automatic schema versioning.
+
+- Purpose: Automatically inject YAML frontmatter into markdown documents in .idumb/ locations with intelligent type detection, UUID v7 generation, title extraction, non-destructive updates, **relationship tracking fields**, and automatic schema versioning.
+- Key APIs:
+  - shouldAutoFrontmatter: Determines if a file path should receive automatic frontmatter injection.
+  - detectDocumentType: Detects document type from file path with hierarchical pattern matching.
+  - generateIdumbFrontmatter: Generates complete iDumb frontmatter with UUID v7, timestamps, metadata, and **Phase 7 relationship tracking fields**.
+  - extractTitle: Extracts title from document content (first # heading).
+  - extractTitleFromPath: Generates title from file path when content has no heading.
+  - injectFrontmatter: Injects iDumb frontmatter into document content with preservation of existing non-iDumb frontmatter and **Phase 7 field preservation**.
+  - validateIdumbFrontmatter: Validates iDumb frontmatter structure, UUID v7 format, and **Phase 7 relationship tracking fields**.
+- Configuration and Behavior:
+  - Managed paths include .idumb/project-output/, .idumb/sessions/, .idumb/brain/governance/, .idumb/brain/context/, .idumb/brain/drift/.
+  - Intelligent type detection from file path patterns (phases, tasks, research, decisions, validations, sessions, checkpoints).
+  - UUID v7 generation for time-ordered, sortable identifiers.
+  - Title extraction from content headings or filename fallback.
+  - Non-destructive updates that preserve existing non-iDumb frontmatter.
+  - **Phase 7: Automatic schema versioning (e.g., "phase-v1", "decision-v1") based on document type**.
+  - **Phase 7: Enhanced relationship tracking with child_ids, references, requirement_ids, validation_ids preservation**.
+  - **Phase 7: Custom metadata extension point with deep merge strategy**.
+- Integration Patterns:
+  - Integrated into tool.execute.before hook for file write operations.
+  - Operates only on .idumb/ directory paths and .md files.
+  - Graceful error handling that doesn't break tool execution.
+  - **Phase 7: Backward compatibility with existing frontmatter structures**.
+- Examples:
+  - Location detection: shouldAutoFrontmatter('.idumb/project-output/plan.md')
+  - Type detection: detectDocumentType('.idumb/project-output/phases/P1-plan.md')
+  - Frontmatter generation: generateIdumbFrontmatter('.idumb/test.md', '# Test', 'idumb-builder', 'ses-123')
+  - Frontmatter injection: injectFrontmatter('.idumb/test.md', '# Test Document', 'idumb-builder', 'ses-456')
+  - Validation: validateIdumbFrontmatter({ id: '018b3f7a-7f8c-7234-8abc-123456789012', title: 'Test', type: 'phase', created: '2026-02-05T10:30:00.000Z' })
+  - **Phase 7: Schema type detection: generateIdumbFrontmatter('.idumb/phases/test.md', '# Phase', 'agent').schema_type // "phase-v1"**
+  - **Phase 7: Relationship field preservation: injectFrontmatter(existingDocWithChildIds, content, 'agent') preserves child_ids array**
+- Performance Characteristics:
+  - Minimal overhead during tool execution.
+  - Graceful degradation if frontmatter processing fails.
+  - Efficient path checking and type detection algorithms.
+  - **Phase 7: Automatic schema versioning adds negligible overhead**.
+- Error Handling:
+  - Silently handles errors without breaking tool execution.
+  - Validates UUID v7 format and rejects invalid formats.
+  - Preserves original content if frontmatter injection fails.
+  - **Phase 7: Backward compatibility validation for existing frontmatter structures**.
+- Best Practices:
+  - Use in conjunction with .idumb/ directory structure for consistent metadata.
+  - Leverage intelligent type detection for automatic categorization.
+  - Combine with session tracking for parent-child document relationships.
+  - **Phase 7: Utilize relationship tracking fields for document lineage and dependency management**.
+  - **Phase 7: Use custom metadata extension point for project-specific fields**.
+
+**Section sources**
+- [frontmatter.ts](file://src/plugins/lib/frontmatter.ts#L1-L360)
+- [idumb-core.ts](file://src/plugins/idumb-core.ts#L943-L972)
+
+### Phase 7 Enhanced Relationship Tracking Fields
+**New** Comprehensive documentation for the new relationship tracking fields introduced in Phase 7.
+
+The enhanced frontmatter system now includes comprehensive relationship tracking capabilities for improved document management and traceability.
+
+- **child_ids**: Array of child document IDs for reverse lookup cache and auto-maintenance. Enables hierarchical navigation and parent-child relationship tracking.
+- **references**: Array of loosely referenced document IDs that are not direct dependencies but are conceptually related.
+- **schema_type**: Auto-detected schema type for validation (e.g., "phase-v1", "decision-v1", "base-v1"). Provides version-specific validation rules.
+- **decision_reason**: Rationale for why a decision document exists, particularly important for ADR (Architectural Decision Records) and decision-making documentation.
+- **failure_analysis**: Post-mortem analysis of what went wrong, used for learning from failures and improving future decision-making processes.
+- **requirement_ids**: Linked requirement or milestone IDs that connect documents to specific requirements or project milestones.
+- **validation_ids**: Associated validation report IDs that link documents to their validation outcomes and quality assurance reports.
+- **custom**: Extension point for user-defined metadata allowing arbitrary custom fields while maintaining schema validation compatibility.
+
+**Configuration and Behavior**:
+- **Automatic schema versioning**: Schema types are auto-detected based on document type (phase-v1, task-v1, research-v1, decision-v1, base-v1).
+- **Field preservation**: During updates, existing relationship tracking fields are preserved while new fields are added.
+- **Deep merge strategy**: Custom fields support deep merging to prevent data loss during updates.
+- **Backward compatibility**: Existing frontmatter structures without Phase 7 fields remain fully compatible.
+
+**Integration Patterns**:
+- Seamlessly integrated into the frontmatter injection pipeline.
+- Compatible with existing document management workflows.
+- Supports both creation and update scenarios with appropriate field handling.
+
+**Examples**:
+- Child relationship tracking: `child_ids: ['child-1', 'child-2']` enables parent-child navigation.
+- Requirement linking: `requirement_ids: ['REQ-001', 'REQ-002'] connects documents to requirements.
+- Custom metadata: `custom: { project: 'iDumb', version: '0.2.0' }` extends metadata without schema conflicts.
+
+**Section sources**
+- [frontmatter.ts](file://src/plugins/lib/frontmatter.ts#L72-L101)
+- [frontmatter-phase7.test.ts](file://src/plugins/lib/__tests__/frontmatter-phase7.test.ts#L19-L191)
+
+### Frontmatter Injection Integration
+**Updated** Enhanced integration details for the Phase 7 frontmatter system within the core plugin architecture.
+
+The frontmatter system is now seamlessly integrated into the core plugin infrastructure with **Phase 7 enhanced relationship tracking** and automatic schema versioning.
+
+- Integration Points:
+  - tool.execute.before hook intercepts file write operations.
+  - Path validation using shouldAutoFrontmatter() prevents processing non-.idumb/ files.
+  - Content enhancement using injectFrontmatter() with agent role and session ID.
+  - In-place args modification to replace content with enhanced version.
+  - **Phase 7: Automatic schema type detection and relationship field preservation**.
+- Configuration and Behavior:
+  - Only processes .md files within managed .idumb/ paths.
+  - Preserves existing non-iDumb frontmatter alongside new iDumb fields.
+  - Updates existing iDumb frontmatter while preserving type and created timestamps.
+  - Generates new UUID v7 IDs and updated timestamps on each injection.
+  - **Phase 7: Auto-detects schema_type based on document type during injection**.
+  - **Phase 7: Preserves relationship tracking fields (child_ids, references, etc.) during updates**.
+- Integration Patterns:
+  - Seamless integration with existing tool execution pipeline.
+  - Non-blocking operation that doesn't affect tool performance.
+  - Error isolation that prevents frontmatter failures from breaking tool execution.
+  - **Phase 7: Backward compatibility with existing frontmatter structures**.
+- Examples:
+  - Tool interception: Frontmatter auto-generation triggered on write operations.
+  - Content enhancement: Original content replaced with frontmatter-enhanced version.
+  - Error handling: Frontmatter processing failures logged but don't break tool execution.
+  - **Phase 7: Schema versioning: New documents automatically receive appropriate schema_type**.
+  - **Phase 7: Relationship preservation: Updates maintain existing child_ids and references**.
+
+**Section sources**
+- [idumb-core.ts](file://src/plugins/idumb-core.ts#L943-L972)
+- [frontmatter.ts](file://src/plugins/lib/frontmatter.ts#L255-L322)
+
 ## Dependency Analysis
-The tools share common libraries for hierarchical parsing, indexing, and bash operations. The orchestrator coordinates validation across multiple tools, while configuration and state management provide governance context.
+The tools share common libraries for hierarchical parsing, indexing, and bash operations. The orchestrator coordinates validation across multiple tools, while configuration and state management provide governance context. The new frontmatter system integrates with the core plugin infrastructure and depends on gray-matter for YAML parsing and uuid for UUID v7 generation. **Phase 7 enhancements add automatic schema versioning and relationship tracking without additional dependencies**.
 
 ```mermaid
 graph TB
@@ -463,6 +620,10 @@ Chunks --> BE["bash-executors.ts"]
 Config["idumb-config.ts"] --> State["idumb-state.ts"]
 Validate["idumb-validate.ts"] --> Config
 Validate --> State
+Core["idumb-core.ts"] --> Frontmatter["frontmatter.ts"]
+Frontmatter --> GrayMatter["gray-matter"]
+Frontmatter --> UUID["uuid (v7)"]
+Frontmatter --> Zod["zod (for validation)"]
 ```
 
 **Diagram sources**
@@ -474,12 +635,16 @@ Validate --> State
 - [idumb-config.ts](file://src/tools/idumb-config.ts#L1-L1024)
 - [idumb-state.ts](file://src/tools/idumb-state.ts#L1-L599)
 - [idumb-validate.ts](file://src/tools/idumb-validate.ts#L1-L1043)
+- [idumb-core.ts](file://src/plugins/idumb-core.ts#L1-L1215)
+- [frontmatter.ts](file://src/plugins/lib/frontmatter.ts#L1-L360)
 
 **Section sources**
 - [idumb-orchestrator.ts](file://src/tools/idumb-orchestrator.ts#L1-L527)
 - [idumb-chunker.ts](file://src/tools/idumb-chunker.ts#L1-L930)
 - [idumb-config.ts](file://src/tools/idumb-config.ts#L1-L1024)
 - [idumb-validate.ts](file://src/tools/idumb-validate.ts#L1-L1043)
+- [idumb-core.ts](file://src/plugins/idumb-core.ts#L1-L1215)
+- [frontmatter.ts](file://src/plugins/lib/frontmatter.ts#L1-L360)
 
 ## Performance Considerations
 - Chunking and Sharding: Use idumb-chunker with appropriate chunk sizes to avoid context overflow and enable parallel processing via sharding.
@@ -487,6 +652,8 @@ Validate --> State
 - Indexing: Utilize idumb-chunker.index to cache hierarchical indexes and reduce repeated parsing costs.
 - Validation Scope: Use targeted checks (e.g., idumb-quality.checkErrors, idumb-performance.checkIterationLimits) to minimize overhead.
 - Resource Monitoring: Regularly monitor .idumb resource usage with idumb-performance.monitor and perform cleanup to maintain performance.
+- **Frontmatter Processing**: The frontmatter system has minimal overhead and gracefully handles errors without affecting tool performance. **Phase 7 enhancements add negligible overhead for schema versioning and relationship tracking**.
+- **Phase 7 Schema Versioning**: Automatic schema type detection adds minimal computational overhead during frontmatter injection.
 
 ## Troubleshooting Guide
 - Missing Files: Many tools return structured error messages when files are not found. Use idumb-validate.structure to confirm directory structure and idumb-validate.schema to verify state.json.
@@ -496,6 +663,9 @@ Validate --> State
 - Performance Bottlenecks: Use idumb-performance.validate to identify inefficient scanning, memory leaks, and iteration limits.
 - Style Issues: Use idumb-style.list and idumb-style.info to diagnose style-related problems and ensure consistent formatting.
 - Configuration Problems: Use idumb-config.ensure and idumb-config.sync to ensure configuration integrity and alignment with planning settings.
+- **Frontmatter Issues**: Use validateIdumbFrontmatter to check frontmatter structure and UUID v7 format validity. Check logs for frontmatter processing errors. **Phase 7: Validate schema_type field for automatic schema versioning**.
+- **Phase 7 Relationship Tracking**: Verify child_ids, references, requirement_ids, and validation_ids arrays are properly formatted. Check custom metadata serialization if using extension fields.
+- **Backward Compatibility**: Existing frontmatter structures without Phase 7 fields remain fully compatible. Use validation to ensure compatibility with new schema requirements.
 
 **Section sources**
 - [idumb-validate.ts](file://src/tools/idumb-validate.ts#L28-L456)
@@ -503,6 +673,8 @@ Validate --> State
 - [idumb-performance.ts](file://src/tools/idumb-performance.ts#L380-L533)
 - [idumb-style.ts](file://src/tools/idumb-style.ts#L23-L196)
 - [idumb-config.ts](file://src/tools/idumb-config.ts#L931-L1024)
+- [frontmatter.ts](file://src/plugins/lib/frontmatter.ts#L333-L360)
+- [frontmatter-phase7.test.ts](file://src/plugins/lib/__tests__/frontmatter-phase7.test.ts#L63-L113)
 
 ## Conclusion
-The iDumb Utility Tools provide a robust foundation for text processing, context management, manifest generation, quality assessment, style enforcement, and TODO management. By leveraging the orchestrator for coordinated validation, the hierarchical parsing and indexing libraries for efficient document handling, and the configuration/state management tools for governance, teams can maintain high standards while scaling operations effectively. Adhering to the best practices and troubleshooting guidelines outlined above will ensure reliable and performant tool usage across diverse project contexts.
+The iDumb Utility Tools provide a robust foundation for text processing, context management, manifest generation, quality assessment, style enforcement, TODO management, and **automated frontmatter generation with Phase 7 schema support**. By leveraging the orchestrator for coordinated validation, the hierarchical parsing and indexing libraries for efficient document handling, and the configuration/state management tools for governance, teams can maintain high standards while scaling operations effectively. The new frontmatter system enhances document metadata management with intelligent type detection, UUID v7 generation, non-destructive updates, **Phase 7 relationship tracking fields**, and automatic schema versioning. The enhanced relationship tracking capabilities enable sophisticated document lineage management, while the automatic schema versioning ensures compatibility across different document types. Adhering to the best practices and troubleshooting guidelines outlined above will ensure reliable and performant tool usage across diverse project contexts, with particular emphasis on leveraging the new Phase 7 features for improved document management and traceability.

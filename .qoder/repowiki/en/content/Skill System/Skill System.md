@@ -13,12 +13,21 @@
 - [idumb-project-validation/SKILL.md](file://src/skills/idumb-project-validation/SKILL.md)
 - [hierarchical-mindfulness/SKILL.md](file://src/skills/hierarchical-mindfulness/SKILL.md)
 - [idumb-meta-orchestrator/SKILL.md](file://src/skills/idumb-meta-orchestrator/SKILL.md)
+- [spec-driven-workflow/SKILL.md](file://src/skills/spec-driven-workflow/SKILL.md)
 - [index.ts](file://src/plugins/lib/index.ts)
 - [idumb-core.ts](file://src/plugins/idumb-core.ts)
 - [idumb-validate.ts](file://src/tools/idumb-validate.ts)
 - [idumb-state.ts](file://src/tools/idumb-state.ts)
 - [idumb-orchestrator.ts](file://src/tools/idumb-orchestrator.ts)
 </cite>
+
+## Update Summary
+**Changes Made**
+- Added comprehensive documentation for the new Spec-Driven Workflow System
+- Updated skill architecture to include the 10th complementary skill
+- Enhanced integration patterns to accommodate spec-driven development workflows
+- Added new workflow categories for API, full-stack, and specialized development roles
+- Updated validation and governance frameworks to support structured specification processes
 
 ## Table of Contents
 1. [Introduction](#introduction)
@@ -32,10 +41,10 @@
 9. [Conclusion](#conclusion)
 
 ## Introduction
-This document explains iDumb’s extensible validation and enhancement framework centered around its skill system. It covers the skill architecture, registration and invocation patterns, integration mechanisms, and the nine complementary skills that provide governance validation, meta-framework transformation, security enforcement, performance optimization, and stress testing. It also documents configuration, parameter passing, result processing, development guidelines, custom skill creation, and operational practices for debugging, monitoring, and maintenance.
+This document explains iDumb's extensible validation and enhancement framework centered around its skill system. The framework now includes 10 complementary skills that provide comprehensive coverage of compliance, logic, integration, security, performance, governance, and structured specification development. It covers the skill architecture, registration and invocation patterns, integration mechanisms, and the ten built-in skills that provide governance validation, meta-framework transformation, security enforcement, performance optimization, stress testing, and the new spec-driven workflow system. It also documents configuration, parameter passing, result processing, development guidelines, custom skill creation, and operational practices for debugging, monitoring, and maintenance.
 
 ## Project Structure
-The skill system is organized as a set of modular, purpose-built skills under src/skills, each with a dedicated SKILL.md that defines its philosophy, categories, workflows, and integration points. A meta-orchestrator skill coordinates activation based on context, operation type, and risk level. Supporting tools and plugins provide validation, state management, and OpenCode integration hooks.
+The skill system is organized as a set of modular, purpose-built skills under src/skills, each with a dedicated SKILL.md that defines its philosophy, categories, workflows, and integration points. A meta-orchestrator skill coordinates activation based on context, operation type, and risk level. The new spec-driven workflow system provides comprehensive framework templates for API development, full-stack projects, and specialized web development roles. Supporting tools and plugins provide validation, state management, and OpenCode integration hooks.
 
 ```mermaid
 graph TB
@@ -50,6 +59,7 @@ G["idumb-code-quality"]
 H["idumb-project-validation"]
 I["hierarchical-mindfulness"]
 J["idumb-meta-orchestrator"]
+K["spec-driven-workflow"]
 end
 subgraph "Tools"
 T1["idumb-validate.ts"]
@@ -69,6 +79,7 @@ J --> F
 J --> G
 J --> H
 J --> I
+J --> K
 A --> T2
 B --> T1
 C --> T1
@@ -78,6 +89,8 @@ F --> T1
 G --> T1
 H --> T1
 I --> T2
+K --> T1
+K --> T2
 P1 --> P2
 P1 --> T2
 P1 --> T1
@@ -94,6 +107,7 @@ P1 --> T1
 - [idumb-code-quality/SKILL.md](file://src/skills/idumb-code-quality/SKILL.md#L375-L414)
 - [idumb-project-validation/SKILL.md](file://src/skills/idumb-project-validation/SKILL.md#L562-L612)
 - [hierarchical-mindfulness/SKILL.md](file://src/skills/hierarchical-mindfulness/SKILL.md#L96-L144)
+- [spec-driven-workflow/SKILL.md](file://src/skills/spec-driven-workflow/SKILL.md#L1-L534)
 - [idumb-validate.ts](file://src/tools/idumb-validate.ts#L1-L105)
 - [idumb-state.ts](file://src/tools/idumb-state.ts#L61-L78)
 - [idumb-orchestrator.ts](file://src/tools/idumb-orchestrator.ts#L257-L343)
@@ -117,6 +131,7 @@ P1 --> T1
   - idumb-project-validation: Greenfield/brownfield project validation and continuous governance.
   - hierarchical-mindfulness: Session state awareness, delegation depth, and chain enforcement.
   - idumb-meta-orchestrator: Automatic activation of validation skills based on context and risk.
+  - **spec-driven-workflow**: Comprehensive spec-driven development workflow with sector-specific templates and validation rules.
 - Tools and plugin:
   - idumb-validate.ts: Validation runner with structure, schema, freshness, planning alignment, and integration points.
   - idumb-state.ts: State read/write, anchors, history, and session management.
@@ -133,21 +148,25 @@ P1 --> T1
 - [index.ts](file://src/plugins/lib/index.ts#L1-L131)
 
 ## Architecture Overview
-The meta-orchestrator coordinates skill activation based on operation type, risk level, and file type. It selects appropriate validation skills and runs them in parallel where feasible, aggregating results and making decisions based on blockers, warnings, and pass/fail outcomes. The plugin layer integrates with OpenCode to inject governance context, enforce permissions, track execution metrics, and manage compaction.
+The meta-orchestrator coordinates skill activation based on operation type, risk level, and file type. It selects appropriate validation skills and runs them in parallel where feasible, aggregating results and making decisions based on blockers, warnings, and pass/fail outcomes. The plugin layer integrates with OpenCode to inject governance context, enforce permissions, track execution metrics, and manage compaction. The new spec-driven workflow system provides structured development processes with sector-specific guidance and validation rules.
 
 ```mermaid
 sequenceDiagram
 participant User as "User"
 participant Orchestrator as "idumb-meta-orchestrator"
 participant Skills as "Validation Skills"
+participant SpecWorkflow as "Spec-Driven Workflow"
 participant Plugin as "idumb-core Plugin"
 participant Tools as "idumb-validate / idumb-state"
 User->>Orchestrator : "Trigger validation (operation/risk/context)"
 Orchestrator->>Orchestrator : "Assess risk and select skills"
 Orchestrator->>Skills : "Activate security/quality/performance"
+Orchestrator->>SpecWorkflow : "Activate spec-driven workflow"
+SpecWorkflow->>Tools : "Run spec validation and research"
 Skills->>Tools : "Run checks (structure/schema/freshness/etc.)"
 Tools-->>Skills : "Validation results"
-Skills-->>Orchestrator : "Aggregated results"
+Tools-->>SpecWorkflow : "Spec artifacts and validation"
+SpecWorkflow-->>Orchestrator : "Aggregated spec results"
 Orchestrator->>Plugin : "Decision (block/warn/proceed)"
 Plugin-->>User : "Feedback and governance injection"
 ```
@@ -157,6 +176,7 @@ Plugin-->>User : "Feedback and governance injection"
 - [idumb-orchestrator.ts](file://src/tools/idumb-orchestrator.ts#L257-L343)
 - [idumb-validate.ts](file://src/tools/idumb-validate.ts#L402-L456)
 - [idumb-core.ts](file://src/plugins/idumb-core.ts#L651-L741)
+- [spec-driven-workflow/SKILL.md](file://src/skills/spec-driven-workflow/SKILL.md#L482-L534)
 
 ## Detailed Component Analysis
 
@@ -299,8 +319,29 @@ Plugin-->>User : "Feedback and governance injection"
 - [hierarchical-mindfulness/SKILL.md](file://src/skills/hierarchical-mindfulness/SKILL.md#L147-L227)
 - [hierarchical-mindfulness/SKILL.md](file://src/skills/hierarchical-mindfulness/SKILL.md#L230-L287)
 
+### Spec-Driven Workflow System (spec-driven-workflow)
+- **New Addition**: Comprehensive spec-driven development workflow that enforces quality through mandatory research, validated specifications, and systematic execution.
+- **Sector Adaptation**: Adapts to any project sector (web, mobile, API, CLI, AI/ML, etc.) and complexity tier (simple to enterprise).
+- **Core Principles**: Nothing ships without spec, research before commitment, multi-source validation, sector-aware templates, complexity-scaled governance.
+- **Research Requirements**: Minimum 1-3 research tools depending on complexity tier.
+- **Stage Framework**: 7-stage process with 56 sub-stages covering discovery, ideation, research, specification, planning, execution, and verification.
+- **Template System**: Universal templates plus sector-specific and complexity-scaled variants.
+- **Validation Rules**: Comprehensive validation criteria for all document types and stage gates.
+
+**Updated** Added comprehensive documentation for the new spec-driven workflow system
+
+**Section sources**
+- [spec-driven-workflow/SKILL.md](file://src/skills/spec-driven-workflow/SKILL.md#L1-L534)
+- [spec-driven-workflow/SKILL.md](file://src/skills/spec-driven-workflow/SKILL.md#L19-L26)
+- [spec-driven-workflow/SKILL.md](file://src/skills/spec-driven-workflow/SKILL.md#L27-L49)
+- [spec-driven-workflow/SKILL.md](file://src/skills/spec-driven-workflow/SKILL.md#L80-L156)
+- [spec-driven-workflow/SKILL.md](file://src/skills/spec-driven-workflow/SKILL.md#L158-L217)
+- [spec-driven-workflow/SKILL.md](file://src/skills/spec-driven-workflow/SKILL.md#L302-L392)
+- [spec-driven-workflow/SKILL.md](file://src/skills/spec-driven-workflow/SKILL.md#L394-L480)
+- [spec-driven-workflow/SKILL.md](file://src/skills/spec-driven-workflow/SKILL.md#L482-L534)
+
 ### Meta-Orchestrator (idumb-meta-orchestrator)
-- Skill registry: Coordinates idumb-security, idumb-code-quality, idumb-performance, idumb-validation, idumb-governance, hierarchical-mindfulness, idumb-project-validation, idumb-stress-test, idumb-meta-builder.
+- Skill registry: Coordinates idumb-security, idumb-code-quality, idumb-performance, idumb-validation, idumb-governance, hierarchical-mindfulness, idumb-project-validation, idumb-stress-test, idumb-meta-builder, **spec-driven-workflow**.
 - Activation matrix: By operation type, risk level, and file type.
 - Orchestration workflows: Pre-write, pre-delegate, phase-transition, continuous monitoring.
 - Activation rules: Critical security first, code quality on creation, performance on batch operations, validation at boundaries, governance on delegation.
@@ -344,9 +385,10 @@ Plugin-->>User : "Feedback and governance injection"
 - [index.ts](file://src/plugins/lib/index.ts#L1-L131)
 
 ## Dependency Analysis
-The skill system exhibits low coupling and high cohesion:
+The skill system exhibits low coupling and high cohesion with the addition of the new spec-driven workflow system:
 - Each skill encapsulates a distinct domain with minimal overlap.
 - The orchestrator decouples activation logic from skill implementations.
+- The spec-driven workflow system integrates seamlessly with existing validation and governance skills.
 - Tools and plugin modules provide shared utilities for validation, state, and OpenCode integration.
 
 ```mermaid
@@ -361,6 +403,7 @@ Skills --> Governance["idumb-governance"]
 Skills --> ProjectVal["idumb-project-validation"]
 Skills --> Mindfulness["hierarchical-mindfulness"]
 Skills --> MetaBuilder["idumb-meta-builder"]
+Skills --> SpecWorkflow["spec-driven-workflow"]
 Validation --> Tools["idumb-validate.ts"]
 Stress --> Tools
 Security --> Tools
@@ -370,6 +413,8 @@ Governance --> State["idumb-state.ts"]
 ProjectVal --> Tools
 Mindfulness --> State
 MetaBuilder --> Tools
+SpecWorkflow --> Tools
+SpecWorkflow --> State
 Plugin["idumb-core.ts"] --> Lib["lib/index.ts"]
 Plugin --> State
 Plugin --> Tools
@@ -381,6 +426,7 @@ Plugin --> Tools
 - [idumb-state.ts](file://src/tools/idumb-state.ts#L61-L78)
 - [idumb-core.ts](file://src/plugins/idumb-core.ts#L130-L189)
 - [index.ts](file://src/plugins/lib/index.ts#L1-L131)
+- [spec-driven-workflow/SKILL.md](file://src/skills/spec-driven-workflow/SKILL.md#L482-L534)
 
 **Section sources**
 - [SKILL-ARCHITECTURE.md](file://src/skills/SKILL-ARCHITECTURE.md#L45-L96)
@@ -392,6 +438,7 @@ Plugin --> Tools
 - Iteration limits: Performance skill enforces iteration limits to prevent infinite loops.
 - Resource monitoring: Periodic checks for disk usage, open file handles, and memory consumption.
 - Cleanup policies: Automated removal of old validation records and anchors to prevent accumulation.
+- **Spec workflow optimization**: The new spec-driven workflow system includes built-in optimization for research tool usage and validation gating to prevent redundant checks.
 
 **Section sources**
 - [idumb-meta-orchestrator/SKILL.md](file://src/skills/idumb-meta-orchestrator/SKILL.md#L225-L250)
@@ -399,6 +446,7 @@ Plugin --> Tools
 - [idumb-performance/SKILL.md](file://src/skills/idumb-performance/SKILL.md#L177-L252)
 - [idumb-performance/SKILL.md](file://src/skills/idumb-performance/SKILL.md#L308-L357)
 - [idumb-performance/SKILL.md](file://src/skills/idumb-performance/SKILL.md#L416-L425)
+- [spec-driven-workflow/SKILL.md](file://src/skills/spec-driven-workflow/SKILL.md#L27-L49)
 
 ## Troubleshooting Guide
 Common issues and remedies:
@@ -416,6 +464,11 @@ Common issues and remedies:
 - Self-healing:
   - Utilize stress-test self-healing protocol for auto-fixable issues.
   - Escalate unresolved gaps with stall detection and escalation protocol.
+- **Spec workflow issues**:
+  - Use spec-driven workflow validation rules to identify spec blockers.
+  - Check research tool inventory and minimum requirements.
+  - Verify sector and complexity detection accuracy.
+  - Review stage gate requirements and clarity scoring.
 
 **Section sources**
 - [idumb-validate.ts](file://src/tools/idumb-validate.ts#L401-L456)
@@ -424,6 +477,9 @@ Common issues and remedies:
 - [idumb-performance/SKILL.md](file://src/skills/idumb-performance/SKILL.md#L308-L357)
 - [idumb-stress-test/SKILL.md](file://src/skills/idumb-stress-test/SKILL.md#L520-L570)
 - [idumb-stress-test/SKILL.md](file://src/skills/idumb-stress-test/SKILL.md#L564-L607)
+- [spec-driven-workflow/SKILL.md](file://src/skills/spec-driven-workflow/SKILL.md#L27-L49)
+- [spec-driven-workflow/SKILL.md](file://src/skills/spec-driven-workflow/SKILL.md#L400-L425)
+- [spec-driven-workflow/SKILL.md](file://src/skills/spec-driven-workflow/SKILL.md#L472-L505)
 
 ## Conclusion
-iDumb’s skill system provides a robust, extensible framework for governance, security, performance, validation, and stress testing. Its meta-orchestrator coordinates activation intelligently, while modular skills maintain focused responsibilities. The integration with OpenCode via plugins ensures seamless governance injection, permission enforcement, and session lifecycle management. Developers can extend the system by adding new skills aligned with the non-overlapping design principles and leveraging the provided tools and plugin hooks.
+iDumb's skill system provides a robust, extensible framework for governance, security, performance, validation, stress testing, and structured specification development. The addition of the spec-driven workflow system significantly enhances the framework's ability to handle complex development projects across multiple sectors and complexity levels. The system now includes 10 complementary skills that provide comprehensive coverage of compliance, logic, integration, security, performance, governance, and structured specification processes. Its meta-orchestrator coordinates activation intelligently, while modular skills maintain focused responsibilities. The integration with OpenCode via plugins ensures seamless governance injection, permission enforcement, and session lifecycle management. The new spec-driven workflow system provides structured development processes with sector-specific guidance, validation rules, and quality gates. Developers can extend the system by adding new skills aligned with the non-overlapping design principles and leveraging the provided tools and plugin hooks.
